@@ -1,12 +1,15 @@
 module.exports = {
   filenameHashing: false,
+
   chainWebpack: (config) => {
     config.optimization.delete("splitChunks");
   },
+
   configureWebpack: (config) => {
     config.output.filename = "[name].js";
     config.devtool = "cheap-module-source-map";
   },
+
   pages: {
     popup: {
       entry: "src/popup/main.ts",
@@ -34,6 +37,12 @@ module.exports = {
       template: "public/newtab.html",
       filename: "newtab.html",
       title: "Bookmark Dashboard",
+    },
+  },
+
+  pluginOptions: {
+    vuetify: {
+      // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
     },
   },
 };
