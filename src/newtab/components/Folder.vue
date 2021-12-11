@@ -1,32 +1,20 @@
 <template>
-  <div v-for="(file, i) in Item" v-bind:key="i">
-    <div v-if="file.type == 'folder'" @click="open(file.id)">
-      {{ file.title }}
-      <modal
-        :ref="`modal-${file.id}`"
-        name="file.title"
-        draggable="true"
-        :adaptive="true"
-      ></modal>
-    </div>
-    <div v-else>
-      {{ file.title }}
+  <div class="flex-container">
+    <div v-for="child in Item" :key="child.id">
+      <v-card class="card" outlined tile @click="open(child.id, child.url)">{{
+        child.title
+      }}</v-card>
     </div>
   </div>
-
-  <!-- <Folder :Item=""></Folder> -->
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Item } from "../../shared/types/store";
-import modal from "vue-js-modal";
+
 export default defineComponent({
   setup() {
     return {};
-  },
-  components: {
-    modal,
   },
   props: {
     Item: {
@@ -35,12 +23,24 @@ export default defineComponent({
     },
   },
   methods: {
-    open(id: string) {
-      console.log(id);
-      console.log(this.$refs[`modal-${id}`]);
+    open(id: string, url: string) {
+      console.log(`${id}자식을 클릭했어요!`);
+      window.open(url, "_blank")?.focus();
     },
   },
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px 40px;
+  gap: 16px;
+}
+
+.card {
+  width: 100px;
+  height: 120px;
+}
+</style>

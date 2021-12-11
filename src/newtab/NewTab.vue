@@ -1,34 +1,27 @@
 <template lang="">
   <div>new tab에서 보여지는 페이지 입니다.</div>
-  <Folder :Item="Items"></Folder>
+  <Folder :Item="bookmarks"></Folder>
 </template>
 <script>
 import { defineComponent } from "vue";
 import Folder from "./components/Folder.vue";
-
-const dummyFiles = [
-  { id: 1, title: "Naver", url: "https://www.naver.com", type: "file" },
-  { id: 2, title: "Google", url: "https://www.google.com", type: "file" },
-  {
-    id: 3,
-    title: "dir1",
-    type: "folder",
-    children: {
-      id: 4,
-      title: "file1",
-      url: "https://google.com",
-      type: "file",
-    },
-  },
-];
+import { mockData } from "./constant";
 
 export default defineComponent({
   name: "Popup",
   components: { Folder },
   data() {
     return {
-      Items: dummyFiles,
+      bookmarks: [],
     };
+  },
+  async mounted() {
+    this.bookmarks = chrome
+      ? await chrome.bookmarks.getTree().then(async (tree) => {
+          const [main, _] = tree[0].children;
+          return await chrome.bookmarks.getChildren(main.id);
+        })
+      : mockData;
   },
 });
 </script>
