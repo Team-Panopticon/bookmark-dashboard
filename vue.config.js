@@ -5,6 +5,7 @@ module.exports = {
   },
   configureWebpack: (config) => {
     config.output.filename = "[name].js";
+    config.devtool = "cheap-module-source-map";
   },
   pages: {
     popup: {

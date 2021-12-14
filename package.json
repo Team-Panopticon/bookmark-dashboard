@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build && cp ./src/manifest.json ./dist && rm -rf ./dist/index.*",
+    "build": "vue-cli-service build && rm -rf ./dist/index.*",
+    "dev": "vue-cli-service build --watch",
     "config": "cp ./src/manifest.json",
     "lint": "vue-cli-service lint"
   },
