@@ -5,7 +5,6 @@
 <script>
 import { defineComponent } from "vue";
 import Folder from "./components/Folder.vue";
-import { mockData } from "./constant";
 
 export default defineComponent({
   name: "Popup",
@@ -16,12 +15,10 @@ export default defineComponent({
     };
   },
   async mounted() {
-    this.bookmarks = chrome
-      ? await chrome.bookmarks.getTree().then(async (tree) => {
-          const [main, _] = tree[0].children;
-          return await chrome.bookmarks.getChildren(main.id);
-        })
-      : mockData;
+    this.bookmarks = await chrome.bookmarks.getTree().then(async (tree) => {
+      const [main, _] = tree[0].children;
+      return await chrome.bookmarks.getChildren(main.id);
+    });
   },
 });
 </script>
