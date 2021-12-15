@@ -1,4 +1,5 @@
 import { createApp } from "vue";
 import NewTab from "./NewTab.vue";
+import vuetify from "@/plugins/vuetify";
 
-createApp(NewTab).mount("#newtab");
+createApp(NewTab).use(vuetify).mount("#newtab");
