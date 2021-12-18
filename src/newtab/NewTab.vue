@@ -1,5 +1,4 @@
 <template lang="">
-  <div>new tab에서 보여지는 페이지 입니다.</div>
   <Folder :item="bookmarks"></Folder>
 </template>
 <script>
