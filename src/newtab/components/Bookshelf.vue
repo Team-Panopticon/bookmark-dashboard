@@ -32,54 +32,6 @@
       </v-btn>
     </div>
   </div>
-  <vue-final-modal
-    v-model="showModal"
-    classes="modal-container"
-    content-class="modal-content"
-    overlay-class="modal-overlay"
-    :drag="true"
-    :resize="true"
-    :max-height="700"
-    :max-width="700"
-    :hide-overlay="true"
-    :click-to-close="false"
-    :esc-to-close="true"
-    :prevent-click="true"
-  >
-    <v-sheet class="modal-inner" outlined title elevation="7">
-      <div v-for="(file, i) in children" v-bind:key="i">
-        <v-btn
-          class="btn"
-          tile
-          elevation="0"
-          @dblclick="openFolder(file.children)"
-          v-if="file.children"
-        >
-          <div class="item-container">
-            <v-icon x-large class="item-icon">mdi-folder</v-icon>
-            <p class="item-title">
-              {{ file.title }}
-            </p>
-          </div>
-        </v-btn>
-
-        <v-btn
-          v-else
-          class="btn"
-          tile
-          elevation="0"
-          @dblclick="openUrl(file.id, file.url)"
-        >
-          <div class="item-container">
-            <v-icon x-large class="item-icon">mdi-web</v-icon>
-            <p class="item-title">
-              {{ file.title }}
-            </p>
-          </div>
-        </v-btn>
-      </div>
-    </v-sheet>
-  </vue-final-modal>
 </template>
 
 <script lang="ts">
@@ -87,10 +39,6 @@ import { defineComponent, PropType } from "vue";
 import { Item, Items } from "../../shared/types/store";
 
 export default defineComponent({
-  data: () => ({
-    showModal: false,
-    children: [] as Items,
-  }),
   props: {
     item: {
       type: Object as PropType<Item>,
@@ -99,8 +47,7 @@ export default defineComponent({
   },
   methods: {
     openFolder(children: Items) {
-      this.children = children;
-      this.showModal = true;
+      this.$emit("openFolder", children);
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
@@ -110,21 +57,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-::v-deep .modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-::v-deep .modal-content {
-  position: relative;
-  width: 500px;
-  height: 500px;
-}
-
-.modal-inner {
-  border: 1px solid lightgray;
-}
-
 .flex-container {
   display: flex;
   flex-wrap: wrap;

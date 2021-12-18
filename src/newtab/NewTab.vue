@@ -1,13 +1,13 @@
 <template lang="">
-  <Folder :item="bookmarks"></Folder>
+  <Desktop :item="bookmarks"></Desktop>
 </template>
 <script>
 import { defineComponent } from "vue";
-import Folder from "./components/Folder.vue";
+import Desktop from "./pages/Desktop";
 
 export default defineComponent({
   name: "Popup",
-  components: { Folder },
+  components: { Desktop },
   data() {
     return {
       bookmarks: [],
