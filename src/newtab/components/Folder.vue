@@ -46,16 +46,39 @@
     :esc-to-close="true"
     :prevent-click="true"
   >
-    <div class="modal-inner" outlined title>
+    <v-sheet class="modal-inner" outlined title elevation="7">
       <div v-for="(file, i) in children" v-bind:key="i">
-        <div v-if="file.children" @dblclick="openFolder(file.children)">
-          {{ file.title + "folder" }}
-        </div>
-        <div v-else>
-          {{ file.title + "file" }}
-        </div>
+        <v-btn
+          class="btn"
+          tile
+          elevation="0"
+          @dblclick="openFolder(file.children)"
+          v-if="file.children"
+        >
+          <div class="item-container">
+            <v-icon x-large class="item-icon">mdi-folder</v-icon>
+            <p class="item-title">
+              {{ file.title }}
+            </p>
+          </div>
+        </v-btn>
+
+        <v-btn
+          v-else
+          class="btn"
+          tile
+          elevation="0"
+          @dblclick="openUrl(file.id, file.url)"
+        >
+          <div class="item-container">
+            <v-icon x-large class="item-icon">mdi-web</v-icon>
+            <p class="item-title">
+              {{ file.title }}
+            </p>
+          </div>
+        </v-btn>
       </div>
-    </div>
+    </v-sheet>
   </vue-final-modal>
 </template>
 
@@ -96,6 +119,10 @@ export default defineComponent({
   position: relative;
   width: 500px;
   height: 500px;
+}
+
+.modal-inner {
+  border: 1px solid lightgray;
 }
 
 .flex-container {
