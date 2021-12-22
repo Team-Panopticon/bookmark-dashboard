@@ -1,12 +1,5 @@
 <template>
-  <div v-for="(file, i) in item" v-bind:key="i">
-    <div v-if="file.children" @click="open(file.children)" class="red">
-      {{ file.title }}
-    </div>
-    <div v-else>
-      {{ file.title }}
-    </div>
-  </div>
+  <Bookshelf @openFolder="openFolder" :item="item"></Bookshelf>
   <vue-final-modal
     v-model="showModal"
     classes="modal-container"
@@ -21,24 +14,28 @@
     :esc-to-close="true"
     :prevent-click="true"
   >
-    <div class="modal-inner">
-      <div v-for="(file, i) in children" v-bind:key="i">
-        <div v-if="file.children" @click="open(file.children)" class="red">
-          {{ file.title + "folder" }}
-        </div>
-        <div v-else>
-          {{ file.title + "file" }}
-        </div>
-      </div>
-    </div>
+    <v-card class="modal-inner" outlined title elevation="7">
+      <v-card-header class="modal-banner">
+        <span class="modal__title">
+          <v-breadcrumbs :items="['folder1', 'folder2', 'folder3']">
+          </v-breadcrumbs>
+        </span>
+        <button class="modal__close" @click="showModal = false">
+          <v-icon>mdi-close</v-icon>
+        </button>
+      </v-card-header>
+      <Bookshelf @openFolder="openFolder" :item="children"> </Bookshelf>
+    </v-card>
   </vue-final-modal>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Item, Items } from "../../shared/types/store";
+import Bookshelf from "../components/Bookshelf.vue";
 
 export default defineComponent({
+  components: { Bookshelf },
   data: () => ({
     showModal: false,
     children: [] as Items,
@@ -50,10 +47,12 @@ export default defineComponent({
     },
   },
   methods: {
-    open(children: Items) {
-      console.log("clicked");
+    openFolder(children: Items) {
       this.children = children;
       this.showModal = true;
+    },
+    openUrl(id: string, url: string) {
+      window.open(url, "_blank")?.focus();
     },
   },
 });
@@ -67,11 +66,16 @@ export default defineComponent({
 }
 ::v-deep .modal-content {
   position: relative;
-  background-color: yellow;
   width: 500px;
   height: 500px;
 }
-.red {
-  color: red;
+
+.modal-inner {
+  border: 1px solid lightgray;
+}
+
+.modal-banner {
+  display: flex;
+  justify-content: space-between;
 }
 </style>
