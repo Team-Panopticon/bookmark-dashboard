@@ -15,10 +15,9 @@
     :prevent-click="true"
   >
     <v-card class="modal-inner" outlined title elevation="7">
-      <v-card-header class="modal-banner">
+      <v-card-header class="modal-banner bg-primary">
         <span class="modal__title">
-          <v-breadcrumbs :items="['folder1', 'folder2', 'folder3']">
-          </v-breadcrumbs>
+          <v-breadcrumbs :items="[folderTitle, '']"></v-breadcrumbs>
         </span>
         <button class="modal__close" @click="showModal = false">
           <v-icon>mdi-close</v-icon>
@@ -39,6 +38,7 @@ export default defineComponent({
   data: () => ({
     showModal: false,
     children: [] as Items,
+    folderTitle: "",
   }),
   props: {
     item: {
@@ -47,7 +47,8 @@ export default defineComponent({
     },
   },
   methods: {
-    openFolder(children: Items) {
+    openFolder(title: string, children: Items) {
+      this.folderTitle = title;
       this.children = children;
       this.showModal = true;
     },

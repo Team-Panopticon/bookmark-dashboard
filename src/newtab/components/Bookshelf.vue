@@ -5,7 +5,7 @@
         class="btn"
         tile
         elevation="0"
-        @dblclick="openFolder(file.children)"
+        @dblclick="openFolder(file.title, file.children)"
         v-if="file.children"
       >
         <div class="item-container">
@@ -46,8 +46,8 @@ export default defineComponent({
     },
   },
   methods: {
-    openFolder(children: Items) {
-      this.$emit("openFolder", children);
+    openFolder(title: string, children: Items) {
+      this.$emit("openFolder", title, children);
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
