@@ -1,17 +1,17 @@
 <template>
   <div class="flex-container">
-    <div v-for="(file, i) in item" v-bind:key="i">
+    <div v-for="(item, i) in items" v-bind:key="i">
       <v-btn
         class="btn"
         tile
         elevation="0"
-        @dblclick="openFolder(file.title, file.children)"
-        v-if="file.children"
+        @dblclick="open(item)"
+        v-if="item.children"
       >
         <div class="item-container">
           <v-icon x-large class="item-icon">mdi-folder</v-icon>
           <p class="item-title">
-            {{ file.title }}
+            {{ item.title }}
           </p>
         </div>
       </v-btn>
@@ -21,12 +21,12 @@
         class="btn"
         tile
         elevation="0"
-        @dblclick="openUrl(file.id, file.url)"
+        @dblclick="openUrl(item.id, item.url)"
       >
         <div class="item-container">
           <v-icon x-large class="item-icon">mdi-web</v-icon>
           <p class="item-title">
-            {{ file.title }}
+            {{ item.title }}
           </p>
         </div>
       </v-btn>
@@ -36,18 +36,30 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Item, Items } from "../../shared/types/store";
+import { Item } from "../../shared/types/store";
 
 export default defineComponent({
   props: {
-    item: {
-      type: Object as PropType<Item>,
+    items: {
+      type: Array as PropType<Item[]>,
       required: true,
     },
   },
   methods: {
-    openFolder(title: string, children: Items) {
+    open(item: Item) {
+      const { title, children = [], parentId } = item;
+      const isRootItem = parentId === "1";
+      if (isRootItem) {
+        this.openModal(title, children);
+      } else {
+        this.openFolder(title, children);
+      }
+    },
+    openFolder(title: string, children: Item[]) {
       this.$emit("openFolder", title, children);
+    },
+    openModal(title: string, children: Item[]) {
+      this.$emit("openModal", title, children);
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();

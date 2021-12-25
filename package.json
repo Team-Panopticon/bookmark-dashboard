@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build && rm -rf ./dist/index.*",
+    "serve": "vue-cli-service build --watch",
     "dev": "vue-cli-service build --watch",
+    "build": "vue-cli-service build && rm -rf ./dist/index.*",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

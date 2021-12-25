@@ -1,56 +1,49 @@
 <template>
-  <Bookshelf @openFolder="openFolder" :item="item"></Bookshelf>
-  <vue-final-modal
-    v-model="showModal"
-    classes="modal-container"
-    content-class="modal-content"
-    overlay-class="modal-overlay"
-    :drag="true"
-    :resize="true"
-    :max-height="700"
-    :max-width="700"
-    :hide-overlay="true"
-    :click-to-close="false"
-    :esc-to-close="true"
-    :prevent-click="true"
-  >
-    <v-card class="modal-inner" outlined title elevation="7">
-      <v-card-header class="modal-banner bg-primary">
-        <span class="modal__title">
-          <v-breadcrumbs :items="[folderTitle, '']"></v-breadcrumbs>
-        </span>
-        <button class="modal__close" @click="showModal = false">
-          <v-icon>mdi-close</v-icon>
-        </button>
-      </v-card-header>
-      <Bookshelf @openFolder="openFolder" :item="children"> </Bookshelf>
-    </v-card>
-  </vue-final-modal>
+  <Bookshelf
+    @openModal="openModal"
+    @openFolder="openFolder"
+    :items="items"
+  ></Bookshelf>
+  <Modal
+    @closeModal="closeModal"
+    @openFolder="openFolder"
+    :showModal="showModal"
+    :items="children"
+    :folderTitle="folderTitle"
+  ></Modal>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Item, Items } from "../../shared/types/store";
+import { Item } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
+import Modal from "../components/Modal.vue";
 
 export default defineComponent({
-  components: { Bookshelf },
+  components: { Bookshelf, Modal },
   data: () => ({
     showModal: false,
-    children: [] as Items,
+    children: [] as Item[],
     folderTitle: "",
   }),
   props: {
-    item: {
-      type: Object as PropType<Item>,
+    items: {
+      type: Array as PropType<Item[]>,
       required: true,
     },
   },
   methods: {
-    openFolder(title: string, children: Items) {
+    openModal(title: string, children: Item[]) {
       this.folderTitle = title;
       this.children = children;
       this.showModal = true;
+    },
+    openFolder(title: string, children: Item[]) {
+      this.folderTitle = title;
+      this.children = children;
+    },
+    closeModal() {
+      this.showModal = false;
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
