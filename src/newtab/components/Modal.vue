@@ -15,14 +15,17 @@
   >
     <v-card class="modal-inner" outlined title elevation="7">
       <v-card-header class="modal-banner bg-primary">
-        <span class="modal__title">
-          <v-breadcrumbs :items="[folderTitle, '']"></v-breadcrumbs>
-        </span>
+        <div class="modal__title d-flex">
+          <button v-if="showBackward" class="modal__backward" @click="backward">
+            <v-icon>mdi-keyboard-backspace</v-icon>
+          </button>
+          <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
+        </div>
         <button class="modal__close" @click="closeModal">
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-      <Bookshelf @openFolder="openFolder" :items="items"> </Bookshelf>
+      <Bookshelf @openFolder="openFolder" :items="viewItem"> </Bookshelf>
     </v-card>
   </vue-final-modal>
 </template>
@@ -34,24 +37,38 @@ import Bookshelf from "../components/Bookshelf.vue";
 export default defineComponent({
   components: { Bookshelf },
   data() {
-    return {};
+    return {
+      children: [] as Item[],
+      folderRoute: [] as string[],
+      items: [] as Item[][],
+    };
   },
   props: {
-    showModal: {
-      type: Boolean,
-      required: true,
-    },
-    items: {
+    initItems: {
       type: Array as PropType<Item[]>,
       required: true,
     },
-    folderTitle: {
+    initTitle: {
       type: String,
       required: true,
     },
+    showModal: {
+      required: true,
+      type: Boolean,
+    },
+  },
+  created() {
+    this.items.push(this.initItems);
+    this.folderRoute.push(this.initTitle);
   },
   computed: {
-    _showModal: function () {
+    showBackward() {
+      return this.folderRoute.length > 1;
+    },
+    viewItem() {
+      return this.items[this.items.length - 1];
+    },
+    _showModal() {
       return this.showModal;
     },
   },
@@ -59,8 +76,18 @@ export default defineComponent({
     closeModal() {
       this.$emit("closeModal");
     },
+
     openFolder(title: string, children: Item[]) {
-      this.$emit("openFolder", title, children);
+      this.items.push(children);
+
+      this.addRoute(title);
+    },
+    addRoute(title: string) {
+      this.folderRoute.push(title);
+    },
+    backward() {
+      this.folderRoute.pop();
+      this.items.pop();
     },
   },
 });

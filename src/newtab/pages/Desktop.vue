@@ -1,30 +1,34 @@
 <template>
-  <Bookshelf
-    @openModal="openModal"
-    @openFolder="openFolder"
-    :items="items"
-  ></Bookshelf>
-  <Modal
+  <Bookshelf @openModal="openModal" :items="items"></Bookshelf>
+  <component
+    v-for="({ component, title, children, showModal }, i) in modals"
+    :key="i"
+    :is="component"
+    @closeModal="closeModal($event, i)"
+    :initItems="children"
+    :initTitle="title"
+    :showModal="showModal"
+  ></component>
+  <!-- <Modal
     @closeModal="closeModal"
     @openFolder="openFolder"
+    @backward="backward"
     :showModal="showModal"
     :items="children"
     :folderTitle="folderTitle"
-  ></Modal>
+  ></Modal> -->
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Item } from "../../shared/types/store";
+import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import Modal from "../components/Modal.vue";
 
 export default defineComponent({
   components: { Bookshelf, Modal },
   data: () => ({
-    showModal: false,
-    children: [] as Item[],
-    folderTitle: "",
+    modals: [] as modalInfo[],
   }),
   props: {
     items: {
@@ -34,16 +38,15 @@ export default defineComponent({
   },
   methods: {
     openModal(title: string, children: Item[]) {
-      this.folderTitle = title;
-      this.children = children;
-      this.showModal = true;
+      this.modals.push({
+        children: children,
+        component: "Modal",
+        title: title,
+        showModal: true,
+      });
     },
-    openFolder(title: string, children: Item[]) {
-      this.folderTitle = title;
-      this.children = children;
-    },
-    closeModal() {
-      this.showModal = false;
+    closeModal(_: null, idx: number) {
+      this.modals[idx].showModal = false;
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
