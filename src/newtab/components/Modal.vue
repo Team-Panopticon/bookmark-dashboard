@@ -10,8 +10,9 @@
     :max-width="700"
     :hide-overlay="true"
     :click-to-close="false"
-    :esc-to-close="true"
+    :esc-to-close="false"
     :prevent-click="true"
+    :z-index="zIndex"
   >
     <v-card class="modal-inner" outlined title elevation="7">
       <v-card-header class="modal-banner bg-primary">
@@ -55,6 +56,10 @@ export default defineComponent({
     showModal: {
       required: true,
       type: Boolean,
+    },
+    zIndex: {
+      required: true,
+      type: Number,
     },
   },
   created() {
