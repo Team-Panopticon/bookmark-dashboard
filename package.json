@@ -12,6 +12,7 @@
     "@mdi/font": "5.9.55",
     "core-js": "^3.6.5",
     "roboto-fontface": "*",
+    "v-contextmenu": "^3.0.0",
     "vue": "3.2.24",
     "vue-final-modal": "^3.4.3",
     "vue-js-modal": "^2.0.1",
@@ -19,6 +20,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
+    "@types/chrome": "0.0.168",
     "@types/webfontloader": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
@@ -34,7 +36,6 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.0.0",
     "prettier": "^2.2.1",
-    "@types/chrome": "0.0.168",
     "sass": "^1.38.0",
     "sass-loader": "^10.0.0",
     "typescript": "~4.1.5",

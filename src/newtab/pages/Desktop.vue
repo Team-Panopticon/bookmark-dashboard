@@ -1,5 +1,9 @@
 <template>
-  <Bookshelf @openModal="openModal" :items="items"></Bookshelf>
+  <Bookshelf
+    @openModal="openModal"
+    :items="items"
+    v-contextmenu:contextmenu
+  ></Bookshelf>
   <Modal
     v-for="({ title, children, showModal, zIndex }, i) in modals"
     :key="i"
@@ -10,6 +14,11 @@
     :showModal="showModal"
     :zIndex="zIndex"
   ></Modal>
+  <v-contextmenu ref="contextmenu">
+    <v-contextmenu-item>Create Folder</v-contextmenu-item>
+    <v-contextmenu-item>Edit</v-contextmenu-item>
+    <v-contextmenu-item>Delete</v-contextmenu-item>
+  </v-contextmenu>
 </template>
 
 <script lang="ts">
@@ -17,6 +26,7 @@ import { defineComponent, PropType } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import Modal from "../components/Modal.vue";
+import "v-contextmenu/dist/themes/default.css";
 
 const OFFSET = 2;
 
