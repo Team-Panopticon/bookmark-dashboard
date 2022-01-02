@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-container">
+  <div class="grid-container">
     <div v-for="(item, i) in items" v-bind:key="i">
       <v-btn
         class="btn"
@@ -69,11 +69,14 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.flex-container {
-  display: flex;
-  flex-wrap: wrap;
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 80px);
+  grid-auto-rows: 100px;
   padding: 20px;
   gap: 16px;
+  width: 100%;
+  height: 100%;
 }
 
 .btn {
