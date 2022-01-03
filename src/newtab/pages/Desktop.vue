@@ -2,7 +2,7 @@
   <Bookshelf
     @openModal="openModal"
     :items="items"
-    v-contextmenu:contextmenu
+    @contextmenu.prevent="openContextMenu($event)"
   ></Bookshelf>
   <Modal
     v-for="({ title, children, showModal, zIndex }, i) in modals"
@@ -14,11 +14,7 @@
     :showModal="showModal"
     :zIndex="zIndex"
   ></Modal>
-  <v-contextmenu ref="contextmenu">
-    <v-contextmenu-item>Create Folder</v-contextmenu-item>
-    <v-contextmenu-item>Edit</v-contextmenu-item>
-    <v-contextmenu-item>Delete</v-contextmenu-item>
-  </v-contextmenu>
+  <ContextMenu :show="showContextMenu" :position="contextMenuPosition" />
 </template>
 
 <script lang="ts">
@@ -26,15 +22,23 @@ import { defineComponent, PropType } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import Modal from "../components/Modal.vue";
+import ContextMenu from "../components/ContextMenu.vue";
 import "v-contextmenu/dist/themes/default.css";
 
 const OFFSET = 2;
 
+interface Position {
+  x: number;
+  y: number;
+}
+
 export default defineComponent({
-  components: { Bookshelf, Modal },
+  components: { Bookshelf, Modal, ContextMenu },
   data: () => ({
     modals: [] as modalInfo[],
     maxZIndex: 1000,
+    contextMenuPosition: { x: 0, y: 0 } as Position,
+    showContextMenu: false,
   }),
   props: {
     items: {
@@ -59,6 +63,10 @@ export default defineComponent({
     },
     focusModal(idx: number) {
       this.modals[idx].zIndex = this.maxZIndex += OFFSET;
+    },
+    openContextMenu(event: PointerEvent) {
+      this.contextMenuPosition = { x: event.clientX, y: event.clientY };
+      this.showContextMenu = true;
     },
   },
 });
