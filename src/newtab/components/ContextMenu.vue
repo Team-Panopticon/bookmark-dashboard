@@ -8,9 +8,6 @@
 
 <script>
 export default {
-  setup() {
-    return {};
-  },
   props: {
     show: {
       type: Boolean,

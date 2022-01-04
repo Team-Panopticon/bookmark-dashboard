@@ -2,6 +2,7 @@
   <Bookshelf
     @openModal="openModal"
     :items="items"
+    @click="closeContextMenu()"
     @contextmenu.prevent="openContextMenu($event)"
   ></Bookshelf>
   <Modal
@@ -67,6 +68,9 @@ export default defineComponent({
     openContextMenu(event: PointerEvent) {
       this.contextMenuPosition = { x: event.clientX, y: event.clientY };
       this.showContextMenu = true;
+    },
+    closeContextMenu() {
+      this.showContextMenu = false;
     },
   },
 });
