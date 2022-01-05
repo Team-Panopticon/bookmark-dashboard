@@ -15,7 +15,9 @@
     :showModal="showModal"
     :zIndex="zIndex"
   ></Modal>
-  <ContextMenu :show="showContextMenu" :position="contextMenuPosition" />
+  <ContextMenu :show="showContextMenu" :position="contextMenuPosition">
+    <div>Create Folder</div>
+  </ContextMenu>
 </template>
 
 <script lang="ts">

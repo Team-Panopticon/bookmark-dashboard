@@ -1,9 +1,7 @@
 <template>
-  <ul v-if="show" class="context-menu" :style="cssVars">
-    <li>Create Folder</li>
-    <li>Edit</li>
-    <li>Delete</li>
-  </ul>
+  <div v-if="show" class="context-menu" :style="cssVars">
+    <slot></slot>
+  </div>
 </template>
 
 <script>
@@ -20,8 +18,6 @@ export default {
   },
   computed: {
     cssVars() {
-      console.log(this.show);
-      console.log(this.position);
       return {
         "--top": `${this.position.y}px`,
         "--left": `${this.position.x}px`,
