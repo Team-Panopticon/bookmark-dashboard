@@ -2,7 +2,6 @@
   <Bookshelf
     @openModal="openModal"
     :items="items"
-    @click="closeContextMenu()"
     @contextmenu.prevent="openContextMenu($event)"
   ></Bookshelf>
   <Modal
@@ -15,7 +14,7 @@
     :showModal="showModal"
     :zIndex="zIndex"
   ></Modal>
-  <ContextMenu :show="showContextMenu" :position="contextMenuPosition">
+  <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
     <div>Create Folder</div>
   </ContextMenu>
 </template>
@@ -70,9 +69,6 @@ export default defineComponent({
     openContextMenu(event: PointerEvent) {
       this.contextMenuPosition = { x: event.clientX, y: event.clientY };
       this.showContextMenu = true;
-    },
-    closeContextMenu() {
-      this.showContextMenu = false;
     },
   },
 });

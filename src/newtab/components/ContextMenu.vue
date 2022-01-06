@@ -1,11 +1,19 @@
 <template>
-  <div v-if="show" class="context-menu" :style="cssVars">
+  <div v-if="show" class="context-menu" :style="cssVars" ref="container">
     <slot></slot>
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "@vue/runtime-core";
+
+export default defineComponent({
+  mounted() {
+    window.addEventListener("click", this.onClickOutside);
+  },
+  unmounted() {
+    window.removeEventListener("click", this.onClickOutside);
+  },
   props: {
     show: {
       type: Boolean,
@@ -16,6 +24,7 @@ export default {
       required: true,
     },
   },
+  emits: ["update:show"],
   computed: {
     cssVars() {
       return {
@@ -24,7 +33,18 @@ export default {
       };
     },
   },
-};
+  methods: {
+    onClickOutside(event: MouseEvent) {
+      const targetElement = event.target as HTMLElement;
+      if (!targetElement) return;
+      const parentContextMenu = targetElement.closest(".context-menu");
+      const clickedOutside = parentContextMenu !== this.$refs.container;
+      if (clickedOutside) {
+        this.$emit("update:show", false);
+      }
+    },
+  },
+});
 </script>
 
 <style lang="scss" scoped>
