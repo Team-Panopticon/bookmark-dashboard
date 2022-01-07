@@ -2,7 +2,7 @@
   <Bookshelf
     @openModal="openModal"
     :items="items"
-    @contextmenu.prevent="openContextMenu($event)"
+    @contextmenu.prevent.stop="openContextMenu($event)"
   ></Bookshelf>
   <Modal
     v-for="({ title, children, showModal, zIndex }, i) in modals"
@@ -24,15 +24,10 @@ import { defineComponent, PropType } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import Modal from "../components/Modal.vue";
-import ContextMenu from "../components/ContextMenu.vue";
+import ContextMenu, { Position } from "../components/ContextMenu.vue";
 import "v-contextmenu/dist/themes/default.css";
 
 const OFFSET = 2;
-
-interface Position {
-  x: number;
-  y: number;
-}
 
 export default defineComponent({
   components: { Bookshelf, Modal, ContextMenu },

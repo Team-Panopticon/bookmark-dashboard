@@ -7,6 +7,11 @@
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 
+export interface Position {
+  x: number;
+  y: number;
+}
+
 export default defineComponent({
   mounted() {
     window.addEventListener("click", this.onClickOutside);
