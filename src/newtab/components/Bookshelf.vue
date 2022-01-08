@@ -13,7 +13,7 @@
         v-if="item.children"
       >
         <div class="item-container">
-          <v-icon x-large class="item-icon">mdi-folder</v-icon>
+          <v-icon class="item-icon">mdi-folder</v-icon>
           <p class="item-title">
             {{ item.title }}
           </p>
@@ -28,7 +28,7 @@
         @dblclick="openUrl(item.id, item.url)"
       >
         <div class="item-container">
-          <v-icon x-large class="item-icon">mdi-web</v-icon>
+          <Favicon :url="item.url" />
           <p class="item-title">
             {{ item.title }}
           </p>
@@ -46,9 +46,10 @@
 import { defineComponent, PropType } from "vue";
 import { Item } from "../../shared/types/store";
 import ContextMenu, { Position } from "./ContextMenu.vue";
+import Favicon from "./Favicon.vue";
 
 export default defineComponent({
-  components: { ContextMenu },
+  components: { ContextMenu, Favicon },
   data: () => ({
     showContextMenu: false,
     contextMenuPosition: { x: 0, y: 0 } as Position,
@@ -115,7 +116,7 @@ export default defineComponent({
 }
 
 .item-icon {
-  font-size: 60px;
+  font-size: 50px;
   color: #36454f;
 }
 
