@@ -8,6 +8,7 @@ class BookmarkApi {
       await chrome.bookmarks.create({ parentId, title, url });
       return true;
     } catch (e) {
+      console.debug("Bookmark Api create error >> ", e);
       return false;
     }
   }
@@ -17,6 +18,7 @@ class BookmarkApi {
       await chrome.bookmarks.update(id, { title });
       return true;
     } catch (e) {
+      console.debug("Bookmark Api updateTitle error >> ", e);
       return false;
     }
   }
@@ -26,6 +28,7 @@ class BookmarkApi {
       await chrome.bookmarks.update(id, { url });
       return true;
     } catch (e) {
+      console.debug("Bookmark Api updateUrl error >> ", e);
       return false;
     }
   }
@@ -39,6 +42,7 @@ class BookmarkApi {
       await chrome.bookmarks.move(id, { parentId, index });
       return true;
     } catch (e) {
+      console.debug("Bookmark Api move error >> ", e);
       return false;
     }
   }
@@ -48,6 +52,7 @@ class BookmarkApi {
       await chrome.bookmarks.remove(id);
       return true;
     } catch (e) {
+      console.debug("Bookmark Api remove error >> ", e);
       return false;
     }
   }
@@ -57,6 +62,7 @@ class BookmarkApi {
       await chrome.bookmarks.removeTree(id);
       return true;
     } catch (e) {
+      console.debug("Bookmark Api recursiveRemove error >> ", e);
       return false;
     }
   }
