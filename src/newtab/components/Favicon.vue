@@ -6,7 +6,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
-const PRE_FIX = "https://www.google.com/s2/favicons?domain=";
+const PREFIX = "https://www.google.com/s2/favicons?domain=";
 
 export default defineComponent({
   props: {
@@ -17,7 +17,7 @@ export default defineComponent({
   },
   computed: {
     src() {
-      return PRE_FIX + this.url;
+      return PREFIX + this.url;
     },
   },
 });
