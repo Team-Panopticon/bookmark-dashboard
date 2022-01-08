@@ -15,7 +15,7 @@
     :zIndex="zIndex"
   ></Modal>
   <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-    <div>Create Folder</div>
+    <div class="context-menu-item">Create Folder</div>
   </ContextMenu>
 </template>
 
@@ -69,7 +69,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 ::v-deep .modal-container {
   display: flex;
   justify-content: center;
@@ -88,5 +88,12 @@ export default defineComponent({
 .modal-banner {
   display: flex;
   justify-content: space-between;
+}
+
+.context-menu-item {
+  &:hover {
+    background-color: rgba(54, 69, 79, 0.2);
+    cursor: pointer;
+  }
 }
 </style>

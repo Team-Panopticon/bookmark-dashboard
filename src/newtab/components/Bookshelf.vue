@@ -36,8 +36,8 @@
       </v-btn>
     </div>
     <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-      <div>Edit</div>
-      <div>Delete</div>
+      <div class="context-menu-item">Edit</div>
+      <div class="context-menu-item">Delete</div>
     </ContextMenu>
   </div>
 </template>
@@ -86,7 +86,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, 80px);
@@ -131,5 +131,12 @@ export default defineComponent({
   word-break: break-all;
   letter-spacing: 0.5px;
   color: #36454f;
+}
+
+.context-menu-item {
+  &:hover {
+    background-color: rgba(54, 69, 79, 0.2);
+    cursor: pointer;
+  }
 }
 </style>
