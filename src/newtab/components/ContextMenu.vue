@@ -63,5 +63,6 @@ export default defineComponent({
   left: var(--left, 0);
   border: 1px solid black;
   background-color: white;
+  min-width: 64px;
 }
 </style>
