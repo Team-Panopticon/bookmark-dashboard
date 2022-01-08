@@ -1,30 +1,30 @@
 <template>
-  <Bookshelf
-    @openModal="openModal"
-    @openFolder="openFolder"
-    :items="items"
-  ></Bookshelf>
+  <Bookshelf @openModal="openModal" :items="items"></Bookshelf>
   <Modal
-    @closeModal="closeModal"
-    @openFolder="openFolder"
+    v-for="({ title, children, showModal, zIndex }, i) in modals"
+    :key="i"
+    @mousedown.capture="focusModal(i)"
+    @closeModal="closeModal($event, i)"
+    :initItems="children"
+    :initTitle="title"
     :showModal="showModal"
-    :items="children"
-    :folderTitle="folderTitle"
+    :zIndex="zIndex"
   ></Modal>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Item } from "../../shared/types/store";
+import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import Modal from "../components/Modal.vue";
+
+const OFFSET = 2;
 
 export default defineComponent({
   components: { Bookshelf, Modal },
   data: () => ({
-    showModal: false,
-    children: [] as Item[],
-    folderTitle: "",
+    modals: [] as modalInfo[],
+    maxZIndex: 1000,
   }),
   props: {
     items: {
@@ -34,19 +34,21 @@ export default defineComponent({
   },
   methods: {
     openModal(title: string, children: Item[]) {
-      this.folderTitle = title;
-      this.children = children;
-      this.showModal = true;
+      this.modals.push({
+        children: children,
+        title: title,
+        showModal: true,
+        zIndex: (this.maxZIndex += OFFSET),
+      });
     },
-    openFolder(title: string, children: Item[]) {
-      this.folderTitle = title;
-      this.children = children;
-    },
-    closeModal() {
-      this.showModal = false;
+    closeModal(_: null, idx: number) {
+      this.modals[idx].showModal = false;
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
+    },
+    focusModal(idx: number) {
+      this.modals[idx].zIndex = this.maxZIndex += OFFSET;
     },
   },
 });
