@@ -25,7 +25,6 @@ import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import Modal from "../components/Modal.vue";
 import ContextMenu, { Position } from "../components/ContextMenu.vue";
-import "v-contextmenu/dist/themes/default.css";
 
 const OFFSET = 2;
 

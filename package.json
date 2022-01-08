@@ -12,7 +12,6 @@
     "@mdi/font": "5.9.55",
     "core-js": "^3.6.5",
     "roboto-fontface": "*",
-    "v-contextmenu": "^3.0.0",
     "vue": "3.2.24",
     "vue-final-modal": "^3.4.3",
     "vue-js-modal": "^2.0.1",
