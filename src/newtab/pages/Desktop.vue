@@ -90,6 +90,7 @@ export default defineComponent({
 }
 
 .context-menu-item {
+  padding: 4px 8px;
   &:hover {
     background-color: rgba(54, 69, 79, 0.2);
     cursor: pointer;
