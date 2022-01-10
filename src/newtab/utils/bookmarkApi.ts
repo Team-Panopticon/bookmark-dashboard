@@ -1,4 +1,12 @@
+import { Item } from "@/shared/types/store";
+
 class BookmarkApi {
+  static async getTree(): Promise<Item[]> {
+    const bookMarks = await chrome.bookmarks.getTree();
+    const [main, _] = bookMarks[0].children || [];
+    return main.children || [];
+  }
+
   static async create(
     parentId: string,
     title: string,

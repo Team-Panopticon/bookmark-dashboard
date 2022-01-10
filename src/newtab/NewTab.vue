@@ -6,6 +6,7 @@
 import { defineComponent } from "vue";
 import Desktop from "./pages/Desktop.vue";
 import { Item } from "../shared/types/store";
+import BookmarkApi from "./utils/bookmarkApi";
 
 export default defineComponent({
   name: "Popup",
@@ -16,10 +17,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    this.bookmarks = await chrome.bookmarks.getTree().then(async (tree) => {
-      const [main, _] = tree[0].children || [];
-      return main.children || [];
-    });
+    this.bookmarks = await BookmarkApi.getTree();
   },
 });
 </script>
