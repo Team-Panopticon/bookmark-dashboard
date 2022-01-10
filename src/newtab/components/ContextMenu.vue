@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="context-menu" :style="cssVars" ref="container">
+  <div v-show="show" class="context-menu" :style="cssVars" ref="container">
     <slot></slot>
   </div>
 </template>
