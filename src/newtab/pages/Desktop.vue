@@ -1,19 +1,19 @@
 <template>
   <Bookshelf
-    @openModal="openModal"
+    @openBookshelfModal="openBookshelfModal"
     :items="items"
     @contextmenu.prevent.stop="openContextMenu($event)"
   ></Bookshelf>
-  <Modal
-    v-for="({ title, children, showModal, zIndex }, i) in modals"
+  <BookshelfModal
+    v-for="({ title, children, showBookshelfModal, zIndex }, i) in modals"
     :key="i"
     @mousedown.capture="focusModal(i)"
-    @closeModal="closeModal($event, i)"
+    @closeBookshelfModal="closeBookshelfModal($event, i)"
     :initItems="children"
     :initTitle="title"
-    :showModal="showModal"
+    :showBookshelfModal="showBookshelfModal"
     :zIndex="zIndex"
-  ></Modal>
+  ></BookshelfModal>
   <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
     <div class="context-menu-item">Create Folder</div>
   </ContextMenu>
@@ -23,13 +23,13 @@
 import { defineComponent, PropType } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
-import Modal from "../components/Modal.vue";
+import BookshelfModal from "../components/BookshelfModal.vue";
 import ContextMenu, { Position } from "../components/ContextMenu.vue";
 
 const OFFSET = 2;
 
 export default defineComponent({
-  components: { Bookshelf, Modal, ContextMenu },
+  components: { Bookshelf, BookshelfModal, ContextMenu },
   data: () => ({
     modals: [] as modalInfo[],
     maxZIndex: 1000,
@@ -43,16 +43,16 @@ export default defineComponent({
     },
   },
   methods: {
-    openModal(title: string, children: Item[]) {
+    openBookshelfModal(title: string, children: Item[]) {
       this.modals.push({
         children: children,
         title: title,
-        showModal: true,
+        showBookshelfModal: true,
         zIndex: (this.maxZIndex += OFFSET),
       });
     },
-    closeModal(_: null, idx: number) {
-      this.modals[idx].showModal = false;
+    closeBookshelfModal(_: null, idx: number) {
+      this.modals[idx].showBookshelfModal = false;
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
