@@ -21,22 +21,16 @@ class BookmarkApi {
     }
   }
 
-  static async updateTitle(id: string, title: string): Promise<boolean> {
+  static async update(
+    id: string,
+    url: string,
+    title?: string
+  ): Promise<boolean> {
     try {
-      await chrome.bookmarks.update(id, { title });
+      await chrome.bookmarks.update(id, { url, title });
       return true;
     } catch (e) {
       console.debug("Bookmark Api updateTitle error >> ", e);
-      return false;
-    }
-  }
-
-  static async updateUrl(id: string, url: string): Promise<boolean> {
-    try {
-      await chrome.bookmarks.update(id, { url });
-      return true;
-    } catch (e) {
-      console.debug("Bookmark Api updateUrl error >> ", e);
       return false;
     }
   }
