@@ -1,6 +1,10 @@
 <template>
-  <div class="flex-container">
-    <div v-for="(item, i) in items" v-bind:key="i">
+  <div class="grid-container">
+    <div
+      v-for="(item, i) in items"
+      v-bind:key="i"
+      @contextmenu.prevent.stop="openContextMenu($event)"
+    >
       <v-btn
         class="btn"
         tile
@@ -31,14 +35,24 @@
         </div>
       </v-btn>
     </div>
+    <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
+      <div class="context-menu-item">Edit</div>
+      <div class="context-menu-item">Delete</div>
+    </ContextMenu>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Item } from "../../shared/types/store";
+import ContextMenu, { Position } from "./ContextMenu.vue";
 
 export default defineComponent({
+  components: { ContextMenu },
+  data: () => ({
+    showContextMenu: false,
+    contextMenuPosition: { x: 0, y: 0 } as Position,
+  }),
   props: {
     items: {
       type: Array as PropType<Item[]>,
@@ -64,16 +78,23 @@ export default defineComponent({
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
+    openContextMenu(event: PointerEvent) {
+      this.contextMenuPosition = { x: event.clientX, y: event.clientY };
+      this.showContextMenu = true;
+    },
   },
 });
 </script>
 
-<style scoped>
-.flex-container {
-  display: flex;
-  flex-wrap: wrap;
+<style lang="scss" scoped>
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 80px);
+  grid-auto-rows: 100px;
   padding: 20px;
   gap: 16px;
+  width: 100%;
+  height: 100%;
 }
 
 .btn {
@@ -110,5 +131,13 @@ export default defineComponent({
   word-break: break-all;
   letter-spacing: 0.5px;
   color: #36454f;
+}
+
+.context-menu-item {
+  padding: 4px 8px;
+  &:hover {
+    background-color: rgba(54, 69, 79, 0.2);
+    cursor: pointer;
+  }
 }
 </style>

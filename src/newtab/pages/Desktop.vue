@@ -1,5 +1,9 @@
 <template>
-  <Bookshelf @openModal="openModal" :items="items"></Bookshelf>
+  <Bookshelf
+    @openModal="openModal"
+    :items="items"
+    @contextmenu.prevent.stop="openContextMenu($event)"
+  ></Bookshelf>
   <Modal
     v-for="({ title, children, showModal, zIndex }, i) in modals"
     :key="i"
@@ -10,6 +14,9 @@
     :showModal="showModal"
     :zIndex="zIndex"
   ></Modal>
+  <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
+    <div class="context-menu-item">Create Folder</div>
+  </ContextMenu>
 </template>
 
 <script lang="ts">
@@ -17,14 +24,17 @@ import { defineComponent, PropType } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import Modal from "../components/Modal.vue";
+import ContextMenu, { Position } from "../components/ContextMenu.vue";
 
 const OFFSET = 2;
 
 export default defineComponent({
-  components: { Bookshelf, Modal },
+  components: { Bookshelf, Modal, ContextMenu },
   data: () => ({
     modals: [] as modalInfo[],
     maxZIndex: 1000,
+    contextMenuPosition: { x: 0, y: 0 } as Position,
+    showContextMenu: false,
   }),
   props: {
     items: {
@@ -50,11 +60,15 @@ export default defineComponent({
     focusModal(idx: number) {
       this.modals[idx].zIndex = this.maxZIndex += OFFSET;
     },
+    openContextMenu(event: PointerEvent) {
+      this.contextMenuPosition = { x: event.clientX, y: event.clientY };
+      this.showContextMenu = true;
+    },
   },
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 ::v-deep .modal-container {
   display: flex;
   justify-content: center;
@@ -73,5 +87,13 @@ export default defineComponent({
 .modal-banner {
   display: flex;
   justify-content: space-between;
+}
+
+.context-menu-item {
+  padding: 4px 8px;
+  &:hover {
+    background-color: rgba(54, 69, 79, 0.2);
+    cursor: pointer;
+  }
 }
 </style>
