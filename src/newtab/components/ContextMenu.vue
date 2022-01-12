@@ -64,5 +64,6 @@ export default defineComponent({
   border: 1px solid black;
   background-color: white;
   min-width: 64px;
+  z-index: 1000;
 }
 </style>
