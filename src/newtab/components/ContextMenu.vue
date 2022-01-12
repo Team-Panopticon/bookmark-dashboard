@@ -14,13 +14,13 @@ export interface Position {
 
 export default defineComponent({
   mounted() {
-    window.addEventListener("mousedown", this.onClickOutside);
+    window.addEventListener("click", this.onClickOutside);
     window.addEventListener("contextmenu", this.onClickOutside, {
       capture: true,
     });
   },
   unmounted() {
-    window.removeEventListener("mousedown", this.onClickOutside);
+    window.removeEventListener("click", this.onClickOutside);
     window.removeEventListener("contextmenu", this.onClickOutside);
   },
   props: {
