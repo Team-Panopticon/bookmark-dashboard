@@ -2397,6 +2397,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vue/devtools-api@npm:^6.0.0-beta.11":
+  version: 6.0.0-beta.21.1
+  resolution: "@vue/devtools-api@npm:6.0.0-beta.21.1"
+  checksum: 0ba256aa6e184455ff0e990e765ebb4d8f7cb5509c97d25898d2e98f213c2d2b3d44492b3f92ff50fae22ee4806f684675f15f324ae81260ada89e9b3e12303c
+  languageName: node
+  linkType: hard
+
 "@vue/eslint-config-prettier@npm:^6.0.0":
   version: 6.0.0
   resolution: "@vue/eslint-config-prettier@npm:6.0.0"
@@ -3654,6 +3661,7 @@ __metadata:
     vue-js-modal: ^2.0.1
     vuetify: ^3.0.0-alpha.0
     vuetify-loader: ^2.0.0-alpha.0
+    vuex: next
     webfontloader: ^1.0.0
   languageName: unknown
   linkType: soft
@@ -12157,6 +12165,17 @@ __metadata:
   peerDependencies:
     vue: ^3.2.19
   checksum: cf14c1f7fc48afe92e21ad3c12b62f9393c0808ea4587ea936131a425c7cb3c5a8f3d4850d76f83bec6acce13e1b014fd99891185db675b8fdc9794d782fb2e4
+  languageName: node
+  linkType: hard
+
+"vuex@npm:next":
+  version: 4.0.2
+  resolution: "vuex@npm:4.0.2"
+  dependencies:
+    "@vue/devtools-api": ^6.0.0-beta.11
+  peerDependencies:
+    vue: ^3.0.2
+  checksum: d7c03f0afcbad045ef58921a4baa9ec23bc12c71dbaf1317f1df94e7d8740ce839b9fac48ec775955ce7a8893dceb7217bc05e45421fc6bacc559ed3541e6052
   languageName: node
   linkType: hard
 

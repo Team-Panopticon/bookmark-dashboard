@@ -20,11 +20,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import BookshelfModal from "../components/BookshelfModal.vue";
 import ContextMenu, { Position } from "../components/ContextMenu.vue";
+import { mapGetters } from "vuex";
 
 const OFFSET = 2;
 
@@ -36,11 +37,8 @@ export default defineComponent({
     contextMenuPosition: { x: 0, y: 0 } as Position,
     showContextMenu: false,
   }),
-  props: {
-    items: {
-      type: Array as PropType<Item[]>,
-      required: true,
-    },
+  computed: {
+    ...mapGetters({ items: "getBookmarkTree" }),
   },
   methods: {
     openBookshelfModal(title: string, children: Item[]) {
