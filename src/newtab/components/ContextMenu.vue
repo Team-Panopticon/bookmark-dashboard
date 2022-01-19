@@ -14,7 +14,9 @@ export interface Position {
 
 export default defineComponent({
   mounted() {
-    window.addEventListener("mousedown", this.onClickOutside);
+    window.addEventListener("mousedown", this.onClickOutside, {
+      capture: true,
+    });
     window.addEventListener("contextmenu", this.onClickOutside, {
       capture: true,
     });
@@ -64,5 +66,6 @@ export default defineComponent({
   border: 1px solid black;
   background-color: white;
   min-width: 64px;
+  z-index: 1000;
 }
 </style>
