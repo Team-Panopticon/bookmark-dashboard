@@ -1,6 +1,8 @@
 import { Item } from "@/shared/types/store";
 import { createStore } from "vuex";
 
+export const GET_BOOKMARK_TREE = "getBookmarkTree";
+export const SET_BOOKMARK_TREE = "setBookmarkTree";
 export interface State {
   bookmarkTree: Item[];
 }
@@ -10,12 +12,12 @@ const store = createStore<State>({
     bookmarkTree: [] as Item[],
   },
   getters: {
-    getBookmarkTree(state) {
+    [GET_BOOKMARK_TREE](state) {
       return state.bookmarkTree;
     },
   },
   mutations: {
-    setBookmarkTree(state, _bookmarkTree) {
+    [SET_BOOKMARK_TREE](state, _bookmarkTree) {
       state.bookmarkTree = _bookmarkTree;
     },
   },

@@ -7,12 +7,13 @@ import { defineComponent } from "vue";
 import Desktop from "./pages/Desktop.vue";
 import BookmarkApi from "./utils/bookmarkApi";
 import { mapMutations } from "vuex";
+import { SET_BOOKMARK_TREE } from "./store";
 
 export default defineComponent({
   name: "Popup",
   components: { Desktop },
   methods: {
-    ...mapMutations(["setBookmarkTree"]),
+    ...mapMutations([SET_BOOKMARK_TREE]),
   },
   async mounted() {
     this.setBookmarkTree(await BookmarkApi.getTree());
