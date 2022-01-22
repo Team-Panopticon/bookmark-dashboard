@@ -27,7 +27,7 @@ import Bookshelf from "../components/Bookshelf.vue";
 import BookshelfModal from "../components/BookshelfModal.vue";
 import ContextMenu, { Position } from "../components/ContextMenu.vue";
 import { mapGetters } from "vuex";
-import { GET_BOOKMARK_TREE } from "../store";
+import { GET_BOOKMARK_TREE_CHILDREN } from "../store";
 import CreateModal from "../components/CreateModal.vue";
 
 const OFFSET = 2;
@@ -41,7 +41,7 @@ export default defineComponent({
     showContextMenu: false,
   }),
   computed: {
-    ...mapGetters({ items: GET_BOOKMARK_TREE }),
+    ...mapGetters({ items: GET_BOOKMARK_TREE_CHILDREN }),
   },
   methods: {
     openBookshelfModal(title: string, children: Item[]) {

@@ -1,11 +1,11 @@
 import { Item } from "@/shared/types/store";
 
 class BookmarkApi {
-  static async getTree(): Promise<Item[]> {
+  static async getTree(): Promise<Item> {
     const bookMarks = await chrome.bookmarks.getTree();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [main, _] = bookMarks[0].children || [];
-    return main.children || [];
+    return main;
   }
 
   static async create(
