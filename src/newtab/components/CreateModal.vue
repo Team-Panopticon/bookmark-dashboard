@@ -51,4 +51,7 @@ export default defineComponent({
   display: flex;
   flex-direction: row;
 }
+::v-deep .v-field--active .v-field-label--floating {
+  transform: scale(0.75);
+}
 </style>
