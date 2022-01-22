@@ -9,7 +9,7 @@
       <v-text-field label="Folder Name"></v-text-field>
       <div class="button-group">
         <v-btn color="success" class="mr-4">Create Folder</v-btn>
-        <v-btn color="error">Cancel</v-btn>
+        <v-btn color="error" @click="closeCreateModal">Cancel</v-btn>
       </div>
     </v-card>
   </vue-final-modal>
@@ -25,6 +25,11 @@ export default defineComponent({
   data: () => ({
     show: false,
   }),
+  methods: {
+    closeCreateModal() {
+      this.show = false;
+    },
+  },
 });
 </script>
 
