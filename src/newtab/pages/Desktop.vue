@@ -79,7 +79,7 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
 }
-::v-deep .modal-content {
+.modal-content {
   position: relative;
   width: 500px;
   height: 500px;
