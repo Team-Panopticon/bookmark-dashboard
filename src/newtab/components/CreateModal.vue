@@ -6,17 +6,22 @@
   >
     <v-card class="modal-content">
       <h2 class="modal-title">Create Folder</h2>
-      <v-text-field label="Folder Name"></v-text-field>
+      <v-text-field label="Folder Name" v-model="folderName"></v-text-field>
       <div class="button-group">
-        <v-btn color="success" class="mr-4">Create Folder</v-btn>
+        <v-btn color="success" class="mr-4" @click="createFolder(folderName)"
+          >Create Folder</v-btn
+        >
         <v-btn color="error" @click="closeCreateModal">Cancel</v-btn>
       </div>
     </v-card>
   </vue-final-modal>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from "vue";
+import { mapGetters } from "vuex";
+import { GET_BOOKMARK_TREE_ROOT } from "../store";
+import BookmarkApi from "../utils/bookmarkApi";
 
 export default defineComponent({
   setup() {
@@ -24,8 +29,21 @@ export default defineComponent({
   },
   data: () => ({
     show: false,
+    folderName: "",
   }),
+  computed: {
+    ...mapGetters({ bookmarkTreeRoot: GET_BOOKMARK_TREE_ROOT }),
+  },
   methods: {
+    async createFolder(folderName: string) {
+      const createSuccessful = await BookmarkApi.create(
+        this.bookmarkTreeRoot.id,
+        folderName
+      );
+      if (createSuccessful) {
+        this.show = false;
+      }
+    },
     closeCreateModal() {
       this.show = false;
     },
