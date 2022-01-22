@@ -65,7 +65,7 @@ export default defineComponent({
       const { title, children = [], parentId } = item;
       const isRootItem = parentId === "1";
       if (isRootItem) {
-        this.openModal(title, children);
+        this.openBookshelfModal(title, children);
       } else {
         this.openFolder(title, children);
       }
@@ -73,8 +73,8 @@ export default defineComponent({
     openFolder(title: string, children: Item[]) {
       this.$emit("openFolder", title, children);
     },
-    openModal(title: string, children: Item[]) {
-      this.$emit("openModal", title, children);
+    openBookshelfModal(title: string, children: Item[]) {
+      this.$emit("openBookshelfModal", title, children);
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();

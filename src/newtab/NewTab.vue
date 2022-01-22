@@ -1,23 +1,22 @@
 <template lang="">
-  <Desktop :items="bookmarks"></Desktop>
+  <Desktop></Desktop>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import Desktop from "./pages/Desktop.vue";
-import { Item } from "../shared/types/store";
 import BookmarkApi from "./utils/bookmarkApi";
+import { mapMutations } from "vuex";
+import { SET_BOOKMARK_TREE } from "./store";
 
 export default defineComponent({
   name: "Popup",
   components: { Desktop },
-  data() {
-    return {
-      bookmarks: [] as Item[],
-    };
+  methods: {
+    ...mapMutations([SET_BOOKMARK_TREE]),
   },
   async mounted() {
-    this.bookmarks = await BookmarkApi.getTree();
+    this.setBookmarkTree(await BookmarkApi.getTree());
   },
 });
 </script>

@@ -3,6 +3,7 @@ import { Item } from "@/shared/types/store";
 class BookmarkApi {
   static async getTree(): Promise<Item[]> {
     const bookMarks = await chrome.bookmarks.getTree();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [main, _] = bookMarks[0].children || [];
     return main.children || [];
   }
@@ -21,22 +22,16 @@ class BookmarkApi {
     }
   }
 
-  static async updateTitle(id: string, title: string): Promise<boolean> {
+  static async update(
+    id: string,
+    url: string,
+    title?: string
+  ): Promise<boolean> {
     try {
-      await chrome.bookmarks.update(id, { title });
+      await chrome.bookmarks.update(id, { url, title });
       return true;
     } catch (e) {
       console.debug("Bookmark Api updateTitle error >> ", e);
-      return false;
-    }
-  }
-
-  static async updateUrl(id: string, url: string): Promise<boolean> {
-    try {
-      await chrome.bookmarks.update(id, { url });
-      return true;
-    } catch (e) {
-      console.debug("Bookmark Api updateUrl error >> ", e);
       return false;
     }
   }

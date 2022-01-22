@@ -1,6 +1,6 @@
 <template>
   <vue-final-modal
-    v-model="_showModal"
+    v-model="_showBookshelfModal"
     classes="modal-container"
     content-class="modal-content"
     overlay-class="modal-overlay"
@@ -33,7 +33,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Item } from "../../shared/types/store";
-import Bookshelf from "../components/Bookshelf.vue";
+import Bookshelf from "./Bookshelf.vue";
 
 export default defineComponent({
   components: { Bookshelf },
@@ -53,7 +53,7 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    showModal: {
+    showBookshelfModal: {
       required: true,
       type: Boolean,
     },
@@ -73,13 +73,13 @@ export default defineComponent({
     viewItem() {
       return this.items[this.items.length - 1];
     },
-    _showModal() {
-      return this.showModal;
+    _showBookshelfModal() {
+      return this.showBookshelfModal;
     },
   },
   methods: {
     closeModal() {
-      this.$emit("closeModal");
+      this.$emit("closeBookshelfModal");
     },
 
     openFolder(title: string, children: Item[]) {

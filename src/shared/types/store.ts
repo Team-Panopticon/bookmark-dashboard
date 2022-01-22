@@ -1,7 +1,8 @@
 export type Item = chrome.bookmarks.BookmarkTreeNode;
+
 export type modalInfo = {
   children: Item[];
   title: string;
-  showModal: boolean;
+  showBookshelfModal: boolean;
   zIndex: number;
 };
