@@ -1,5 +1,6 @@
 import { Item } from "@/shared/types/store";
 import { createStore } from "vuex";
+import createModalModule from "./modules/createModal";
 
 export const GET_BOOKMARK_TREE_CHILDREN = "getBookmarkTree";
 export const GET_BOOKMARK_TREE_ROOT = "getBookmarkTreeRoot";
@@ -9,6 +10,7 @@ export interface State {
 }
 
 const store = createStore<State>({
+  modules: { createModalModule },
   state: {
     bookmarkTree: { title: "placeholder", id: "-1", children: [] } as Item,
   },
