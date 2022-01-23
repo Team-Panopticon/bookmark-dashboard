@@ -74,26 +74,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-::v-deep .modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.modal-content {
-  position: relative;
-  width: 500px;
-  height: 500px;
-}
-
-.modal-inner {
-  border: 1px solid lightgray;
-}
-
-.modal-banner {
-  display: flex;
-  justify-content: space-between;
-}
-
 .context-menu-item {
   padding: 4px 8px;
   &:hover {

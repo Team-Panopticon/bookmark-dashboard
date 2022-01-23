@@ -3,8 +3,9 @@
     v-model="show"
     :name="'createModal'"
     classes="modal-container"
+    content-class="modal-content"
   >
-    <v-card class="modal-content">
+    <v-card class="modal-inner">
       <h2 class="modal-title">Create Folder</h2>
       <v-text-field label="Folder Name" v-model="folderName"></v-text-field>
       <div class="button-group">
@@ -52,13 +53,17 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.vfm::v-deep {
+  .modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    position: relative;
+  }
 }
-.modal-content {
-  position: relative;
+.modal-inner {
   padding: 20px;
 }
 .modal-title {

@@ -98,22 +98,19 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-.modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+<style lang="scss" scoped>
+.vfm::v-deep {
+  .modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
 }
-.modal-content {
-  position: relative;
-  width: 500px;
-  height: 500px;
-}
-
-.modal-inner {
-  border: 1px solid lightgray;
-}
-
 .modal-banner {
   display: flex;
   justify-content: space-between;
