@@ -3,6 +3,7 @@ import { RootState } from "../index";
 
 export const GET_BOOKMARK_UPDATE_INFO = "getBookmarkUpdateInfo";
 export const SET_BOOKMARK_UPDATE_INFO = "setBookmarkUpdateInfo";
+
 export const GET_BOOKMARK_UPDATE_SHOW = "getBookmarkUpdateShow";
 export const SET_BOOKMARK_UPDATE_SHOW = "setBookmarkUpdateShow";
 
@@ -16,7 +17,7 @@ export interface State {
 }
 
 const updateModalModule: Module<State, RootState> = {
-  namespaced: true,
+  namespaced: false,
   state: {
     updateModalInfo: {
       id: "",
@@ -28,17 +29,17 @@ const updateModalModule: Module<State, RootState> = {
 
   getters: {
     [GET_BOOKMARK_UPDATE_SHOW](state) {
-      return state.updateModalInfo;
+      return state.updateModalShow;
     },
     [GET_BOOKMARK_UPDATE_INFO](state) {
       return state.updateModalInfo;
     },
   },
   mutations: {
-    [GET_BOOKMARK_UPDATE_SHOW](state, _updateModalInfo) {
+    [SET_BOOKMARK_UPDATE_INFO](state, _updateModalInfo) {
       state.updateModalInfo = { ..._updateModalInfo };
     },
-    [GET_BOOKMARK_UPDATE_SHOW](state, _updateModalShow) {
+    [SET_BOOKMARK_UPDATE_SHOW](state, _updateModalShow) {
       state.updateModalShow = _updateModalShow;
     },
   },
