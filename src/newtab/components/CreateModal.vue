@@ -21,7 +21,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
-import { GET_BOOKMARK_TREE_ROOT } from "../store";
+import { GET_BOOKMARK_CREATE_INFO } from "../store/modules/createModal";
 import BookmarkApi from "../utils/bookmarkApi";
 
 export default defineComponent({
@@ -33,12 +33,14 @@ export default defineComponent({
     folderName: "",
   }),
   computed: {
-    ...mapGetters({ bookmarkTreeRoot: GET_BOOKMARK_TREE_ROOT }),
+    ...mapGetters({
+      createModalInfo: `createModalModule/${GET_BOOKMARK_CREATE_INFO}`,
+    }),
   },
   methods: {
     async createFolder(folderName: string) {
       const createSuccessful = await BookmarkApi.create(
-        this.bookmarkTreeRoot.id,
+        this.createModalInfo.parentId,
         folderName
       );
       if (createSuccessful) {
