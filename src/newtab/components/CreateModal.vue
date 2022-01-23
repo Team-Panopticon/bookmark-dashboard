@@ -20,8 +20,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapGetters } from "vuex";
-import { GET_BOOKMARK_CREATE_INFO } from "../store/modules/createModal";
+import { mapGetters, mapMutations } from "vuex";
+import {
+  GET_BOOKMARK_CREATE_INFO,
+  RESET_BOOKMARK_CREATE_INFO,
+} from "../store/modules/createModal";
 import BookmarkApi from "../utils/bookmarkApi";
 
 export default defineComponent({
@@ -44,12 +47,16 @@ export default defineComponent({
         folderName
       );
       if (createSuccessful) {
+        this.resetCreateModalInfo();
         this.show = false;
       }
     },
     closeCreateModal() {
       this.show = false;
     },
+    ...mapMutations({
+      resetCreateModalInfo: `createModalModule/${RESET_BOOKMARK_CREATE_INFO}`,
+    }),
   },
 });
 </script>
