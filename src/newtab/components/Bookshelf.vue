@@ -1,9 +1,12 @@
 <template>
-  <div class="grid-container">
+  <div
+    class="grid-container"
+    @contextmenu.prevent.stop="openContextMenu($event, 'BACKGROUND')"
+  >
     <div
       v-for="(item, i) in items"
       v-bind:key="i"
-      @contextmenu.prevent.stop="openContextMenu($event)"
+      @contextmenu.prevent.stop="openContextMenu($event, 'ITEM')"
     >
       <v-btn
         class="btn"
@@ -36,8 +39,18 @@
       </v-btn>
     </div>
     <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-      <div class="context-menu-item">Edit</div>
-      <div class="context-menu-item">Delete</div>
+      <div
+        v-show="contextMenuTarget === 'BACKGROUND'"
+        class="context-menu-item"
+      >
+        Create Folder
+      </div>
+      <div v-show="contextMenuTarget === 'ITEM'" class="context-menu-item">
+        Edit
+      </div>
+      <div v-show="contextMenuTarget === 'ITEM'" class="context-menu-item">
+        Delete
+      </div>
     </ContextMenu>
   </div>
 </template>
@@ -53,6 +66,7 @@ export default defineComponent({
   data: () => ({
     showContextMenu: false,
     contextMenuPosition: { x: 0, y: 0 } as Position,
+    contextMenuTarget: "",
   }),
   props: {
     items: {
@@ -79,8 +93,9 @@ export default defineComponent({
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
-    openContextMenu(event: PointerEvent) {
+    openContextMenu(event: PointerEvent, targetType: "ITEM" | "BACKGROUND") {
       this.contextMenuPosition = { x: event.clientX, y: event.clientY };
+      this.contextMenuTarget = targetType;
       this.showContextMenu = true;
     },
   },
