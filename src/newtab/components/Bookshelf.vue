@@ -42,6 +42,7 @@
       <div
         v-show="contextMenuTarget === 'BACKGROUND'"
         class="context-menu-item"
+        @click="openCreateModal"
       >
         Create Folder
       </div>

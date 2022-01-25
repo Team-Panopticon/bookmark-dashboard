@@ -4,6 +4,7 @@
     :name="'createModal'"
     classes="modal-container"
     content-class="modal-content"
+    z-index="1100"
   >
     <v-card class="modal-inner">
       <h2 class="modal-title">Create Folder</h2>

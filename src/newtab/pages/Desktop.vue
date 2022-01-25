@@ -13,9 +13,6 @@
     :showBookshelfModal="showBookshelfModal"
     :zIndex="zIndex"
   ></BookshelfModal>
-  <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-    <div class="context-menu-item" @click="openCreateModal">Create Folder</div>
-  </ContextMenu>
   <CreateModal />
 </template>
 
@@ -24,7 +21,7 @@ import { defineComponent } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import BookshelfModal from "../components/BookshelfModal.vue";
-import ContextMenu, { Position } from "../components/ContextMenu.vue";
+import { Position } from "../components/ContextMenu.vue";
 import { mapGetters, mapMutations } from "vuex";
 import { GET_BOOKMARK_TREE_CHILDREN, GET_BOOKMARK_TREE_ROOT } from "../store";
 import CreateModal from "../components/CreateModal.vue";
@@ -33,7 +30,7 @@ import { SET_BOOKMARK_CREATE_INFO } from "../store/modules/createModal";
 const OFFSET = 2;
 
 export default defineComponent({
-  components: { Bookshelf, BookshelfModal, ContextMenu, CreateModal },
+  components: { Bookshelf, BookshelfModal, CreateModal },
   data: () => ({
     modals: [] as modalInfo[],
     maxZIndex: 1000,
