@@ -1,16 +1,15 @@
 <template>
   <Bookshelf
     @openBookshelfModal="openBookshelfModal"
-    :items="items"
+    :folderItem="bookmarkTreeRoot"
     @contextmenu.prevent.stop="openContextMenu($event)"
   ></Bookshelf>
   <BookshelfModal
-    v-for="({ title, children, showBookshelfModal, zIndex }, i) in modals"
+    v-for="({ folderItem, showBookshelfModal, zIndex }, i) in modals"
     :key="i"
     @mousedown.capture="focusModal(i)"
     @closeBookshelfModal="closeBookshelfModal($event, i)"
-    :initItems="children"
-    :initTitle="title"
+    :initFolderItem="folderItem"
     :showBookshelfModal="showBookshelfModal"
     :zIndex="zIndex"
   ></BookshelfModal>
@@ -48,10 +47,9 @@ export default defineComponent({
     }),
   },
   methods: {
-    openBookshelfModal(title: string, children: Item[]) {
+    openBookshelfModal(folderItem: Item) {
       this.modals.push({
-        children: children,
-        title: title,
+        folderItem,
         showBookshelfModal: true,
         zIndex: (this.maxZIndex += OFFSET),
       });

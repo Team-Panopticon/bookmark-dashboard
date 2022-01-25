@@ -4,7 +4,7 @@
     @contextmenu.prevent.stop="openContextMenu($event, 'BACKGROUND')"
   >
     <div
-      v-for="(item, i) in items"
+      v-for="(item, i) in folderItem.children"
       v-bind:key="i"
       @contextmenu.prevent.stop="openContextMenu($event, 'ITEM')"
     >
@@ -57,7 +57,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { mapMutations } from "vuex";
 import { Item } from "../../shared/types/store";
+import { SET_BOOKMARK_CREATE_INFO } from "../store/modules/createModal";
 import ContextMenu, { Position } from "./ContextMenu.vue";
 import Favicon from "./Favicon.vue";
 
@@ -69,26 +71,26 @@ export default defineComponent({
     contextMenuTarget: "",
   }),
   props: {
-    items: {
-      type: Array as PropType<Item[]>,
+    folderItem: {
+      type: Object as PropType<chrome.bookmarks.BookmarkTreeNode>,
       required: true,
     },
   },
   methods: {
     open(item: Item) {
-      const { title, children = [], parentId } = item;
+      const { parentId } = item;
       const isRootItem = parentId === "1";
       if (isRootItem) {
-        this.openBookshelfModal(title, children);
+        this.openBookshelfModal(item);
       } else {
-        this.openFolder(title, children);
+        this.openFolder(item);
       }
     },
-    openFolder(title: string, children: Item[]) {
-      this.$emit("openFolder", title, children);
+    openFolder(folderItem: Item) {
+      this.$emit("openFolder", folderItem);
     },
-    openBookshelfModal(title: string, children: Item[]) {
-      this.$emit("openBookshelfModal", title, children);
+    openBookshelfModal(folderItem: Item) {
+      this.$emit("openBookshelfModal", folderItem);
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
@@ -98,6 +100,14 @@ export default defineComponent({
       this.contextMenuTarget = targetType;
       this.showContextMenu = true;
     },
+    openCreateModal() {
+      this.setCreateModalInfo({ parentId: this.folderItem.id });
+      this.$vfm.show("createModal");
+      this.showContextMenu = false;
+    },
+    ...mapMutations({
+      setCreateModalInfo: `createModalModule/${SET_BOOKMARK_CREATE_INFO}`,
+    }),
   },
 });
 </script>
