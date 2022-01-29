@@ -4,10 +4,9 @@
     classes="modal-container"
     content-class="modal-content"
     overlay-class="modal-overlay"
+    :min-height="300"
     :drag="true"
     :resize="true"
-    :max-height="700"
-    :max-width="700"
     :hide-overlay="true"
     :click-to-close="false"
     :esc-to-close="false"
@@ -113,11 +112,13 @@ export default defineComponent({
 ::v-deep .modal-content {
   position: relative;
   width: 500px;
-  height: 500px;
+  height: 300px;
 }
 
 .modal-inner {
   border: 1px solid lightgray;
+  width: 100%;
+  height: 100%;
 }
 
 .modal-banner {
