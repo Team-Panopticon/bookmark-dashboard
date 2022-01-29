@@ -1,16 +1,18 @@
 <template>
-  <div v-show="show" class="context-menu" :style="cssVars" ref="container">
+  <div v-show="isShow" class="context-menu" :style="cssVars" ref="container">
     <slot></slot>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-
-export interface Position {
-  x: number;
-  y: number;
-}
+import store from "../store/index";
+import { mapGetters } from "vuex";
+import {
+  GET_CONTEXT_MENU_CSS_VARS,
+  GET_CONTEXT_MENU_SHOW_STATE,
+  SET_CONTEXT_MENU_SHOW_STATE,
+} from "../store/modules/contextMenu";
 
 export default defineComponent({
   mounted() {
@@ -25,24 +27,9 @@ export default defineComponent({
     window.removeEventListener("mousedown", this.onClickOutside);
     window.removeEventListener("contextmenu", this.onClickOutside);
   },
-  props: {
-    show: {
-      type: Boolean,
-      required: true,
-    },
-    position: {
-      type: Object,
-      required: true,
-    },
-  },
-  emits: ["update:show"],
   computed: {
-    cssVars() {
-      return {
-        "--top": `${this.position.y}px`,
-        "--left": `${this.position.x}px`,
-      };
-    },
+    ...mapGetters({ cssVars: GET_CONTEXT_MENU_CSS_VARS }),
+    ...mapGetters({ isShow: GET_CONTEXT_MENU_SHOW_STATE }),
   },
   methods: {
     onClickOutside(event: MouseEvent) {
@@ -51,7 +38,7 @@ export default defineComponent({
       const parentContextMenu = targetElement.closest(".context-menu");
       const clickedOutside = parentContextMenu !== this.$refs.container;
       if (clickedOutside) {
-        this.$emit("update:show", false);
+        store.commit(SET_CONTEXT_MENU_SHOW_STATE, false);
       }
     },
   },
