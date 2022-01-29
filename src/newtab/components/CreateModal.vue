@@ -22,6 +22,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapGetters, mapMutations } from "vuex";
+import { SET_BOOKMARK_TREE } from "../store";
 import {
   GET_BOOKMARK_CREATE_INFO,
   GET_BOOKMARK_CREATE_SHOW,
@@ -58,8 +59,10 @@ export default defineComponent({
         folderName
       );
       if (createSuccessful) {
+        this.folderName = "";
         this.resetCreateModalInfo();
         this.setCreateModalShow(false);
+        this.setBookmarkTree(await BookmarkApi.getTree());
       }
     },
     closeCreateModal() {
@@ -68,6 +71,7 @@ export default defineComponent({
     ...mapMutations({
       resetCreateModalInfo: RESET_BOOKMARK_CREATE_INFO,
       setCreateModalShow: SET_BOOKMARK_CREATE_SHOW,
+      setBookmarkTree: SET_BOOKMARK_TREE,
     }),
   },
 });
