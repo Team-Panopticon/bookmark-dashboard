@@ -3,18 +3,26 @@ import { RootState } from "../index";
 
 export const SET_CONTEXT_MENU_SHOW_STATE = "contextMenu/setShow";
 export const SET_CONTEXT_MENU_POSITION = "contextMenu/setPosition";
+export const SET_CONTEXT_MENU_TARGET = "contextMenu/setTarget";
 
 export const GET_CONTEXT_MENU_CSS_VARS = "contextMenu/getCssVars";
 export const GET_CONTEXT_MENU_SHOW_STATE = "contextMenu/getShow";
+export const GET_CONTEXT_MENU_TARGET = "contextMenu/getTarget";
 
 export type Position = {
   x: number;
   y: number;
 };
 
+export type ContextMenuTarget = {
+  id: string;
+  type: "FILE" | "FOLDER" | "BACKGROUND";
+};
+
 export type State = {
   isShow: boolean;
   position: Position;
+  target?: ContextMenuTarget;
 };
 
 const contextMenuModule: Module<State, RootState> = {
@@ -30,6 +38,9 @@ const contextMenuModule: Module<State, RootState> = {
     setPosition(state, payload: Position) {
       state.position = payload;
     },
+    setTarget(state, payload: ContextMenuTarget) {
+      state.target = payload;
+    },
   },
   getters: {
     getCssVars(state) {
@@ -40,6 +51,9 @@ const contextMenuModule: Module<State, RootState> = {
     },
     getShow(state) {
       return state.isShow;
+    },
+    getTarget(state) {
+      return state.target;
     },
   },
   actions: {},
