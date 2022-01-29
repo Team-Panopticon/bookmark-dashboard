@@ -1,6 +1,6 @@
 <template>
   <vue-final-modal
-    v-model="_showBookshelfModal"
+    v-model="showBookshelfModal"
     classes="modal-container"
     content-class="modal-content"
     overlay-class="modal-overlay"
@@ -14,7 +14,13 @@
     :prevent-click="true"
     :z-index="zIndex"
   >
-    <v-card class="modal-inner" outlined title elevation="7">
+    <v-card
+      class="modal-inner"
+      outlined
+      title
+      elevation="7"
+      @mousedown.capture="focusBookshelfModal(initId)"
+    >
       <v-card-header class="modal-banner bg-primary">
         <div class="modal__title d-flex">
           <button v-if="showBackward" class="modal__backward" @click="backward">
@@ -22,7 +28,7 @@
           </button>
           <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
         </div>
-        <button class="modal__close" @click="closeModal">
+        <button class="modal__close" @click="closeBookshelfModal(initId)">
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
@@ -32,7 +38,12 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { mapMutations } from "vuex";
 import { Item } from "../../shared/types/store";
+import {
+  CLOSE_BOOKSHELF_MODALS,
+  FOCUS_BOOKSHELF_MODALS,
+} from "../store/modules/bookshelfModal";
 import Bookshelf from "./Bookshelf.vue";
 
 export default defineComponent({
@@ -42,9 +53,14 @@ export default defineComponent({
       children: [] as Item[],
       folderRoute: [] as string[],
       items: [] as Item[][],
+      showBookshelfModal: true,
     };
   },
   props: {
+    initId: {
+      type: String,
+      required: true,
+    },
     initItems: {
       type: Array as PropType<Item[]>,
       required: true,
@@ -52,10 +68,6 @@ export default defineComponent({
     initTitle: {
       type: String,
       required: true,
-    },
-    showBookshelfModal: {
-      required: true,
-      type: Boolean,
     },
     zIndex: {
       required: true,
@@ -73,15 +85,9 @@ export default defineComponent({
     viewItem() {
       return this.items[this.items.length - 1];
     },
-    _showBookshelfModal() {
-      return this.showBookshelfModal;
-    },
   },
   methods: {
-    closeModal() {
-      this.$emit("closeBookshelfModal");
-    },
-
+    ...mapMutations([CLOSE_BOOKSHELF_MODALS, FOCUS_BOOKSHELF_MODALS]),
     openFolder(title: string, children: Item[]) {
       this.items.push(children);
 

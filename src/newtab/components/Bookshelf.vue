@@ -44,7 +44,9 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { mapMutations } from "vuex";
 import { Item } from "../../shared/types/store";
+import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
 import ContextMenu, { Position } from "./ContextMenu.vue";
 import Favicon from "./Favicon.vue";
 
@@ -61,11 +63,12 @@ export default defineComponent({
     },
   },
   methods: {
+    ...mapMutations([OPEN_BOOKSHELF_MODALS]),
     open(item: Item) {
-      const { title, children = [], parentId } = item;
+      const { id, title, children = [], parentId } = item;
       const isRootItem = parentId === "1";
       if (isRootItem) {
-        this.openBookshelfModal(title, children);
+        this._openBookshelfModal(title, children, id);
       } else {
         this.openFolder(title, children);
       }
@@ -73,8 +76,8 @@ export default defineComponent({
     openFolder(title: string, children: Item[]) {
       this.$emit("openFolder", title, children);
     },
-    openBookshelfModal(title: string, children: Item[]) {
-      //
+    _openBookshelfModal(title: string, children: Item[], id: string) {
+      this.openBookshelfModal({ title, children, id });
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
