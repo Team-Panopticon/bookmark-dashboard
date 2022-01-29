@@ -74,7 +74,7 @@ export default defineComponent({
       this.$emit("openFolder", title, children);
     },
     openBookshelfModal(title: string, children: Item[]) {
-      this.$emit("openBookshelfModal", title, children);
+      //
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
