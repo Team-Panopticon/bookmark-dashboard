@@ -24,7 +24,9 @@ import { defineComponent } from "vue";
 import { mapGetters, mapMutations } from "vuex";
 import {
   GET_BOOKMARK_CREATE_INFO,
+  GET_BOOKMARK_CREATE_SHOW,
   RESET_BOOKMARK_CREATE_INFO,
+  SET_BOOKMARK_CREATE_SHOW,
 } from "../store/modules/createModal";
 import BookmarkApi from "../utils/bookmarkApi";
 
@@ -33,13 +35,21 @@ export default defineComponent({
     return {};
   },
   data: () => ({
-    show: false,
     folderName: "",
   }),
   computed: {
     ...mapGetters({
-      createModalInfo: `createModalModule/${GET_BOOKMARK_CREATE_INFO}`,
+      createModalInfo: GET_BOOKMARK_CREATE_INFO,
+      createModalShow: GET_BOOKMARK_CREATE_SHOW,
     }),
+    show: {
+      get() {
+        return this.createModalShow;
+      },
+      set(newValue: boolean) {
+        this.setCreateModalShow(newValue);
+      },
+    },
   },
   methods: {
     async createFolder(folderName: string) {
@@ -49,14 +59,15 @@ export default defineComponent({
       );
       if (createSuccessful) {
         this.resetCreateModalInfo();
-        this.show = false;
+        this.setCreateModalShow(false);
       }
     },
     closeCreateModal() {
       this.show = false;
     },
     ...mapMutations({
-      resetCreateModalInfo: `createModalModule/${RESET_BOOKMARK_CREATE_INFO}`,
+      resetCreateModalInfo: RESET_BOOKMARK_CREATE_INFO,
+      setCreateModalShow: SET_BOOKMARK_CREATE_SHOW,
     }),
   },
 });

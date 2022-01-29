@@ -107,7 +107,7 @@ export default defineComponent({
       this.showContextMenu = false;
     },
     ...mapMutations({
-      setCreateModalInfo: `createModalModule/${SET_BOOKMARK_CREATE_INFO}`,
+      setCreateModalInfo: SET_BOOKMARK_CREATE_INFO,
     }),
   },
 });
