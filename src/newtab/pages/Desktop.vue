@@ -14,7 +14,7 @@
     :showBookshelfModal="showBookshelfModal"
     :zIndex="zIndex"
   ></BookshelfModal>
-  <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
+  <ContextMenu>
     <div class="context-menu-item">Create Folder</div>
   </ContextMenu>
 </template>
@@ -24,9 +24,13 @@ import { defineComponent } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import BookshelfModal from "../components/BookshelfModal.vue";
-import ContextMenu, { Position } from "../components/ContextMenu.vue";
+import ContextMenu from "../components/ContextMenu.vue";
 import { mapGetters } from "vuex";
-import { GET_BOOKMARK_TREE } from "../store";
+import store, { GET_BOOKMARK_TREE } from "../store";
+import {
+  SET_CONTEXT_MENU_SHOW_STATE,
+  SET_CONTEXT_MENU_POSITION,
+} from "../store/modules/contextMenu";
 
 const OFFSET = 2;
 
@@ -35,7 +39,6 @@ export default defineComponent({
   data: () => ({
     modals: [] as modalInfo[],
     maxZIndex: 1000,
-    contextMenuPosition: { x: 0, y: 0 } as Position,
     showContextMenu: false,
   }),
   computed: {
@@ -60,8 +63,11 @@ export default defineComponent({
       this.modals[idx].zIndex = this.maxZIndex += OFFSET;
     },
     openContextMenu(event: PointerEvent) {
-      this.contextMenuPosition = { x: event.clientX, y: event.clientY };
-      this.showContextMenu = true;
+      store.commit(SET_CONTEXT_MENU_POSITION, {
+        x: event.clientX,
+        y: event.clientY,
+      });
+      store.commit(SET_CONTEXT_MENU_SHOW_STATE, true);
     },
   },
 });
