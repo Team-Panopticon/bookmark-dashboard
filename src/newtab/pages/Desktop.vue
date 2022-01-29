@@ -3,6 +3,7 @@
     :items="items"
     @contextmenu.prevent.stop="openContextMenu($event)"
   ></Bookshelf>
+  <BookshelfModalContainer></BookshelfModalContainer>
   <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
     <div class="context-menu-item">Create Folder</div>
   </ContextMenu>
@@ -11,12 +12,17 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Bookshelf from "../components/Bookshelf.vue";
+import BookshelfModalContainer from "../components/BookshelfModalContainer.vue";
 import ContextMenu, { Position } from "../components/ContextMenu.vue";
 import { mapGetters } from "vuex";
 import { GET_BOOKMARK_TREE } from "../store";
 
 export default defineComponent({
-  components: { Bookshelf, BookshelfModal, ContextMenu },
+  components: {
+    Bookshelf,
+    BookshelfModalContainer,
+    ContextMenu,
+  },
   data: () => ({
     contextMenuPosition: { x: 0, y: 0 } as Position,
     showContextMenu: false,
