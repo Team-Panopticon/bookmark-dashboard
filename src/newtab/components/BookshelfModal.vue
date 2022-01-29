@@ -20,19 +20,25 @@
           <button v-if="showBackward" class="modal__backward" @click="backward">
             <v-icon>mdi-keyboard-backspace</v-icon>
           </button>
-          <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
+          <v-breadcrumbs :items="folderRouteTitle"></v-breadcrumbs>
         </div>
         <button class="modal__close" @click="closeModal">
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-      <Bookshelf @openFolder="openFolder" :items="viewItem"> </Bookshelf>
+      <Bookshelf
+        @openFolder="openFolder"
+        @contextmenu.prevent.stop="openContextMenu($event, target)"
+        :items="viewItem"
+      ></Bookshelf>
     </v-card>
   </vue-final-modal>
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Item } from "../../shared/types/store";
+import { ContextMenuTarget } from "../store/modules/contextMenu";
+import { openContextMenu } from "../utils/contextMenu";
 import Bookshelf from "./Bookshelf.vue";
 
 export default defineComponent({
@@ -40,8 +46,9 @@ export default defineComponent({
   data() {
     return {
       children: [] as Item[],
-      folderRoute: [] as string[],
+      folderRoute: [] as { id: string; title: string }[],
       items: [] as Item[][],
+      target: {} as ContextMenuTarget,
     };
   },
   props: {
@@ -61,10 +68,18 @@ export default defineComponent({
       required: true,
       type: Number,
     },
+    targetId: {
+      required: true,
+      type: String,
+    },
   },
   created() {
     this.items.push(this.initItems);
-    this.folderRoute.push(this.initTitle);
+    this.folderRoute.push({ id: this.targetId, title: this.initTitle });
+    this.target = {
+      id: this.targetId,
+      type: "BACKGROUND",
+    };
   },
   computed: {
     showBackward() {
@@ -76,24 +91,32 @@ export default defineComponent({
     _showBookshelfModal() {
       return this.showBookshelfModal;
     },
+    folderRouteTitle() {
+      return this.folderRoute.map(({ title }) => title);
+    },
   },
   methods: {
     closeModal() {
       this.$emit("closeBookshelfModal");
     },
 
-    openFolder(title: string, children: Item[]) {
+    openFolder(targetId: string, title: string, children: Item[]) {
       this.items.push(children);
-
-      this.addRoute(title);
+      this.target = { ...this.target, id: targetId };
+      this.addRoute({ id: targetId, title });
     },
-    addRoute(title: string) {
-      this.folderRoute.push(title);
+    addRoute(target: { id: string; title: string }) {
+      this.folderRoute.push(target);
     },
     backward() {
       this.folderRoute.pop();
+      const prevTarget = this.folderRoute[this.folderRoute.length - 1];
+      if (prevTarget) {
+        this.target = { id: prevTarget?.id, type: "BACKGROUND" };
+      }
       this.items.pop();
     },
+    openContextMenu,
   },
 });
 </script>
