@@ -7,6 +7,9 @@
         elevation="0"
         @dblclick="open(item)"
         v-if="item.children"
+        @contextmenu.prevent.stop="
+          openContextMenu($event, { id: item.id, type: 'FOLDER' })
+        "
       >
         <div class="item-container">
           <v-icon class="item-icon">mdi-folder</v-icon>
@@ -22,6 +25,9 @@
         tile
         elevation="0"
         @dblclick="openUrl(item.id, item.url)"
+        @contextmenu.prevent.stop="
+          openContextMenu($event, { id: item.id, type: 'FILE' })
+        "
       >
         <div class="item-container">
           <Favicon :url="item.url" />
@@ -37,6 +43,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Item } from "../../shared/types/store";
+import { openContextMenu } from "../utils/contextMenu";
 import Favicon from "./Favicon.vue";
 
 export default defineComponent({
@@ -49,23 +56,24 @@ export default defineComponent({
   },
   methods: {
     open(item: Item) {
-      const { title, children = [], parentId } = item;
+      const { id, title, children = [], parentId } = item;
       const isRootItem = parentId === "1";
       if (isRootItem) {
-        this.openBookshelfModal(title, children);
+        this.openBookshelfModal(id, title, children);
       } else {
-        this.openFolder(title, children);
+        this.openFolder(id, title, children);
       }
     },
-    openFolder(title: string, children: Item[]) {
-      this.$emit("openFolder", title, children);
+    openFolder(targetId: string, title: string, children: Item[]) {
+      this.$emit("openFolder", targetId, title, children);
     },
-    openBookshelfModal(title: string, children: Item[]) {
-      this.$emit("openBookshelfModal", title, children);
+    openBookshelfModal(targetId: string, title: string, children: Item[]) {
+      this.$emit("openBookshelfModal", targetId, title, children);
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
+    openContextMenu,
   },
 });
 </script>
