@@ -1,20 +1,29 @@
 <template>
-  <div v-show="isShow" class="context-menu" :style="cssVars" ref="container">
-    <slot></slot>
+  <div
+    v-show="isShow"
+    v-if="currentTarget"
+    class="context-menu"
+    :style="cssVars"
+    ref="container"
+  >
+    <MenuItem :target="currentTarget" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import store from "../store/index";
+import MenuItem from "./MenuItem.vue";
+import store from "../../store/index";
 import { mapGetters } from "vuex";
 import {
   GET_CONTEXT_MENU_CSS_VARS,
   GET_CONTEXT_MENU_SHOW_STATE,
+  GET_CONTEXT_MENU_TARGET,
   SET_CONTEXT_MENU_SHOW_STATE,
-} from "../store/modules/contextMenu";
+} from "../../store/modules/contextMenu";
 
 export default defineComponent({
+  components: { MenuItem },
   mounted() {
     window.addEventListener("mousedown", this.onClickOutside, {
       capture: true,
@@ -30,6 +39,7 @@ export default defineComponent({
   computed: {
     ...mapGetters({ cssVars: GET_CONTEXT_MENU_CSS_VARS }),
     ...mapGetters({ isShow: GET_CONTEXT_MENU_SHOW_STATE }),
+    ...mapGetters({ currentTarget: GET_CONTEXT_MENU_TARGET }),
   },
   methods: {
     onClickOutside(event: MouseEvent) {
@@ -53,6 +63,6 @@ export default defineComponent({
   border: 1px solid black;
   background-color: white;
   min-width: 64px;
-  z-index: 1000;
+  z-index: 2147483647;
 }
 </style>
