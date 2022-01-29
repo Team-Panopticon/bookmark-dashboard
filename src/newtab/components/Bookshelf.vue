@@ -1,10 +1,6 @@
 <template>
   <div class="grid-container">
-    <div
-      v-for="(item, i) in items"
-      v-bind:key="i"
-      @contextmenu.prevent.stop="openContextMenu($event)"
-    >
+    <div v-for="(item, i) in items" v-bind:key="i">
       <v-btn
         class="btn"
         tile
@@ -35,25 +31,16 @@
         </div>
       </v-btn>
     </div>
-    <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-      <div class="context-menu-item">Edit</div>
-      <div class="context-menu-item">Delete</div>
-    </ContextMenu>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Item } from "../../shared/types/store";
-import ContextMenu, { Position } from "./ContextMenu.vue";
 import Favicon from "./Favicon.vue";
 
 export default defineComponent({
-  components: { ContextMenu, Favicon },
-  data: () => ({
-    showContextMenu: false,
-    contextMenuPosition: { x: 0, y: 0 } as Position,
-  }),
+  components: { Favicon },
   props: {
     items: {
       type: Array as PropType<Item[]>,
@@ -78,10 +65,6 @@ export default defineComponent({
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
-    },
-    openContextMenu(event: PointerEvent) {
-      this.contextMenuPosition = { x: event.clientX, y: event.clientY };
-      this.showContextMenu = true;
     },
   },
 });
