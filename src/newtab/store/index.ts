@@ -1,13 +1,16 @@
 import { Item } from "@/shared/types/store";
 import { createStore } from "vuex";
+import contextMenu from "./modules/contextMenu";
 
 export const GET_BOOKMARK_TREE = "getBookmarkTree";
 export const SET_BOOKMARK_TREE = "setBookmarkTree";
-export interface State {
+
+export interface RootState {
   bookmarkTree: Item[];
 }
 
-const store = createStore<State>({
+const store = createStore<RootState>({
+  modules: { contextMenu },
   state: {
     bookmarkTree: [] as Item[],
   },
