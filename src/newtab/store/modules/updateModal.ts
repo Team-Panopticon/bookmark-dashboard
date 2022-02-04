@@ -1,18 +1,23 @@
 import { Module } from "vuex";
 import { RootState } from "../index";
 
+import { Item } from "../../../shared/types/store";
 export const GET_BOOKMARK_UPDATE_INFO = "getBookmarkUpdateInfo";
 export const SET_BOOKMARK_UPDATE_INFO = "setBookmarkUpdateInfo";
 
 export const GET_BOOKMARK_UPDATE_SHOW = "getBookmarkUpdateShow";
 export const SET_BOOKMARK_UPDATE_SHOW = "setBookmarkUpdateShow";
 
+export const CLOSE_BOOKMARK_UPDATE = "closeBookmarkUpdateAction";
+
+export const OPEN_BOOKMARK_UPDATE = "openBookmarkUpdateAction";
+export interface IUpdateModalInfo {
+  id: string;
+  url?: string | undefined;
+  title: string;
+}
 export interface State {
-  updateModalInfo: {
-    id: string;
-    url: string;
-    title: string;
-  };
+  updateModalInfo: IUpdateModalInfo;
   updateModalShow: boolean;
 }
 
@@ -21,7 +26,7 @@ const updateModalModule: Module<State, RootState> = {
   state: {
     updateModalInfo: {
       id: "",
-      url: "",
+      url: undefined,
       title: "",
     },
     updateModalShow: false,
@@ -36,11 +41,27 @@ const updateModalModule: Module<State, RootState> = {
     },
   },
   mutations: {
-    [SET_BOOKMARK_UPDATE_INFO](state, _updateModalInfo) {
+    [SET_BOOKMARK_UPDATE_INFO](state, _updateModalInfo: IUpdateModalInfo) {
       state.updateModalInfo = { ..._updateModalInfo };
     },
-    [SET_BOOKMARK_UPDATE_SHOW](state, _updateModalShow) {
+    [SET_BOOKMARK_UPDATE_SHOW](state, _updateModalShow: boolean) {
       state.updateModalShow = _updateModalShow;
+    },
+  },
+  actions: {
+    [OPEN_BOOKMARK_UPDATE]({ commit }, updateModalInfo) {
+      commit(SET_BOOKMARK_UPDATE_INFO, updateModalInfo);
+      commit(SET_BOOKMARK_UPDATE_SHOW, true);
+    },
+
+    [CLOSE_BOOKMARK_UPDATE]({ commit }) {
+      console.log("close");
+      commit(SET_BOOKMARK_UPDATE_INFO, {
+        id: "",
+        url: undefined,
+        title: "",
+      });
+      commit(SET_BOOKMARK_UPDATE_SHOW, false);
     },
   },
 };
