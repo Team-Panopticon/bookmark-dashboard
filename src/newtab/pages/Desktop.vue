@@ -17,12 +17,14 @@
   <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
     <div class="context-menu-item">Create Folder</div>
   </ContextMenu>
+  <UpdateModal />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
+import UpdateModal from "../components/UpdateModal.vue";
 import BookshelfModal from "../components/BookshelfModal.vue";
 import ContextMenu, { Position } from "../components/ContextMenu.vue";
 import { mapGetters } from "vuex";
@@ -31,7 +33,7 @@ import { GET_BOOKMARK_TREE } from "../store";
 const OFFSET = 2;
 
 export default defineComponent({
-  components: { Bookshelf, BookshelfModal, ContextMenu },
+  components: { Bookshelf, BookshelfModal, ContextMenu, UpdateModal },
   data: () => ({
     modals: [] as modalInfo[],
     maxZIndex: 1000,

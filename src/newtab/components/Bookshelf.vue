@@ -3,7 +3,7 @@
     <div
       v-for="(item, i) in items"
       v-bind:key="i"
-      @contextmenu.prevent.stop="openContextMenu($event)"
+      @contextmenu.prevent.stop="openContextMenu($event, item)"
     >
       <v-btn
         class="btn"
@@ -36,7 +36,7 @@
       </v-btn>
     </div>
     <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-      <div class="context-menu-item">Edit</div>
+      <div class="context-menu-item" @click="openBookmarkModal">Edit</div>
       <div class="context-menu-item">Delete</div>
     </ContextMenu>
   </div>
@@ -47,12 +47,14 @@ import { defineComponent, PropType } from "vue";
 import { Item } from "../../shared/types/store";
 import ContextMenu, { Position } from "./ContextMenu.vue";
 import Favicon from "./Favicon.vue";
-
+import { mapActions } from "vuex";
+import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
 export default defineComponent({
   components: { ContextMenu, Favicon },
   data: () => ({
     showContextMenu: false,
     contextMenuPosition: { x: 0, y: 0 } as Position,
+    targetItem: {} as Item,
   }),
   props: {
     items: {
@@ -61,6 +63,10 @@ export default defineComponent({
     },
   },
   methods: {
+    ...mapActions([OPEN_BOOKMARK_UPDATE]),
+    openBookmarkModal() {
+      this[OPEN_BOOKMARK_UPDATE](this.targetItem);
+    },
     open(item: Item) {
       const { title, children = [], parentId } = item;
       const isRootItem = parentId === "1";
@@ -79,9 +85,10 @@ export default defineComponent({
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
-    openContextMenu(event: PointerEvent) {
+    openContextMenu(event: PointerEvent, item: Item) {
       this.contextMenuPosition = { x: event.clientX, y: event.clientY };
       this.showContextMenu = true;
+      this.targetItem = item;
     },
   },
 });
