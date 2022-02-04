@@ -55,7 +55,6 @@ const updateModalModule: Module<State, RootState> = {
     },
 
     [CLOSE_BOOKMARK_UPDATE]({ commit }) {
-      console.log("close");
       commit(SET_BOOKMARK_UPDATE_INFO, {
         id: "",
         url: undefined,
