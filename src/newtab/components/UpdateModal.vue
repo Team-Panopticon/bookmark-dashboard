@@ -5,6 +5,7 @@
     content-class="modal-content"
     overlay-class="modal-overlay"
     :drag="true"
+    drag-selector=".modal-banner"
     :resize="true"
     :max-height="700"
     :max-width="700"
@@ -30,12 +31,14 @@
             label="이름"
             required
             outlined="true"
+            v-on:click.stop.self
           ></v-text-field>
           <v-text-field
             v-show="isBookmark"
             v-model="bookmarkUpdateModalInfo.url"
             label="URL"
             required
+            v-on:click.stop
           >
           </v-text-field>
         </v-form>
@@ -125,6 +128,7 @@ export default defineComponent({
 
 .modal-banner {
   display: flex;
+  width: 100%;
   justify-content: space-between;
 }
 </style>
