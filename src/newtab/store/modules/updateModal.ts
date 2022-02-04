@@ -55,12 +55,12 @@ const updateModalModule: Module<State, RootState> = {
     },
 
     [CLOSE_BOOKMARK_UPDATE]({ commit }) {
+      commit(SET_BOOKMARK_UPDATE_SHOW, false);
       commit(SET_BOOKMARK_UPDATE_INFO, {
         id: "",
         url: undefined,
         title: "",
       });
-      commit(SET_BOOKMARK_UPDATE_SHOW, false);
     },
   },
 };
