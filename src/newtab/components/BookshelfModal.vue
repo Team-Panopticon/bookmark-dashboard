@@ -5,6 +5,7 @@
     content-class="modal-content"
     overlay-class="modal-overlay"
     :drag="true"
+    drag-selector=".modal-banner"
     :resize="true"
     :max-height="700"
     :max-width="700"
