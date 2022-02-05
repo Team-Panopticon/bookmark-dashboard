@@ -25,7 +25,7 @@
           <button v-if="showBackward" class="modal__backward" @click="backward">
             <v-icon>mdi-keyboard-backspace</v-icon>
           </button>
-          <v-breadcrumbs :items="folderRouteTitle"></v-breadcrumbs>
+          <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
         </div>
         <button class="modal__close" @click="closeBookshelfModal(initId)">
           <v-icon>mdi-close</v-icon>
@@ -68,10 +68,6 @@ export default defineComponent({
     zIndex: {
       required: true,
       type: Number,
-    },
-    targetId: {
-      required: true,
-      type: String,
     },
   },
   data() {

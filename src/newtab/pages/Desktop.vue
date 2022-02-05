@@ -3,12 +3,14 @@
   <CreateModal></CreateModal>
   <BookshelfModalContainer></BookshelfModalContainer>
   <ContextMenu />
+  <UpdateModal />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import Bookshelf from "../components/Bookshelf.vue";
 import { mapGetters, mapMutations } from "vuex";
+import UpdateModal from "../components/UpdateModal.vue";
 import { GET_BOOKMARK_TREE_CHILDREN, GET_BOOKMARK_TREE_ROOT } from "../store";
 import CreateModal from "../components/CreateModal.vue";
 import { SET_BOOKMARK_CREATE_INFO } from "../store/modules/createModal";
@@ -16,7 +18,13 @@ import BookshelfModalContainer from "../components/BookshelfModalContainer.vue";
 import ContextMenu from "../components/ContextMenu/ContextMenu.vue";
 
 export default defineComponent({
-  components: { Bookshelf, CreateModal, BookshelfModalContainer, ContextMenu },
+  components: {
+    Bookshelf,
+    CreateModal,
+    BookshelfModalContainer,
+    ContextMenu,
+    UpdateModal,
+  },
   data: () => ({
     maxZIndex: 1000,
   }),

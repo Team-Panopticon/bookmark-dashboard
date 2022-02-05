@@ -51,6 +51,8 @@ import { mapMutations } from "vuex";
 import { Item } from "../../shared/types/store";
 import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
 import Favicon from "./Favicon.vue";
+import { mapActions } from "vuex";
+import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
 import { openContextMenu } from "../utils/contextMenu";
 
 export default defineComponent({
@@ -61,8 +63,16 @@ export default defineComponent({
       required: true,
     },
   },
+  data: () => ({
+    targetItem: {} as Item,
+  }),
   methods: {
     ...mapMutations([OPEN_BOOKSHELF_MODALS]),
+    ...mapActions([OPEN_BOOKMARK_UPDATE]),
+    openBookmarkModal() {
+      // TODO: 네이밍 변경(ex. updateModal)
+      this[OPEN_BOOKMARK_UPDATE](this.targetItem);
+    },
     open(item: Item) {
       const { id, title, children = [], parentId } = item;
       const isRootItem = parentId === "1";
