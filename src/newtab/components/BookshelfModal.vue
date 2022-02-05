@@ -1,20 +1,25 @@
 <template>
   <vue-final-modal
-    v-model="_showBookshelfModal"
+    v-model="showBookshelfModal"
     classes="modal-container"
     content-class="modal-content"
     overlay-class="modal-overlay"
+    :min-height="300"
     :drag="true"
     :resize="true"
-    :max-height="700"
-    :max-width="700"
     :hide-overlay="true"
     :click-to-close="false"
     :esc-to-close="false"
     :prevent-click="true"
     :z-index="zIndex"
   >
-    <v-card class="modal-inner" outlined title elevation="7">
+    <v-card
+      class="modal-inner"
+      outlined
+      title
+      elevation="7"
+      @mousedown.capture="focusBookshelfModal(initId)"
+    >
       <v-card-header class="modal-banner bg-primary">
         <div class="modal__title d-flex">
           <button v-if="showBackward" class="modal__backward" @click="backward">
@@ -22,7 +27,7 @@
           </button>
           <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
         </div>
-        <button class="modal__close" @click="closeModal">
+        <button class="modal__close" @click="closeBookshelfModal(initId)">
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
@@ -32,7 +37,12 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { mapMutations } from "vuex";
 import { Item } from "../../shared/types/store";
+import {
+  CLOSE_BOOKSHELF_MODALS,
+  FOCUS_BOOKSHELF_MODALS,
+} from "../store/modules/bookshelfModal";
 import Bookshelf from "./Bookshelf.vue";
 
 interface BreadCrumb {
@@ -43,13 +53,17 @@ interface BreadCrumb {
 export default defineComponent({
   components: { Bookshelf },
   props: {
-    initFolderItem: {
-      type: Object as PropType<Item>,
+    initId: {
+      type: String,
       required: true,
     },
-    showBookshelfModal: {
+    initItems: {
+      type: Array as PropType<Item[]>,
       required: true,
-      type: Boolean,
+    },
+    initTitle: {
+      type: String,
+      required: true,
     },
     zIndex: {
       required: true,
@@ -58,7 +72,10 @@ export default defineComponent({
   },
   data() {
     return {
-      children: [] as Item[],
+      // children: [] as Item[],
+      // folderRoute: [] as string[],
+      // items: [] as Item[][],
+      showBookshelfModal: true,
       folderItems: [] as Item[],
     };
   },
@@ -80,12 +97,14 @@ export default defineComponent({
     },
   },
   created() {
-    this.folderItems.push(this.initFolderItem);
+    this.folderItems.push({
+      id: this.initId,
+      title: this.initTitle,
+      children: this.initItems,
+    });
   },
   methods: {
-    closeModal() {
-      this.$emit("closeBookshelfModal");
-    },
+    ...mapMutations([CLOSE_BOOKSHELF_MODALS, FOCUS_BOOKSHELF_MODALS]),
     openFolder(folderItem: Item) {
       this.folderItems.push(folderItem);
     },
@@ -108,6 +127,11 @@ export default defineComponent({
     width: 500px;
     height: 500px;
   }
+}
+.modal-inner {
+  border: 1px solid lightgray;
+  width: 100%;
+  height: 100%;
 }
 .modal-banner {
   display: flex;
