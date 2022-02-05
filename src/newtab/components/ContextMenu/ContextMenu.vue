@@ -1,18 +1,34 @@
 <template>
-  <div v-show="show" class="context-menu" :style="cssVars" ref="container">
-    <slot></slot>
+  <div
+    v-show="isShow"
+    v-if="currentTarget"
+    class="context-menu"
+    :style="cssVars"
+    ref="container"
+  >
+    <MenuItem :target="currentTarget" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-
-export interface Position {
-  x: number;
-  y: number;
-}
+import MenuItem from "./MenuItem.vue";
+import store from "../../store/index";
+import { mapGetters } from "vuex";
+import {
+  GET_CONTEXT_MENU_CSS_VARS,
+  GET_CONTEXT_MENU_SHOW_STATE,
+  GET_CONTEXT_MENU_TARGET,
+  SET_CONTEXT_MENU_SHOW_STATE,
+} from "../../store/modules/contextMenu";
 
 export default defineComponent({
+  components: { MenuItem },
+  computed: {
+    ...mapGetters({ cssVars: GET_CONTEXT_MENU_CSS_VARS }),
+    ...mapGetters({ isShow: GET_CONTEXT_MENU_SHOW_STATE }),
+    ...mapGetters({ currentTarget: GET_CONTEXT_MENU_TARGET }),
+  },
   mounted() {
     window.addEventListener("mousedown", this.onClickOutside, {
       capture: true,
@@ -25,25 +41,6 @@ export default defineComponent({
     window.removeEventListener("mousedown", this.onClickOutside);
     window.removeEventListener("contextmenu", this.onClickOutside);
   },
-  props: {
-    show: {
-      type: Boolean,
-      required: true,
-    },
-    position: {
-      type: Object,
-      required: true,
-    },
-  },
-  emits: ["update:show"],
-  computed: {
-    cssVars() {
-      return {
-        "--top": `${this.position.y}px`,
-        "--left": `${this.position.x}px`,
-      };
-    },
-  },
   methods: {
     onClickOutside(event: MouseEvent) {
       const targetElement = event.target as HTMLElement;
@@ -51,7 +48,7 @@ export default defineComponent({
       const parentContextMenu = targetElement.closest(".context-menu");
       const clickedOutside = parentContextMenu !== this.$refs.container;
       if (clickedOutside) {
-        this.$emit("update:show", false);
+        store.commit(SET_CONTEXT_MENU_SHOW_STATE, false);
       }
     },
   },
@@ -66,6 +63,6 @@ export default defineComponent({
   border: 1px solid black;
   background-color: white;
   min-width: 64px;
-  z-index: 1000;
+  z-index: 2147483647;
 }
 </style>

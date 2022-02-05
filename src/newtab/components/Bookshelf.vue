@@ -1,19 +1,20 @@
 <template>
   <div
     class="grid-container"
-    @contextmenu.prevent.stop="openContextMenu($event, 'BACKGROUND')"
+    @contextmenu.prevent.stop="
+      openContextMenu($event, { id: folderItem.id, type: 'BACKGROUND' })
+    "
   >
-    <div
-      v-for="(item, i) in folderItem.children"
-      v-bind:key="i"
-      @contextmenu.prevent.stop="openContextMenu($event, 'ITEM')"
-    >
+    <div v-for="(item, i) in folderItem.children" v-bind:key="i">
       <v-btn
         class="btn"
         tile
         elevation="0"
         @dblclick="open(item)"
         v-if="item.children"
+        @contextmenu.prevent.stop="
+          openContextMenu($event, { id: item.id, type: 'FOLDER' })
+        "
       >
         <div class="item-container">
           <v-icon class="item-icon">mdi-folder</v-icon>
@@ -29,6 +30,9 @@
         tile
         elevation="0"
         @dblclick="openUrl(item.id, item.url)"
+        @contextmenu.prevent.stop="
+          openContextMenu($event, { id: item.id, type: 'FILE' })
+        "
       >
         <div class="item-container">
           <Favicon :url="item.url" />
@@ -38,21 +42,6 @@
         </div>
       </v-btn>
     </div>
-    <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-      <div
-        v-show="contextMenuTarget === 'BACKGROUND'"
-        class="context-menu-item"
-        @click="openCreateModal"
-      >
-        Create Folder
-      </div>
-      <div v-show="contextMenuTarget === 'ITEM'" class="context-menu-item">
-        Edit
-      </div>
-      <div v-show="contextMenuTarget === 'ITEM'" class="context-menu-item">
-        Delete
-      </div>
-    </ContextMenu>
   </div>
 </template>
 
@@ -60,24 +49,18 @@
 import { defineComponent, PropType } from "vue";
 import { mapMutations } from "vuex";
 import { Item } from "../../shared/types/store";
-import { SET_BOOKMARK_CREATE_INFO } from "../store/modules/createModal";
 import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
-import ContextMenu, { Position } from "./ContextMenu.vue";
 import Favicon from "./Favicon.vue";
+import { openContextMenu } from "../utils/contextMenu";
 
 export default defineComponent({
-  components: { ContextMenu, Favicon },
+  components: { Favicon },
   props: {
     folderItem: {
       type: Object as PropType<chrome.bookmarks.BookmarkTreeNode>,
       required: true,
     },
   },
-  data: () => ({
-    showContextMenu: false,
-    contextMenuPosition: { x: 0, y: 0 } as Position,
-    contextMenuTarget: "",
-  }),
   methods: {
     ...mapMutations([OPEN_BOOKSHELF_MODALS]),
     open(item: Item) {
@@ -98,19 +81,7 @@ export default defineComponent({
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
-    openContextMenu(event: PointerEvent, targetType: "ITEM" | "BACKGROUND") {
-      this.contextMenuPosition = { x: event.clientX, y: event.clientY };
-      this.contextMenuTarget = targetType;
-      this.showContextMenu = true;
-    },
-    openCreateModal() {
-      this.setCreateModalInfo({ parentId: this.folderItem.id });
-      this.$vfm.show("createModal");
-      this.showContextMenu = false;
-    },
-    ...mapMutations({
-      setCreateModalInfo: SET_BOOKMARK_CREATE_INFO,
-    }),
+    openContextMenu,
   },
 });
 </script>

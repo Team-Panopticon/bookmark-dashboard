@@ -1,11 +1,8 @@
 <template>
-  <Bookshelf
-    @openBookshelfModal="openBookshelfModal"
-    :folderItem="bookmarkTreeRoot"
-    @contextmenu.prevent.stop="openContextMenu($event)"
-  ></Bookshelf>
+  <Bookshelf :folderItem="bookmarkTreeRoot"></Bookshelf>
   <CreateModal></CreateModal>
   <BookshelfModalContainer></BookshelfModalContainer>
+  <ContextMenu />
 </template>
 
 <script lang="ts">
@@ -16,13 +13,12 @@ import { GET_BOOKMARK_TREE_CHILDREN, GET_BOOKMARK_TREE_ROOT } from "../store";
 import CreateModal from "../components/CreateModal.vue";
 import { SET_BOOKMARK_CREATE_INFO } from "../store/modules/createModal";
 import BookshelfModalContainer from "../components/BookshelfModalContainer.vue";
-import { Position } from "../components/ContextMenu.vue";
+import ContextMenu from "../components/ContextMenu/ContextMenu.vue";
 
 export default defineComponent({
-  components: { Bookshelf, CreateModal, BookshelfModalContainer },
+  components: { Bookshelf, CreateModal, BookshelfModalContainer, ContextMenu },
   data: () => ({
-    contextMenuPosition: { x: 0, y: 0 } as Position,
-    showContextMenu: false,
+    maxZIndex: 1000,
   }),
   computed: {
     ...mapGetters({
@@ -34,14 +30,9 @@ export default defineComponent({
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
-    openContextMenu(event: PointerEvent) {
-      this.contextMenuPosition = { x: event.clientX, y: event.clientY };
-      this.showContextMenu = true;
-    },
     openCreateModal() {
       this.setCreateModalInfo({ parentId: this.bookmarkTreeRoot.id });
       this.$vfm.show("createModal");
-      this.showContextMenu = false;
     },
     ...mapMutations({
       setCreateModalInfo: `createModalModule/${SET_BOOKMARK_CREATE_INFO}`,
@@ -51,11 +42,23 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.context-menu-item {
-  padding: 4px 8px;
-  &:hover {
-    background-color: rgba(54, 69, 79, 0.2);
-    cursor: pointer;
-  }
+::v-deep .modal-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+::v-deep .modal-content {
+  position: relative;
+  width: 500px;
+  height: 500px;
+}
+
+.modal-inner {
+  border: 1px solid lightgray;
+}
+
+.modal-banner {
+  display: flex;
+  justify-content: space-between;
 }
 </style>
