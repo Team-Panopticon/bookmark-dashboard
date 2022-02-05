@@ -66,17 +66,17 @@ import Favicon from "./Favicon.vue";
 
 export default defineComponent({
   components: { ContextMenu, Favicon },
-  data: () => ({
-    showContextMenu: false,
-    contextMenuPosition: { x: 0, y: 0 } as Position,
-    contextMenuTarget: "",
-  }),
   props: {
     folderItem: {
       type: Object as PropType<chrome.bookmarks.BookmarkTreeNode>,
       required: true,
     },
   },
+  data: () => ({
+    showContextMenu: false,
+    contextMenuPosition: { x: 0, y: 0 } as Position,
+    contextMenuTarget: "",
+  }),
   methods: {
     open(item: Item) {
       const { parentId } = item;

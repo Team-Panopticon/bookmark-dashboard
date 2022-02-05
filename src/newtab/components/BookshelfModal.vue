@@ -35,14 +35,13 @@ import { defineComponent, PropType } from "vue";
 import { Item } from "../../shared/types/store";
 import Bookshelf from "./Bookshelf.vue";
 
+interface BreadCrumb {
+  disabled: boolean;
+  text: string | number;
+}
+
 export default defineComponent({
   components: { Bookshelf },
-  data() {
-    return {
-      children: [] as Item[],
-      folderItems: [] as Item[],
-    };
-  },
   props: {
     initFolderItem: {
       type: Object as PropType<Item>,
@@ -57,8 +56,11 @@ export default defineComponent({
       type: Number,
     },
   },
-  created() {
-    this.folderItems.push(this.initFolderItem);
+  data() {
+    return {
+      children: [] as Item[],
+      folderItems: [] as Item[],
+    };
   },
   computed: {
     showBackward() {
@@ -70,9 +72,15 @@ export default defineComponent({
     _showBookshelfModal() {
       return this.showBookshelfModal;
     },
-    folderRoute() {
-      return this.folderItems.map((item) => item.title);
+    folderRoute(): BreadCrumb[] {
+      return this.folderItems.map((item) => ({
+        disabled: false,
+        text: item.title,
+      }));
     },
+  },
+  created() {
+    this.folderItems.push(this.initFolderItem);
   },
   methods: {
     closeModal() {
