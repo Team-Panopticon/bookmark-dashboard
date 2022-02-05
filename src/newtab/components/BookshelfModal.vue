@@ -26,7 +26,7 @@
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-      <Bookshelf @openFolder="openFolder" :items="viewItem"> </Bookshelf>
+      <Bookshelf @openFolder="openFolder" :folderItem="viewItem"> </Bookshelf>
     </v-card>
   </vue-final-modal>
 </template>
@@ -40,17 +40,12 @@ export default defineComponent({
   data() {
     return {
       children: [] as Item[],
-      folderRoute: [] as string[],
-      items: [] as Item[][],
+      folderItems: [] as Item[],
     };
   },
   props: {
-    initItems: {
-      type: Array as PropType<Item[]>,
-      required: true,
-    },
-    initTitle: {
-      type: String,
+    initFolderItem: {
+      type: Object as PropType<Item>,
       required: true,
     },
     showBookshelfModal: {
@@ -63,57 +58,49 @@ export default defineComponent({
     },
   },
   created() {
-    this.items.push(this.initItems);
-    this.folderRoute.push(this.initTitle);
+    this.folderItems.push(this.initFolderItem);
   },
   computed: {
     showBackward() {
       return this.folderRoute.length > 1;
     },
     viewItem() {
-      return this.items[this.items.length - 1];
+      return this.folderItems[this.folderItems.length - 1];
     },
     _showBookshelfModal() {
       return this.showBookshelfModal;
+    },
+    folderRoute() {
+      return this.folderItems.map((item) => item.title);
     },
   },
   methods: {
     closeModal() {
       this.$emit("closeBookshelfModal");
     },
-
-    openFolder(title: string, children: Item[]) {
-      this.items.push(children);
-
-      this.addRoute(title);
-    },
-    addRoute(title: string) {
-      this.folderRoute.push(title);
+    openFolder(folderItem: Item) {
+      this.folderItems.push(folderItem);
     },
     backward() {
-      this.folderRoute.pop();
-      this.items.pop();
+      this.folderItems.pop();
     },
   },
 });
 </script>
 
-<style scoped>
-::v-deep .modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+<style lang="scss" scoped>
+.vfm::v-deep {
+  .modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    position: relative;
+    width: 500px;
+    height: 500px;
+  }
 }
-::v-deep .modal-content {
-  position: relative;
-  width: 500px;
-  height: 500px;
-}
-
-.modal-inner {
-  border: 1px solid lightgray;
-}
-
 .modal-banner {
   display: flex;
   justify-content: space-between;

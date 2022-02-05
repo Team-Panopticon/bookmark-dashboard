@@ -1,9 +1,12 @@
 <template>
-  <div class="grid-container">
+  <div
+    class="grid-container"
+    @contextmenu.prevent.stop="openContextMenu($event, 'BACKGROUND')"
+  >
     <div
-      v-for="(item, i) in items"
+      v-for="(item, i) in folderItem.children"
       v-bind:key="i"
-      @contextmenu.prevent.stop="openContextMenu($event)"
+      @contextmenu.prevent.stop="openContextMenu($event, 'ITEM')"
     >
       <v-btn
         class="btn"
@@ -36,15 +39,28 @@
       </v-btn>
     </div>
     <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-      <div class="context-menu-item">Edit</div>
-      <div class="context-menu-item">Delete</div>
+      <div
+        v-show="contextMenuTarget === 'BACKGROUND'"
+        class="context-menu-item"
+        @click="openCreateModal"
+      >
+        Create Folder
+      </div>
+      <div v-show="contextMenuTarget === 'ITEM'" class="context-menu-item">
+        Edit
+      </div>
+      <div v-show="contextMenuTarget === 'ITEM'" class="context-menu-item">
+        Delete
+      </div>
     </ContextMenu>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { mapMutations } from "vuex";
 import { Item } from "../../shared/types/store";
+import { SET_BOOKMARK_CREATE_INFO } from "../store/modules/createModal";
 import ContextMenu, { Position } from "./ContextMenu.vue";
 import Favicon from "./Favicon.vue";
 
@@ -53,36 +69,46 @@ export default defineComponent({
   data: () => ({
     showContextMenu: false,
     contextMenuPosition: { x: 0, y: 0 } as Position,
+    contextMenuTarget: "",
   }),
   props: {
-    items: {
-      type: Array as PropType<Item[]>,
+    folderItem: {
+      type: Object as PropType<chrome.bookmarks.BookmarkTreeNode>,
       required: true,
     },
   },
   methods: {
     open(item: Item) {
-      const { title, children = [], parentId } = item;
+      const { parentId } = item;
       const isRootItem = parentId === "1";
       if (isRootItem) {
-        this.openBookshelfModal(title, children);
+        this.openBookshelfModal(item);
       } else {
-        this.openFolder(title, children);
+        this.openFolder(item);
       }
     },
-    openFolder(title: string, children: Item[]) {
-      this.$emit("openFolder", title, children);
+    openFolder(folderItem: Item) {
+      this.$emit("openFolder", folderItem);
     },
-    openBookshelfModal(title: string, children: Item[]) {
-      this.$emit("openBookshelfModal", title, children);
+    openBookshelfModal(folderItem: Item) {
+      this.$emit("openBookshelfModal", folderItem);
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
-    openContextMenu(event: PointerEvent) {
+    openContextMenu(event: PointerEvent, targetType: "ITEM" | "BACKGROUND") {
       this.contextMenuPosition = { x: event.clientX, y: event.clientY };
+      this.contextMenuTarget = targetType;
       this.showContextMenu = true;
     },
+    openCreateModal() {
+      this.setCreateModalInfo({ parentId: this.folderItem.id });
+      this.$vfm.show("createModal");
+      this.showContextMenu = false;
+    },
+    ...mapMutations({
+      setCreateModalInfo: SET_BOOKMARK_CREATE_INFO,
+    }),
   },
 });
 </script>

@@ -1,22 +1,19 @@
 <template>
   <Bookshelf
     @openBookshelfModal="openBookshelfModal"
-    :items="items"
+    :folderItem="bookmarkTreeRoot"
     @contextmenu.prevent.stop="openContextMenu($event)"
   ></Bookshelf>
   <BookshelfModal
-    v-for="({ title, children, showBookshelfModal, zIndex }, i) in modals"
+    v-for="({ folderItem, showBookshelfModal, zIndex }, i) in modals"
     :key="i"
     @mousedown.capture="focusModal(i)"
     @closeBookshelfModal="closeBookshelfModal($event, i)"
-    :initItems="children"
-    :initTitle="title"
+    :initFolderItem="folderItem"
     :showBookshelfModal="showBookshelfModal"
     :zIndex="zIndex"
   ></BookshelfModal>
-  <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-    <div class="context-menu-item">Create Folder</div>
-  </ContextMenu>
+  <CreateModal />
 </template>
 
 <script lang="ts">
@@ -24,14 +21,16 @@ import { defineComponent } from "vue";
 import { Item, modalInfo } from "../../shared/types/store";
 import Bookshelf from "../components/Bookshelf.vue";
 import BookshelfModal from "../components/BookshelfModal.vue";
-import ContextMenu, { Position } from "../components/ContextMenu.vue";
-import { mapGetters } from "vuex";
-import { GET_BOOKMARK_TREE } from "../store";
+import { Position } from "../components/ContextMenu.vue";
+import { mapGetters, mapMutations } from "vuex";
+import { GET_BOOKMARK_TREE_CHILDREN, GET_BOOKMARK_TREE_ROOT } from "../store";
+import CreateModal from "../components/CreateModal.vue";
+import { SET_BOOKMARK_CREATE_INFO } from "../store/modules/createModal";
 
 const OFFSET = 2;
 
 export default defineComponent({
-  components: { Bookshelf, BookshelfModal, ContextMenu },
+  components: { Bookshelf, BookshelfModal, CreateModal },
   data: () => ({
     modals: [] as modalInfo[],
     maxZIndex: 1000,
@@ -39,13 +38,15 @@ export default defineComponent({
     showContextMenu: false,
   }),
   computed: {
-    ...mapGetters({ items: GET_BOOKMARK_TREE }),
+    ...mapGetters({
+      items: GET_BOOKMARK_TREE_CHILDREN,
+      bookmarkTreeRoot: GET_BOOKMARK_TREE_ROOT,
+    }),
   },
   methods: {
-    openBookshelfModal(title: string, children: Item[]) {
+    openBookshelfModal(folderItem: Item) {
       this.modals.push({
-        children: children,
-        title: title,
+        folderItem,
         showBookshelfModal: true,
         zIndex: (this.maxZIndex += OFFSET),
       });
@@ -63,31 +64,19 @@ export default defineComponent({
       this.contextMenuPosition = { x: event.clientX, y: event.clientY };
       this.showContextMenu = true;
     },
+    openCreateModal() {
+      this.setCreateModalInfo({ parentId: this.bookmarkTreeRoot.id });
+      this.$vfm.show("createModal");
+      this.showContextMenu = false;
+    },
+    ...mapMutations({
+      setCreateModalInfo: `createModalModule/${SET_BOOKMARK_CREATE_INFO}`,
+    }),
   },
 });
 </script>
 
 <style lang="scss" scoped>
-::v-deep .modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-::v-deep .modal-content {
-  position: relative;
-  width: 500px;
-  height: 500px;
-}
-
-.modal-inner {
-  border: 1px solid lightgray;
-}
-
-.modal-banner {
-  display: flex;
-  justify-content: space-between;
-}
-
 .context-menu-item {
   padding: 4px 8px;
   &:hover {
