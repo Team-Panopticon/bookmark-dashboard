@@ -6,6 +6,7 @@
     overlay-class="modal-overlay"
     :min-height="300"
     :drag="true"
+    drag-selector=".modal-banner"
     :resize="true"
     :hide-overlay="true"
     :click-to-close="false"
