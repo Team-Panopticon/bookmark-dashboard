@@ -1,16 +1,20 @@
 <template>
-  <div class="grid-container">
-    <div
-      v-for="(item, i) in items"
-      v-bind:key="i"
-      @contextmenu.prevent.stop="openContextMenu($event)"
-    >
+  <div
+    class="grid-container"
+    @contextmenu.prevent.stop="
+      openContextMenu($event, { id: folderItem.id, type: 'BACKGROUND' })
+    "
+  >
+    <div v-for="(item, i) in folderItem.children" v-bind:key="i">
       <v-btn
         class="btn"
         tile
         elevation="0"
         @dblclick="open(item)"
         v-if="item.children"
+        @contextmenu.prevent.stop="
+          openContextMenu($event, { id: item.id, type: 'FOLDER' })
+        "
       >
         <div class="item-container">
           <v-icon class="item-icon">mdi-folder</v-icon>
@@ -26,6 +30,9 @@
         tile
         elevation="0"
         @dblclick="openUrl(item.id, item.url)"
+        @contextmenu.prevent.stop="
+          openContextMenu($event, { id: item.id, type: 'FILE' })
+        "
       >
         <div class="item-container">
           <Favicon :url="item.url" />
@@ -35,54 +42,56 @@
         </div>
       </v-btn>
     </div>
-    <ContextMenu v-model:show="showContextMenu" :position="contextMenuPosition">
-      <div class="context-menu-item">Edit</div>
-      <div class="context-menu-item">Delete</div>
-    </ContextMenu>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import { mapMutations } from "vuex";
 import { Item } from "../../shared/types/store";
-import ContextMenu, { Position } from "./ContextMenu.vue";
+import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
 import Favicon from "./Favicon.vue";
+import { mapActions } from "vuex";
+import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
+import { openContextMenu } from "../utils/contextMenu";
 
 export default defineComponent({
-  components: { ContextMenu, Favicon },
-  data: () => ({
-    showContextMenu: false,
-    contextMenuPosition: { x: 0, y: 0 } as Position,
-  }),
+  components: { Favicon },
   props: {
-    items: {
-      type: Array as PropType<Item[]>,
+    folderItem: {
+      type: Object as PropType<chrome.bookmarks.BookmarkTreeNode>,
       required: true,
     },
   },
+  data: () => ({
+    targetItem: {} as Item,
+  }),
   methods: {
+    ...mapMutations([OPEN_BOOKSHELF_MODALS]),
+    ...mapActions([OPEN_BOOKMARK_UPDATE]),
+    openBookmarkModal() {
+      // TODO: 네이밍 변경(ex. updateModal)
+      this[OPEN_BOOKMARK_UPDATE](this.targetItem);
+    },
     open(item: Item) {
-      const { title, children = [], parentId } = item;
+      const { id, title, children = [], parentId } = item;
       const isRootItem = parentId === "1";
       if (isRootItem) {
-        this.openBookshelfModal(title, children);
+        this._openBookshelfModal(title, children, id);
       } else {
-        this.openFolder(title, children);
+        this.openFolder(item);
       }
     },
-    openFolder(title: string, children: Item[]) {
-      this.$emit("openFolder", title, children);
+    openFolder(folderItem: Item) {
+      this.$emit("openFolder", folderItem);
     },
-    openBookshelfModal(title: string, children: Item[]) {
-      this.$emit("openBookshelfModal", title, children);
+    _openBookshelfModal(title: string, children: Item[], id: string) {
+      this.openBookshelfModal({ title, children, id });
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
-    openContextMenu(event: PointerEvent) {
-      this.contextMenuPosition = { x: event.clientX, y: event.clientY };
-      this.showContextMenu = true;
-    },
+    openContextMenu,
   },
 });
 </script>
