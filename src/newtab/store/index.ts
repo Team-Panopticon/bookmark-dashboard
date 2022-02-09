@@ -3,7 +3,7 @@ import BookmarkApi from "../utils/bookmarkApi";
 
 import { Item } from "@/shared/types/store";
 import { createStore } from "vuex";
-import createModalModule from "./modules/createModal";
+import createModalModule from "./modules/createFolderModal";
 import createBookshelfModal from "./modules/bookshelfModal";
 import contextMenu from "./modules/contextMenu";
 
