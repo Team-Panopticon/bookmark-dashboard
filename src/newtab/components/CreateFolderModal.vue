@@ -1,7 +1,6 @@
 <template>
   <vue-final-modal
     v-model="show"
-    :name="'createModal'"
     classes="modal-container"
     content-class="modal-content"
     z-index="1100"
@@ -13,7 +12,7 @@
         <v-btn color="success" class="mr-4" @click="createFolder(folderName)"
           >Create Folder</v-btn
         >
-        <v-btn color="error" @click="closeCreateModal">Cancel</v-btn>
+        <v-btn color="error" @click="closeCreateFolderModal">Cancel</v-btn>
       </div>
     </v-card>
   </vue-final-modal>
@@ -21,14 +20,14 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapGetters, mapMutations } from "vuex";
-import { SET_BOOKMARK_TREE } from "../store";
+import { mapActions, mapGetters, mapMutations } from "vuex";
+import { RENEW_BOOKMARK_TREE, SET_BOOKMARK_TREE } from "../store";
 import {
   GET_BOOKMARK_CREATE_INFO,
   GET_BOOKMARK_CREATE_SHOW,
   RESET_BOOKMARK_CREATE_INFO,
   SET_BOOKMARK_CREATE_SHOW,
-} from "../store/modules/createModal";
+} from "../store/modules/createFolderModal";
 import BookmarkApi from "../utils/bookmarkApi";
 
 export default defineComponent({
@@ -40,38 +39,41 @@ export default defineComponent({
   }),
   computed: {
     ...mapGetters({
-      createModalInfo: GET_BOOKMARK_CREATE_INFO,
-      createModalShow: GET_BOOKMARK_CREATE_SHOW,
+      createFolderModalInfo: GET_BOOKMARK_CREATE_INFO,
+      createFolderModalShow: GET_BOOKMARK_CREATE_SHOW,
     }),
     show: {
       get() {
-        return this.createModalShow;
+        return this.createFolderModalShow;
       },
       set(newValue: boolean) {
-        this.setCreateModalShow(newValue);
+        this.setCreateFolderModalShow(newValue);
       },
     },
   },
   methods: {
     async createFolder(folderName: string) {
       const createSuccessful = await BookmarkApi.create(
-        this.createModalInfo.parentId,
+        this.createFolderModalInfo.parentId,
         folderName
       );
       if (createSuccessful) {
         this.folderName = "";
-        this.resetCreateModalInfo();
-        this.setCreateModalShow(false);
-        this.setBookmarkTree(await BookmarkApi.getTree());
+        this.resetCreateFolderModalInfo();
+        this.setCreateFolderModalShow(false);
+        this.renewBookmarkTree();
       }
     },
-    closeCreateModal() {
+    closeCreateFolderModal() {
       this.show = false;
     },
     ...mapMutations({
-      resetCreateModalInfo: RESET_BOOKMARK_CREATE_INFO,
-      setCreateModalShow: SET_BOOKMARK_CREATE_SHOW,
+      resetCreateFolderModalInfo: RESET_BOOKMARK_CREATE_INFO,
+      setCreateFolderModalShow: SET_BOOKMARK_CREATE_SHOW,
       setBookmarkTree: SET_BOOKMARK_TREE,
+    }),
+    ...mapActions({
+      renewBookmarkTree: RENEW_BOOKMARK_TREE,
     }),
   },
 });

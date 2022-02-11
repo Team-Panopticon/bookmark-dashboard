@@ -10,7 +10,7 @@
         class="btn"
         tile
         elevation="0"
-        @dblclick="open(item)"
+        @dblclick="onDblClickFolder(item)"
         v-if="item.children"
         @contextmenu.prevent.stop="
           openContextMenu($event, { id: item.id, type: 'FOLDER' })
@@ -48,7 +48,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { mapMutations } from "vuex";
-import { Item } from "../../shared/types/store";
+import { FolderItem, Item } from "../../shared/types/store";
 import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
 import Favicon from "./Favicon.vue";
 import { mapActions } from "vuex";
@@ -68,22 +68,22 @@ export default defineComponent({
   }),
   methods: {
     ...mapMutations([OPEN_BOOKSHELF_MODALS]),
-    ...mapActions([OPEN_BOOKMARK_UPDATE]),
+    ...mapActions([OPEN_BOOKMARK_UPDATE]), // updateMODAL
     openBookmarkModal() {
       // TODO: 네이밍 변경(ex. updateModal)
       this[OPEN_BOOKMARK_UPDATE](this.targetItem);
     },
-    open(item: Item) {
+    onDblClickFolder(item: Item) {
       const { id, title, children = [], parentId } = item;
       const isRootItem = parentId === "1";
       if (isRootItem) {
         this._openBookshelfModal(title, children, id);
       } else {
-        this.openFolder(item);
+        this.routeInFolder({ id, title, children });
       }
     },
-    openFolder(folderItem: Item) {
-      this.$emit("openFolder", folderItem);
+    routeInFolder(folderItem: FolderItem) {
+      this.$emit("routeInFolder", folderItem);
     },
     _openBookshelfModal(title: string, children: Item[], id: string) {
       this.openBookshelfModal({ title, children, id });

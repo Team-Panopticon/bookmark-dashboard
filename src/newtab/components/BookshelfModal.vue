@@ -32,14 +32,17 @@
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-      <Bookshelf @openFolder="openFolder" :folderItem="viewItem"></Bookshelf>
+      <Bookshelf
+        @routeInFolder="routeInFolder"
+        :folderItem="viewItem"
+      ></Bookshelf>
     </v-card>
   </vue-final-modal>
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { mapMutations } from "vuex";
-import { Item } from "../../shared/types/store";
+import { FolderItem, Item } from "../../shared/types/store";
 import {
   CLOSE_BOOKSHELF_MODALS,
   FOCUS_BOOKSHELF_MODALS,
@@ -73,11 +76,8 @@ export default defineComponent({
   },
   data() {
     return {
-      // children: [] as Item[],
-      // folderRoute: [] as string[],
-      // items: [] as Item[][],
       showBookshelfModal: true,
-      folderItems: [] as Item[],
+      folderItems: [] as FolderItem[],
     };
   },
   computed: {
@@ -106,7 +106,7 @@ export default defineComponent({
   },
   methods: {
     ...mapMutations([CLOSE_BOOKSHELF_MODALS, FOCUS_BOOKSHELF_MODALS]),
-    openFolder(folderItem: Item) {
+    routeInFolder(folderItem: FolderItem) {
       this.folderItems.push(folderItem);
     },
     backward() {

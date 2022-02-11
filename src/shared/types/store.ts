@@ -5,3 +5,9 @@ export type modalInfo = {
   showBookshelfModal: boolean;
   zIndex: number;
 };
+
+export interface FolderItem {
+  title: string;
+  id: string;
+  children: Item[];
+}

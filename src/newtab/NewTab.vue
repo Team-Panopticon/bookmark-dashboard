@@ -12,11 +12,11 @@ import { SET_BOOKMARK_TREE } from "./store";
 export default defineComponent({
   name: "Popup",
   components: { Desktop },
-  methods: {
-    ...mapMutations([SET_BOOKMARK_TREE]),
-  },
   async mounted() {
     this.setBookmarkTree(await BookmarkApi.getTree());
+  },
+  methods: {
+    ...mapMutations([SET_BOOKMARK_TREE]),
   },
 });
 </script>
