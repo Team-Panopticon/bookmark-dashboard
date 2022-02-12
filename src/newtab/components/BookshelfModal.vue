@@ -1,51 +1,58 @@
 <template>
-  <vue-final-modal
-    v-model="showBookshelfModal"
-    classes="modal-container"
-    content-class="modal-content"
-    overlay-class="modal-overlay"
-    :min-height="300"
-    :drag="true"
-    drag-selector=".modal-banner"
-    :resize="true"
-    :hide-overlay="true"
-    :click-to-close="false"
-    :esc-to-close="false"
-    :prevent-click="true"
-    :z-index="zIndex"
-  >
-    <v-card
-      class="modal-inner"
-      outlined
-      title
-      elevation="7"
-      @mousedown.capture="focusBookshelfModal(initId)"
+  <div ref="vfmContainerRef">
+    <vue-final-modal
+      v-model="showBookshelfModal"
+      classes="modal-container"
+      content-class="modal-content"
+      overlay-class="modal-overlay"
+      :min-height="300"
+      :drag="true"
+      drag-selector=".modal-banner"
+      :resize="true"
+      :hide-overlay="true"
+      :click-to-close="false"
+      :esc-to-close="false"
+      :prevent-click="true"
+      :z-index="zIndex"
     >
-      <v-card-header class="modal-banner bg-primary">
-        <div class="modal__title d-flex">
-          <button v-if="showBackward" class="modal__backward" @click="backward">
-            <v-icon>mdi-keyboard-backspace</v-icon>
+      <v-card
+        class="modal-inner"
+        outlined
+        title
+        elevation="7"
+        @mousedown.capture="focusBookshelfModal(initId)"
+      >
+        <v-card-header class="modal-banner bg-primary">
+          <div class="modal__title d-flex">
+            <button
+              v-if="showBackward"
+              class="modal__backward"
+              @click="backward"
+            >
+              <v-icon>mdi-keyboard-backspace</v-icon>
+            </button>
+            <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
+          </div>
+          <button class="modal__close" @click="closeBookshelfModal(initId)">
+            <v-icon>mdi-close</v-icon>
           </button>
-          <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
-        </div>
-        <button class="modal__close" @click="closeBookshelfModal(initId)">
-          <v-icon>mdi-close</v-icon>
-        </button>
-      </v-card-header>
-      <Bookshelf
-        @routeInFolder="routeInFolder"
-        :folderItem="viewItem"
-      ></Bookshelf>
-    </v-card>
-  </vue-final-modal>
+        </v-card-header>
+        <Bookshelf
+          @routeInFolder="routeInFolder"
+          :folderItem="viewItem"
+        ></Bookshelf>
+      </v-card>
+    </vue-final-modal>
+  </div>
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { mapMutations } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 import { FolderItem, Item } from "../../shared/types/store";
 import {
   CLOSE_BOOKSHELF_MODALS,
   FOCUS_BOOKSHELF_MODALS,
+  GET_BOOKSHELF_MODALS_CURRENT_POSITION,
 } from "../store/modules/bookshelfModal";
 import Bookshelf from "./Bookshelf.vue";
 
@@ -81,6 +88,7 @@ export default defineComponent({
     };
   },
   computed: {
+    ...mapGetters({ position: GET_BOOKSHELF_MODALS_CURRENT_POSITION }),
     showBackward() {
       return this.folderRoute.length > 1;
     },
@@ -103,6 +111,18 @@ export default defineComponent({
       title: this.initTitle,
       children: this.initItems,
     });
+  },
+  mounted() {
+    const vfmContainer = this.$refs.vfmContainerRef as HTMLDivElement;
+    const elVfmContainer = vfmContainer.querySelector(
+      ".modal-content"
+    ) as HTMLDivElement;
+    if (elVfmContainer) {
+      const { top, right } = this.position;
+      elVfmContainer.style.position = "absolute";
+      elVfmContainer.style.top = `${top}px`;
+      elVfmContainer.style.left = `${right}px`;
+    }
   },
   methods: {
     ...mapMutations([CLOSE_BOOKSHELF_MODALS, FOCUS_BOOKSHELF_MODALS]),

@@ -8,6 +8,11 @@ export const OPEN_BOOKSHELF_MODALS = "openBookshelfModal";
 export const FOCUS_BOOKSHELF_MODALS = "focusBookshelfModal";
 export const CLOSE_BOOKSHELF_MODALS = "closeBookshelfModal";
 
+export const GET_BOOKSHELF_MODALS_CURRENT_POSITION =
+  "getBookshelfModalsCurrentPosition";
+export const UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION =
+  "updateBookshelfModalsCurrentPosition";
+
 export interface BookshelfModalParams {
   id: string;
   title: string;
@@ -18,6 +23,12 @@ export interface BookshelfModalParams {
 export interface State {
   currentZIndex: number;
   bookshelfModals: BookshelfModals;
+  currentPosition: Position;
+}
+
+export interface Position {
+  top: number;
+  right: number;
 }
 
 export interface BookshelfModals {
@@ -25,15 +36,25 @@ export interface BookshelfModals {
 }
 
 const OFFSET = 2;
+const POSITION_OFFSET = 50;
 
 const createbookshelfModal: Module<State, RootState> = {
   state: {
     currentZIndex: 1000,
     bookshelfModals: {} as BookshelfModals,
+    currentPosition: { top: 0, right: 0 } as Position,
   },
   getters: {
     [GET_BOOKSHELF_MODALS](state) {
       return state.bookshelfModals;
+    },
+    [GET_BOOKSHELF_MODALS_CURRENT_POSITION](state) {
+      const { top, right } = state.currentPosition;
+      state.currentPosition = {
+        top: top + POSITION_OFFSET,
+        right: right + POSITION_OFFSET,
+      };
+      return { top, right };
     },
   },
   mutations: {
@@ -54,6 +75,10 @@ const createbookshelfModal: Module<State, RootState> = {
     [CLOSE_BOOKSHELF_MODALS](state, bookshelfModalId: string) {
       delete state.bookshelfModals[bookshelfModalId];
       console.debug("open bookshelfModal >> ", bookshelfModalId);
+    },
+    [UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION](state, position?: Position) {
+      const targetPosition = position ?? { top: 100, right: 100 };
+      state.currentPosition = targetPosition;
     },
   },
 };
