@@ -24,4 +24,7 @@ export default defineComponent({
 #newtab {
   height: 100vh;
 }
+html {
+  overflow-y: auto !important;
+}
 </style>
