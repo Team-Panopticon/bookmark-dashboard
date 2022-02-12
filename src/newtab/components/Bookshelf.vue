@@ -54,44 +54,56 @@ import Favicon from "./Favicon.vue";
 import { mapActions } from "vuex";
 import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
 import { openContextMenu } from "../utils/contextMenu";
+import BookmarkApi from "../utils/bookmarkApi";
 
 export default defineComponent({
   components: { Favicon },
   props: {
-    folderItem: {
-      type: Object as PropType<chrome.bookmarks.BookmarkTreeNode>,
+    id: {
+      type: String,
       required: true,
+    },
+    isDesktop: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data: () => ({
-    targetItem: {} as Item,
+    folderItem: {} as Item,
   }),
+  async mounted() {
+    this.refresh();
+  },
   methods: {
     ...mapMutations([OPEN_BOOKSHELF_MODALS]),
     ...mapActions([OPEN_BOOKMARK_UPDATE]), // updateMODAL
     openBookmarkModal() {
       // TODO: 네이밍 변경(ex. updateModal)
-      this[OPEN_BOOKMARK_UPDATE](this.targetItem);
+      this[OPEN_BOOKMARK_UPDATE](this.folderItem);
     },
     onDblClickFolder(item: Item) {
-      const { id, title, children = [], parentId } = item;
-      const isRootItem = parentId === "1";
-      if (isRootItem) {
-        this._openBookshelfModal(title, children, id);
+      const { id, title } = item;
+      // const isRootItem = this.id === "1";
+      if (this.isDesktop) {
+        this._openBookshelfModal(id, title);
       } else {
-        this.routeInFolder({ id, title, children });
+        this.routeInFolder(id, title);
       }
     },
-    routeInFolder(folderItem: FolderItem) {
-      this.$emit("routeInFolder", folderItem);
+    routeInFolder(id: string, title: string) {
+      this.$emit("routeInFolder", id);
     },
-    _openBookshelfModal(title: string, children: Item[], id: string) {
-      this.openBookshelfModal({ title, children, id });
+    _openBookshelfModal(id: string, title: string) {
+      this.openBookshelfModal({ id, title });
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
     openContextMenu,
+    async refresh() {
+      this.folderItem = await BookmarkApi.getSubTree(this.id);
+    },
   },
 });
 </script>

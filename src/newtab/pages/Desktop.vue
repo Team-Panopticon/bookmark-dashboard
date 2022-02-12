@@ -1,5 +1,5 @@
 <template>
-  <Bookshelf :folderItem="bookmarkTreeRoot"></Bookshelf>
+  <Bookshelf id="1" :isDesktop="true"></Bookshelf>
   <CreateFolderModal></CreateFolderModal>
   <BookshelfModalContainer></BookshelfModalContainer>
   <ContextMenu />
