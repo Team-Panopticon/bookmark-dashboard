@@ -1,10 +1,23 @@
 <template>
   <div class="favicon-wrapper">
-    <img class="favicon" :src="src" alt="icon" />
+    <img
+      :class="isLoading ? `favicon` : `disable`"
+      :src="loadingImage"
+      alt="loading"
+    />
+    <img
+      :class="isLoading ? `disable` : `favicon`"
+      :src="imgSrc"
+      @load="loadImage"
+      @error="notFoundImage"
+      alt="icon"
+    />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
+import LoadingImg from "../../assets/loding.gif";
+import NotFoundImg from "../../assets/not-found.png";
 
 const PREFIX = "https://www.google.com/s2/favicons?domain=";
 
@@ -15,9 +28,17 @@ export default defineComponent({
       required: true,
     },
   },
-  computed: {
-    src() {
-      return PREFIX + this.url;
+  data: () => ({ isLoading: true, loadingImage: LoadingImg, imgSrc: "" }),
+  created() {
+    this.imgSrc = PREFIX + this.url;
+  },
+  methods: {
+    loadImage() {
+      this.isLoading = false;
+    },
+
+    notFoundImage() {
+      this.imgSrc = NotFoundImg;
     },
   },
 });
@@ -36,6 +57,10 @@ export default defineComponent({
   .favicon {
     width: 24px;
     height: 24px;
+  }
+
+  .disable {
+    display: none;
   }
 }
 </style>

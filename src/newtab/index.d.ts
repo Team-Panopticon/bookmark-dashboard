@@ -4,3 +4,6 @@ declare module "v-contextmenu" {
   export const Contextmenu: any;
   export const ContextmenuItem: any;
 }
+
+declare module "*.gif";
+declare module "*.png";
