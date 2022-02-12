@@ -9,5 +9,4 @@ export type modalInfo = {
 export interface FolderItem {
   title: string;
   id: string;
-  children: Item[];
 }
