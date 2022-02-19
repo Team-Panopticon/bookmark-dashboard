@@ -1,6 +1,17 @@
-import { Item } from "@/shared/types/store";
+import { Item, FolderItem } from "@/shared/types/store";
 
 class BookmarkApi {
+  static async get(ids: string[]): Promise<FolderItem[]> {
+    const bookMarks = await chrome.bookmarks.get(ids);
+
+    return bookMarks;
+  }
+
+  static async getSubTree(id: string): Promise<Item> {
+    const bookMarks = await chrome.bookmarks.getSubTree(id);
+    return bookMarks[0];
+  }
+
   static async getTree(): Promise<Item> {
     const bookMarks = await chrome.bookmarks.getTree();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

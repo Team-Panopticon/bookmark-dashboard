@@ -1,10 +1,10 @@
 <template>
   <BookshelfModal
-    v-for="({ title, children, zIndex }, id) in modals"
-    :key="id"
-    :initId="id"
-    :initItems="children"
-    :initTitle="title"
+    v-for="({ zIndex, title, id }, bookshelfModalId) in modals"
+    :key="bookshelfModalId"
+    :id="id"
+    :bookshelfModalId="bookshelfModalId"
+    :title="title"
     :zIndex="zIndex"
   ></BookshelfModal>
 </template>

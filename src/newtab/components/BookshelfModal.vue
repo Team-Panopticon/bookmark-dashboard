@@ -19,7 +19,7 @@
       outlined
       title
       elevation="7"
-      @mousedown.capture="focusBookshelfModal(initId)"
+      @mousedown.capture="focusBookshelfModal(bookshelfModalId)"
     >
       <v-card-header class="modal-banner bg-primary">
         <div class="modal__title d-flex">
@@ -28,29 +28,37 @@
           </button>
           <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
         </div>
-        <button class="modal__close" @click="closeBookshelfModal(initId)">
+        <button
+          class="modal__close"
+          @click="closeBookshelfModal(bookshelfModalId)"
+        >
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-      <div class="v-card-content">
-        <Bookshelf
-          @routeInFolder="routeInFolder"
-          :folderItem="viewItem"
-        ></Bookshelf>
-      </div>
+
+    <div class="v-card-content">
+      <Bookshelf
+        v-if="viewItem.id"
+        :key="viewItem.id"
+        @routeInFolder="routeInFolder"
+        :id="viewItem.id"
+        :title="viewItem.title"
+      ></Bookshelf>
+       </div>
+
     </v-card>
   </vue-final-modal>
 </template>
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent } from "vue";
 import { mapMutations } from "vuex";
-import { FolderItem, Item } from "../../shared/types/store";
+import { FolderItem } from "../../shared/types/store";
 import {
   CLOSE_BOOKSHELF_MODALS,
   FOCUS_BOOKSHELF_MODALS,
 } from "../store/modules/bookshelfModal";
 import Bookshelf from "./Bookshelf.vue";
-
+import BookmarkApi from "../utils/bookmarkApi";
 interface BreadCrumb {
   disabled: boolean;
   text: string | number;
@@ -59,15 +67,11 @@ interface BreadCrumb {
 export default defineComponent({
   components: { Bookshelf },
   props: {
-    initId: {
+    bookshelfModalId: {
       type: String,
       required: true,
     },
-    initItems: {
-      type: Array as PropType<Item[]>,
-      required: true,
-    },
-    initTitle: {
+    id: {
       type: String,
       required: true,
     },
@@ -84,10 +88,7 @@ export default defineComponent({
   },
   computed: {
     showBackward() {
-      return this.folderRoute.length > 1;
-    },
-    viewItem() {
-      return this.folderItems[this.folderItems.length - 1];
+      return this.viewItem.id !== "1";
     },
     _showBookshelfModal() {
       return this.showBookshelfModal;
@@ -98,21 +99,32 @@ export default defineComponent({
         text: item.title,
       }));
     },
+    viewItem() {
+      return this.folderItems[this.folderItems.length - 1];
+    },
   },
+
   created() {
-    this.folderItems.push({
-      id: this.initId,
-      title: this.initTitle,
-      children: this.initItems,
-    });
+    this.routeInFolder(this.id);
   },
   methods: {
     ...mapMutations([CLOSE_BOOKSHELF_MODALS, FOCUS_BOOKSHELF_MODALS]),
-    routeInFolder(folderItem: FolderItem) {
-      this.folderItems.push(folderItem);
+    async routeInFolder(id: string) {
+      this.folderItems.push({ id, title: "" });
+      await this.routePathRefresh();
     },
-    backward() {
+    async backward() {
       this.folderItems.pop();
+      if (this.folderItems.length == 0) {
+        this.folderItems.push({ id: "1", title: "" });
+      }
+      await this.routePathRefresh();
+    },
+    async routePathRefresh() {
+      const ids = this.folderItems.map((item) => {
+        return item.id;
+      });
+      if (ids.length > 0) this.folderItems = await BookmarkApi.get(ids);
     },
   },
 });
