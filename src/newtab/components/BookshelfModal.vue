@@ -35,6 +35,8 @@
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
+
+    <div class="v-card-content">
       <Bookshelf
         v-if="viewItem.id"
         :key="viewItem.id"
@@ -42,6 +44,8 @@
         :id="viewItem.id"
         :title="viewItem.title"
       ></Bookshelf>
+       </div>
+
     </v-card>
   </vue-final-modal>
 </template>
@@ -147,5 +151,13 @@ export default defineComponent({
 .modal-banner {
   display: flex;
   justify-content: space-between;
+}
+.v-card {
+  display: flex;
+  flex-direction: column;
+}
+.v-card-content {
+  flex: 1;
+  overflow-y: auto;
 }
 </style>

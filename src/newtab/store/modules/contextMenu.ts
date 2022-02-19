@@ -1,3 +1,4 @@
+import { Item } from "../../../shared/types/store";
 import { Module } from "vuex";
 import { State as RootState } from "../index";
 
@@ -15,7 +16,7 @@ export type Position = {
 };
 
 export type ContextMenuTarget = {
-  id: string;
+  item: Item;
   type: "FILE" | "FOLDER" | "BACKGROUND";
 };
 
