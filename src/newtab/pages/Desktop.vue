@@ -2,7 +2,7 @@
   <Bookshelf :folderItem="bookmarkTreeRoot"></Bookshelf>
   <CreateFolderModal></CreateFolderModal>
   <BookshelfModalContainer></BookshelfModalContainer>
-  <ContextMenu />
+  <ContextMenuContainer />
   <UpdateModal />
 </template>
 
@@ -14,14 +14,14 @@ import UpdateModal from "../components/UpdateModal.vue";
 import { GET_BOOKMARK_TREE_ROOT } from "../store";
 import CreateFolderModal from "../components/CreateFolderModal.vue";
 import BookshelfModalContainer from "../components/BookshelfModalContainer.vue";
-import ContextMenu from "../components/ContextMenu/ContextMenu.vue";
+import ContextMenuContainer from "../components/ContextMenu/ContextMenuContainer.vue";
 
 export default defineComponent({
   components: {
     Bookshelf,
     CreateFolderModal,
     BookshelfModalContainer,
-    ContextMenu,
+    ContextMenuContainer,
     UpdateModal,
   },
   computed: {

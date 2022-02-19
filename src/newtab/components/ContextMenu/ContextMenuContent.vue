@@ -62,7 +62,7 @@ export default defineComponent({
       store.commit(SET_CONTEXT_MENU_SHOW_STATE, false);
     },
     deleteItem(target: ContextMenuTarget) {
-      if (confirm("삭제하시겠습니까?")) {
+      if (confirm("Are you sure you want to delete?")) {
         BookmarkApi.remove(target.item.id);
       }
       store.commit(SET_CONTEXT_MENU_SHOW_STATE, false);
