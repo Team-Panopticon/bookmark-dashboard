@@ -107,16 +107,16 @@ export default defineComponent({
     ...mapMutations([CLOSE_BOOKSHELF_MODALS, FOCUS_BOOKSHELF_MODALS]),
     async routeInFolder(id: string) {
       this.folderItems.push({ id, title: "" });
-      await this.routePahtRefresh();
+      await this.routePathRefresh();
     },
     async backward() {
       this.folderItems.pop();
       if (this.folderItems.length == 0) {
         this.folderItems.push({ id: "1", title: "" });
       }
-      await this.routePahtRefresh();
+      await this.routePathRefresh();
     },
-    async routePahtRefresh() {
+    async routePathRefresh() {
       const ids = this.folderItems.map((item) => {
         return item.id;
       });
