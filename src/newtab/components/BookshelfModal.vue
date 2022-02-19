@@ -36,16 +36,15 @@
         </button>
       </v-card-header>
 
-    <div class="v-card-content">
-      <Bookshelf
-        v-if="viewItem.id"
-        :key="viewItem.id"
-        @routeInFolder="routeInFolder"
-        :id="viewItem.id"
-        :title="viewItem.title"
-      ></Bookshelf>
-       </div>
-
+      <div class="v-card-content">
+        <Bookshelf
+          v-if="viewItem.id"
+          :key="viewItem.id"
+          @routeInFolder="routeInFolder"
+          :id="viewItem.id"
+          :title="viewItem.title"
+        ></Bookshelf>
+      </div>
     </v-card>
   </vue-final-modal>
 </template>

@@ -46,9 +46,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent } from "vue";
 import { mapMutations } from "vuex";
-import { FolderItem, Item } from "../../shared/types/store";
+import { Item } from "../../shared/types/store";
 import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
 import Favicon from "./Favicon.vue";
 import { mapActions } from "vuex";
@@ -88,10 +88,10 @@ export default defineComponent({
       if (this.isDesktop) {
         this._openBookshelfModal(id, title);
       } else {
-        this.routeInFolder(id, title);
+        this.routeInFolder(id);
       }
     },
-    routeInFolder(id: string, title: string) {
+    routeInFolder(id: string) {
       this.$emit("routeInFolder", id);
     },
     _openBookshelfModal(id: string, title: string) {

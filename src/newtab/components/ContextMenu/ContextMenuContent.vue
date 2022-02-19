@@ -42,7 +42,7 @@ export default defineComponent({
   methods: {
     openCreateFolderModal(target: ContextMenuTarget) {
       store.commit(SET_BOOKMARK_CREATE_INFO, {
-        parentId: target.item.parentId,
+        parentId: target.item.id,
       });
       store.commit(SET_BOOKMARK_CREATE_SHOW, true);
       store.commit(SET_CONTEXT_MENU_SHOW_STATE, false);
