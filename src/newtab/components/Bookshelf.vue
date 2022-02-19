@@ -2,7 +2,7 @@
   <div
     class="grid-container"
     @contextmenu.prevent.stop="
-      openContextMenu($event, { id: folderItem.id, type: 'BACKGROUND' })
+      openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
   >
     <div v-for="(item, i) in folderItem.children" v-bind:key="i">
@@ -13,7 +13,7 @@
         @dblclick="onDblClickFolder(item)"
         v-if="item.children"
         @contextmenu.prevent.stop="
-          openContextMenu($event, { id: item.id, type: 'FOLDER' })
+          openContextMenu($event, { item: item, type: 'FOLDER' })
         "
       >
         <div class="item-container">
@@ -31,7 +31,7 @@
         elevation="0"
         @dblclick="openUrl(item.id, item.url)"
         @contextmenu.prevent.stop="
-          openContextMenu($event, { id: item.id, type: 'FILE' })
+          openContextMenu($event, { item: item, type: 'FILE' })
         "
       >
         <div class="item-container">

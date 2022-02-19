@@ -6,13 +6,13 @@
     :style="cssVars"
     ref="container"
   >
-    <MenuItem :target="currentTarget" />
+    <ContextMenuContent :target="currentTarget" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import MenuItem from "./MenuItem.vue";
+import ContextMenuContent from "./ContextMenuContent.vue";
 import store from "../../store/index";
 import { mapGetters } from "vuex";
 import {
@@ -23,7 +23,7 @@ import {
 } from "../../store/modules/contextMenu";
 
 export default defineComponent({
-  components: { MenuItem },
+  components: { ContextMenuContent },
   computed: {
     ...mapGetters({ cssVars: GET_CONTEXT_MENU_CSS_VARS }),
     ...mapGetters({ isShow: GET_CONTEXT_MENU_SHOW_STATE }),
