@@ -1,6 +1,5 @@
 import { Module } from "vuex";
 import { State as RootState } from "../index";
-import { Item } from "@/shared/types/store";
 
 export const GET_BOOKSHELF_MODALS = "getBookshelfModal";
 
