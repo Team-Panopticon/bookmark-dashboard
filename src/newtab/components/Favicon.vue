@@ -50,8 +50,6 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 25px;
-  background-color: #e9e9e9;
   z-index: 999;
 
   .favicon {
