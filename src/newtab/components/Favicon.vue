@@ -19,7 +19,7 @@ import { defineComponent } from "vue";
 import LoadingImg from "../../assets/loding.gif";
 import NotFoundImg from "../../assets/not-found.png";
 
-const PREFIX = "https://www.google.com/s2/favicons?domain=";
+const PREFIX = "https://www.google.com/s2/favicons?sz=64&domain=";
 
 export default defineComponent({
   props: {
@@ -55,8 +55,8 @@ export default defineComponent({
   z-index: 999;
 
   .favicon {
-    width: 24px;
-    height: 24px;
+    width: 48px;
+    height: 48px;
   }
 
   .disable {
