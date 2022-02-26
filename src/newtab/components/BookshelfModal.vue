@@ -121,7 +121,7 @@ export default defineComponent({
       ".modal-content"
     ) as HTMLDivElement;
     if (elVfmContainer) {
-      const { top, right } = this.position;
+      const { top, right } = this.position(500, 500);
       elVfmContainer.style.position = "absolute";
       elVfmContainer.style.top = `${top}px`;
       elVfmContainer.style.left = `${right}px`;

@@ -46,12 +46,22 @@ const createbookshelfModal: Module<State, RootState> = {
       return state.bookshelfModals;
     },
     [GET_BOOKSHELF_MODALS_CURRENT_POSITION](state) {
-      const { top, right } = state.currentPosition;
-      state.currentPosition = {
-        top: top + POSITION_OFFSET,
-        right: right + POSITION_OFFSET,
+      return (modalHeight: number, modalWidth: number) => {
+        const { top, right } = state.currentPosition;
+
+        const { offsetHeight, offsetWidth } = document.body;
+        state.currentPosition = {
+          top:
+            top + modalHeight + POSITION_OFFSET >= offsetHeight
+              ? 0
+              : top + POSITION_OFFSET,
+          right:
+            right + modalWidth + POSITION_OFFSET >= offsetWidth
+              ? 0
+              : right + POSITION_OFFSET,
+        };
+        return { top, right };
       };
-      return { top, right };
     },
   },
   mutations: {
