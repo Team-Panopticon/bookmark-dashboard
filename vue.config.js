@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+process.env.VUE_APP_VERSION = require("./package.json").version;
+
 module.exports = {
   filenameHashing: false,
 
