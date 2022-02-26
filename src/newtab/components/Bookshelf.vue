@@ -2,7 +2,7 @@
   <div
     class="grid-container"
     @contextmenu.prevent.stop="
-      openContextMenu($event, { id: folderItem.id, type: 'BACKGROUND' })
+      openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
   >
     <div v-for="(item, i) in folderItem.children" v-bind:key="i">
@@ -13,7 +13,7 @@
         @dblclick="onDblClickFolder(item)"
         v-if="item.children"
         @contextmenu.prevent.stop="
-          openContextMenu($event, { id: item.id, type: 'FOLDER' })
+          openContextMenu($event, { item: item, type: 'FOLDER' })
         "
       >
         <div class="item-container">
@@ -31,7 +31,7 @@
         elevation="0"
         @dblclick="openUrl(item.id, item.url)"
         @contextmenu.prevent.stop="
-          openContextMenu($event, { id: item.id, type: 'FILE' })
+          openContextMenu($event, { item: item, type: 'FILE' })
         "
       >
         <div class="item-container">
@@ -46,52 +46,64 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent } from "vue";
 import { mapMutations } from "vuex";
-import { FolderItem, Item } from "../../shared/types/store";
+import { Item } from "../../shared/types/store";
 import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
 import Favicon from "./Favicon.vue";
 import { mapActions } from "vuex";
 import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
 import { openContextMenu } from "../utils/contextMenu";
+import BookmarkApi from "../utils/bookmarkApi";
 
 export default defineComponent({
   components: { Favicon },
   props: {
-    folderItem: {
-      type: Object as PropType<chrome.bookmarks.BookmarkTreeNode>,
+    id: {
+      type: String,
       required: true,
+    },
+    isDesktop: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data: () => ({
-    targetItem: {} as Item,
+    folderItem: {} as Item,
   }),
+  async mounted() {
+    this.refresh();
+  },
   methods: {
     ...mapMutations([OPEN_BOOKSHELF_MODALS]),
     ...mapActions([OPEN_BOOKMARK_UPDATE]), // updateMODAL
     openBookmarkModal() {
       // TODO: 네이밍 변경(ex. updateModal)
-      this[OPEN_BOOKMARK_UPDATE](this.targetItem);
+      this[OPEN_BOOKMARK_UPDATE](this.folderItem);
     },
     onDblClickFolder(item: Item) {
-      const { id, title, children = [], parentId } = item;
-      const isRootItem = parentId === "1";
-      if (isRootItem) {
-        this._openBookshelfModal(title, children, id);
+      const { id, title } = item;
+      // const isRootItem = this.id === "1";
+      if (this.isDesktop) {
+        this._openBookshelfModal(id, title);
       } else {
-        this.routeInFolder({ id, title, children });
+        this.routeInFolder(id);
       }
     },
-    routeInFolder(folderItem: FolderItem) {
-      this.$emit("routeInFolder", folderItem);
+    routeInFolder(id: string) {
+      this.$emit("routeInFolder", id);
     },
-    _openBookshelfModal(title: string, children: Item[], id: string) {
-      this.openBookshelfModal({ title, children, id });
+    _openBookshelfModal(id: string, title: string) {
+      this.openBookshelfModal({ id, title });
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
     },
     openContextMenu,
+    async refresh() {
+      this.folderItem = await BookmarkApi.getSubTree(this.id);
+    },
   },
 });
 </script>

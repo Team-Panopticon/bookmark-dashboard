@@ -1,6 +1,5 @@
 import { Module } from "vuex";
 import { State as RootState } from "../index";
-import { Item } from "@/shared/types/store";
 
 export const GET_BOOKSHELF_MODALS = "getBookshelfModal";
 
@@ -15,9 +14,7 @@ export const UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION =
 
 export interface BookshelfModalParams {
   id: string;
-  title: string;
   zIndex: number;
-  children: Item[];
 }
 
 export interface State {
@@ -32,7 +29,7 @@ export interface Position {
 }
 
 export interface BookshelfModals {
-  [key: string]: { title: string; children: Item[]; zIndex: number };
+  [key: string]: { zIndex: number; id: string };
 }
 
 const OFFSET = 2;
@@ -59,13 +56,12 @@ const createbookshelfModal: Module<State, RootState> = {
   },
   mutations: {
     [OPEN_BOOKSHELF_MODALS](state, bookshelfModalData: BookshelfModalParams) {
-      const { id, title, children } = bookshelfModalData;
-      state.bookshelfModals[id] = {
-        title,
-        children,
+      const { id } = bookshelfModalData;
+      const currentTime = new Date().toString();
+      state.bookshelfModals[currentTime] = {
+        id: id,
         zIndex: (state.currentZIndex += OFFSET),
       };
-      console.debug("open bookshelfModal >> ", id);
     },
     [FOCUS_BOOKSHELF_MODALS](state, bookshelfModalId: string) {
       state.bookshelfModals[bookshelfModalId].zIndex = state.currentZIndex +=
