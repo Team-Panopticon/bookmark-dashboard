@@ -61,15 +61,8 @@ export default defineComponent({
   top: var(--top, 0);
   left: var(--left, 0);
   border: 1px solid black;
+  background-color: white;
   min-width: 64px;
   z-index: 2147483647;
-
-  border-radius: 6px;
-  overflow: hidden;
-
-  background-color: rgba(100, 91, 101, 0.95);
-  color: white;
-  font-weight: 500;
-  padding: 2px 4px;
 }
 </style>
