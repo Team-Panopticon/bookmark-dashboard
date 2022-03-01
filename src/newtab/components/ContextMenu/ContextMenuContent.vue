@@ -75,12 +75,15 @@ export default defineComponent({
 .context-menu-wrapper {
   display: flex;
   flex-direction: column;
+  padding: 2px 2px;
 
   .context-menu-item {
-    padding: 4px 8px;
+    padding: 2px 8px;
+    min-width: 96px;
     text-align: start;
+    border-radius: 6px;
     &:hover {
-      background-color: rgba(54, 69, 79, 0.2);
+      background-color: rgb(90, 139, 219);
       cursor: pointer;
     }
   }
