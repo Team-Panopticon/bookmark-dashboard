@@ -63,6 +63,7 @@ import {
   CLOSE_BOOKSHELF_MODALS,
   FOCUS_BOOKSHELF_MODALS,
   GET_BOOKSHELF_MODALS_CURRENT_POSITION,
+  UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION,
 } from "../store/modules/bookshelfModal";
 import Bookshelf from "./Bookshelf.vue";
 import BookmarkApi from "../utils/bookmarkApi";
@@ -124,14 +125,23 @@ export default defineComponent({
       this.$nextTick(() => {
         const { offsetHeight, offsetWidth } = elVfmContainer;
         const { top, right } = this.position(offsetHeight, offsetWidth);
-      elVfmContainer.style.position = "absolute";
-      elVfmContainer.style.top = `${top}px`;
-      elVfmContainer.style.left = `${right}px`;
+        elVfmContainer.style.position = "absolute";
+        elVfmContainer.style.top = `${top}px`;
+        elVfmContainer.style.left = `${right}px`;
       });
     }
+    elVfmContainer.addEventListener("mouseup", () => {
+      const { top, left } = elVfmContainer.getBoundingClientRect();
+      // Element의 left을 css의 right 속성에 적용해야 실제 Element left 위치가 적용됨
+      this.updateBookshelfModalsCurrentPosition({ top, right: left });
+    });
   },
   methods: {
-    ...mapMutations([CLOSE_BOOKSHELF_MODALS, FOCUS_BOOKSHELF_MODALS]),
+    ...mapMutations([
+      CLOSE_BOOKSHELF_MODALS,
+      FOCUS_BOOKSHELF_MODALS,
+      UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION,
+    ]),
     async routeInFolder(id: string) {
       this.folderItems.push({ id, title: "" });
       await this.routePathRefresh();

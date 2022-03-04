@@ -48,19 +48,18 @@ const createbookshelfModal: Module<State, RootState> = {
     [GET_BOOKSHELF_MODALS_CURRENT_POSITION](state) {
       return (modalHeight: number, modalWidth: number) => {
         const { top, right } = state.currentPosition;
-
         const { offsetHeight, offsetWidth } = document.body;
-        state.currentPosition = {
-          top:
-            top + modalHeight + POSITION_OFFSET >= offsetHeight
-              ? 0
-              : top + POSITION_OFFSET,
-          right:
-            right + modalWidth + POSITION_OFFSET >= offsetWidth
-              ? 0
-              : right + POSITION_OFFSET,
+
+        const targetPosition = {
+          top: top + modalHeight >= offsetHeight ? 0 : top,
+          right: right + modalWidth >= offsetWidth ? 0 : right,
         };
-        return { top, right };
+
+        state.currentPosition = {
+          top: targetPosition.top + POSITION_OFFSET,
+          right: targetPosition.right + POSITION_OFFSET,
+        };
+        return targetPosition;
       };
     },
   },
@@ -82,8 +81,11 @@ const createbookshelfModal: Module<State, RootState> = {
       delete state.bookshelfModals[bookshelfModalId];
       console.debug("open bookshelfModal >> ", bookshelfModalId);
     },
-    [UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION](state, position?: Position) {
-      const targetPosition = position ?? { top: 100, right: 100 };
+    [UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION](state, position: Position) {
+      const targetPosition = {
+        top: position.top + POSITION_OFFSET,
+        right: position.right + POSITION_OFFSET,
+      };
       state.currentPosition = targetPosition;
     },
   },
