@@ -132,14 +132,14 @@ export default defineComponent({
         elVfmContainer.style.left = `${right}px`;
       });
     }
-    elVfmContainer.addEventListener("mouseup", () => {
-      const { top, left: right } = elVfmContainer.getBoundingClientRect();
-      if (this.position.top !== top && this.position.right !== right) {
-        // Element의 left을 css의 right 속성에 적용해야 실제 Element left 위치가 적용됨
-        this.updateBookshelfModalsCurrentPosition({ top, right });
-        this.position = { top, right };
-      }
-    });
+    elVfmContainer.addEventListener("mouseup", this.updatePosition);
+  },
+  beforeUnmount() {
+    const vfmContainer = this.$refs.vfmContainerRef as HTMLDivElement;
+    const elVfmContainer = vfmContainer.querySelector(
+      ".modal-content"
+    ) as HTMLDivElement;
+    elVfmContainer.removeEventListener("mouseup", this.updatePosition);
   },
   methods: {
     ...mapMutations([
@@ -163,6 +163,19 @@ export default defineComponent({
         return item.id;
       });
       if (ids.length > 0) this.folderItems = await BookmarkApi.get(ids);
+    },
+    updatePosition() {
+      const vfmContainer = this.$refs.vfmContainerRef as HTMLDivElement;
+      const elVfmContainer = vfmContainer.querySelector(
+        ".modal-content"
+      ) as HTMLDivElement;
+
+      const { top, left: right } = elVfmContainer.getBoundingClientRect();
+      if (this.position.top !== top && this.position.right !== right) {
+        // Element의 left을 css의 right 속성에 적용해야 실제 Element left 위치가 적용됨
+        this.updateBookshelfModalsCurrentPosition({ top, right });
+        this.position = { top, right };
+      }
     },
   },
 });
