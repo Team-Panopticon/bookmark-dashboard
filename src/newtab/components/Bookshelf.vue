@@ -47,12 +47,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapMutations } from "vuex";
+import Favicon from "./Favicon.vue";
+import { mapMutations, mapActions, mapGetters } from "vuex";
 import { Item } from "../../shared/types/store";
 import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
-import Favicon from "./Favicon.vue";
-import { mapActions } from "vuex";
 import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
+import store, { GET_REFRESH_TARGET, SET_REFRESH_TARGET } from "../store/index";
 import { openContextMenu } from "../utils/contextMenu";
 import BookmarkApi from "../utils/bookmarkApi";
 
@@ -72,6 +72,17 @@ export default defineComponent({
   data: () => ({
     folderItem: {} as Item,
   }),
+  computed: {
+    ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
+  },
+  watch: {
+    refreshTargetId(id?: string) {
+      if (id && this.$props.id === id) {
+        this.refresh();
+        store.commit(SET_REFRESH_TARGET, "");
+      }
+    },
+  },
   async mounted() {
     this.refresh();
   },
