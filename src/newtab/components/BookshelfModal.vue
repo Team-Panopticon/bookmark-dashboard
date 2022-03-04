@@ -121,10 +121,13 @@ export default defineComponent({
       ".modal-content"
     ) as HTMLDivElement;
     if (elVfmContainer) {
-      const { top, right } = this.position(500, 500);
+      this.$nextTick(() => {
+        const { offsetHeight, offsetWidth } = elVfmContainer;
+        const { top, right } = this.position(offsetHeight, offsetWidth);
       elVfmContainer.style.position = "absolute";
       elVfmContainer.style.top = `${top}px`;
       elVfmContainer.style.left = `${right}px`;
+      });
     }
   },
   methods: {
