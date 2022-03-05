@@ -17,9 +17,9 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import LoadingImg from "../../assets/loding.gif";
-import NotFoundImg from "../../assets/not-found.png";
+import Blank from "../../assets/blank.png";
 
-const PREFIX = "https://www.google.com/s2/favicons?domain=";
+const PREFIX = "https://www.google.com/s2/favicons?sz=64&domain=";
 
 export default defineComponent({
   props: {
@@ -38,7 +38,7 @@ export default defineComponent({
     },
 
     notFoundImage() {
-      this.imgSrc = NotFoundImg;
+      this.imgSrc = Blank;
     },
   },
 });
@@ -50,13 +50,11 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 25px;
-  background-color: #e9e9e9;
   z-index: 999;
 
   .favicon {
-    width: 24px;
-    height: 24px;
+    width: 48px;
+    height: 48px;
   }
 
   .disable {
