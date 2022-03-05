@@ -11,11 +11,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapGetters, mapMutations } from "vuex";
-import {
-  FOCUS_BOOKSHELF_MODALS,
-  GET_BOOKSHELF_MODALS,
-} from "../store/modules/bookshelfModal";
+import { mapGetters } from "vuex";
+import { GET_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
 import BookshelfModal from "./BookshelfModal.vue";
 
 export default defineComponent({
@@ -24,9 +21,6 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters({ modals: GET_BOOKSHELF_MODALS }),
-  },
-  methods: {
-    ...mapMutations([FOCUS_BOOKSHELF_MODALS]),
   },
 });
 </script>
