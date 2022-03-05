@@ -9,11 +9,14 @@ import contextMenu from "./modules/contextMenu";
 
 export const GET_BOOKMARK_TREE_CHILDREN = "getBookmarkTree";
 export const GET_BOOKMARK_TREE_ROOT = "getBookmarkTreeRoot";
+export const GET_REFRESH_TARGET = "getRefreshTarget";
+export const SET_REFRESH_TARGET = "setRefreshTarget";
 export const SET_BOOKMARK_TREE = "setBookmarkTree";
 export const RENEW_BOOKMARK_TREE = "renewBookmarkTree";
 
 export interface State {
   bookmarkTree: Item;
+  refreshTargetId?: string;
 }
 
 const store = createStore<State>({
@@ -33,10 +36,16 @@ const store = createStore<State>({
     [GET_BOOKMARK_TREE_ROOT](state) {
       return state.bookmarkTree;
     },
+    [GET_REFRESH_TARGET](state) {
+      return state.refreshTargetId;
+    },
   },
   mutations: {
     [SET_BOOKMARK_TREE](state, _bookmarkTree) {
       state.bookmarkTree = _bookmarkTree;
+    },
+    [SET_REFRESH_TARGET](state, id) {
+      state.refreshTargetId = id;
     },
   },
   actions: {

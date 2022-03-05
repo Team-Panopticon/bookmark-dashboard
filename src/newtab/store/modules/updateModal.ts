@@ -11,6 +11,7 @@ export interface IUpdateModalInfo {
   id: string;
   url?: string | undefined;
   title: string;
+  parentId?: string;
 }
 export interface State {
   updateModalInfo: IUpdateModalInfo;
@@ -24,6 +25,7 @@ const updateModalModule: Module<State, RootState> = {
       id: "",
       url: undefined,
       title: "",
+      parentId: "",
     },
     updateModalShow: false,
   },
