@@ -6,7 +6,9 @@
     :style="cssVars"
     ref="container"
   >
-    <ContextMenuContent :target="currentTarget" />
+    <v-card elevation="2" class="context-card" outlined>
+      <ContextMenuContent :target="currentTarget" />
+    </v-card>
   </div>
 </template>
 
@@ -60,9 +62,25 @@ export default defineComponent({
   position: fixed;
   top: var(--top, 0);
   left: var(--left, 0);
-  border: 1px solid black;
-  background-color: white;
+  border: 0.8px rgba(0, 0, 0, 0.8);
   min-width: 64px;
   z-index: 2147483647;
+
+  border-radius: 6px;
+  overflow: hidden;
+
+  background-color: rgba(87, 87, 86, 0.94);
+
+  border-color: white;
+
+  padding: 1px;
+  .context-card {
+    border-radius: 4.6px;
+    padding: 2px 4px;
+    border: 0.1px solid rgba(255, 255, 255, 0.3);
+    font-weight: 500;
+    color: white;
+    background: transparent;
+  }
 }
 </style>

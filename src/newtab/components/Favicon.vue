@@ -17,7 +17,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import LoadingImg from "../../assets/loding.gif";
-import NotFoundImg from "../../assets/not-found.png";
+import Blank from "../../assets/blank.png";
 
 const PREFIX = "https://www.google.com/s2/favicons?sz=64&domain=";
 
@@ -38,7 +38,7 @@ export default defineComponent({
     },
 
     notFoundImage() {
-      this.imgSrc = NotFoundImg;
+      this.imgSrc = Blank;
     },
   },
 });

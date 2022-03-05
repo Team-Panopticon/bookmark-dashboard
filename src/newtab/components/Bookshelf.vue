@@ -125,7 +125,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, auto));
+  grid-template-columns: repeat(auto-fill, minmax(72px, auto));
   grid-auto-rows: 100px;
   padding: 20px;
   gap: 16px;
@@ -136,7 +136,7 @@ export default defineComponent({
 .btn {
   width: 80px;
   height: auto;
-  padding: 0;
+  padding: 4px 0;
 }
 .btn:focus {
   background-color: rgb(225, 225, 225);
@@ -167,13 +167,5 @@ export default defineComponent({
   word-break: break-all;
   letter-spacing: 0.5px;
   color: #36454f;
-}
-
-.context-menu-item {
-  padding: 4px 8px;
-  &:hover {
-    background-color: rgba(54, 69, 79, 0.2);
-    cursor: pointer;
-  }
 }
 </style>
