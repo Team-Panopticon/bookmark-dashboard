@@ -63,6 +63,7 @@ import {
   SET_BOOKMARK_UPDATE_SHOW,
   CLOSE_BOOKMARK_UPDATE,
 } from "../store/modules/updateModal";
+import store, { SET_REFRESH_TARGET } from "../store/index";
 
 import { RENEW_BOOKMARK_TREE } from "../store/index";
 import BookmarkApi from "../utils/bookmarkApi";
@@ -99,10 +100,10 @@ export default defineComponent({
       this[CLOSE_BOOKMARK_UPDATE]();
     },
     async update() {
-      const { id, title, url } = this.bookmarkUpdateModalInfo;
+      const { id, title, url, parentId } = this.bookmarkUpdateModalInfo;
       const updateSuccessful = await BookmarkApi.update(id, title, url);
       if (updateSuccessful) {
-        this[RENEW_BOOKMARK_TREE]();
+        store.commit(SET_REFRESH_TARGET, parentId);
         this[CLOSE_BOOKMARK_UPDATE]();
       }
     },

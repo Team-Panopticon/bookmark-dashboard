@@ -6,58 +6,61 @@
     "
   >
     <div v-for="(item, i) in folderItem.children" v-bind:key="i">
-      <v-btn
-        class="btn"
-        tile
-        elevation="0"
-        @dblclick="onDblClickFolder(item)"
-        v-if="item.children"
-        @contextmenu.prevent.stop="
-          openContextMenu($event, { item: item, type: 'FOLDER' })
-        "
-      >
-        <div class="item-container">
-          <v-icon class="item-icon">mdi-folder</v-icon>
-          <p class="item-title">
-            {{ item.title }}
-          </p>
-        </div>
-      </v-btn>
+      <Tooltip :text="item.title">
+        <v-btn
+          class="btn"
+          tile
+          elevation="0"
+          @dblclick="onDblClickFolder(item)"
+          v-if="item.children"
+          @contextmenu.prevent.stop="
+            openContextMenu($event, { item: item, type: 'FOLDER' })
+          "
+        >
+          <div class="item-container">
+            <v-icon class="item-icon">mdi-folder</v-icon>
+            <p class="item-title">
+              {{ item.title }}
+            </p>
+          </div>
+        </v-btn>
 
-      <v-btn
-        v-else
-        class="btn"
-        tile
-        elevation="0"
-        @dblclick="openUrl(item.id, item.url)"
-        @contextmenu.prevent.stop="
-          openContextMenu($event, { item: item, type: 'FILE' })
-        "
-      >
-        <div class="item-container">
-          <Favicon :url="item.url" />
-          <p class="item-title">
-            {{ item.title }}
-          </p>
-        </div>
-      </v-btn>
+        <v-btn
+          v-else
+          class="btn"
+          tile
+          elevation="0"
+          @dblclick="openUrl(item.id, item.url)"
+          @contextmenu.prevent.stop="
+            openContextMenu($event, { item: item, type: 'FILE' })
+          "
+        >
+          <div class="item-container">
+            <Favicon :url="item.url" />
+            <p class="item-title">
+              {{ item.title }}
+            </p>
+          </div>
+        </v-btn>
+      </Tooltip>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapMutations } from "vuex";
+import Favicon from "./Favicon.vue";
+import { mapMutations, mapActions, mapGetters } from "vuex";
 import { Item } from "../../shared/types/store";
 import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
-import Favicon from "./Favicon.vue";
-import { mapActions } from "vuex";
 import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
+import store, { GET_REFRESH_TARGET, SET_REFRESH_TARGET } from "../store/index";
 import { openContextMenu } from "../utils/contextMenu";
 import BookmarkApi from "../utils/bookmarkApi";
+import Tooltip from "../components/Tooltip.vue";
 
 export default defineComponent({
-  components: { Favicon },
+  components: { Favicon, Tooltip },
   props: {
     id: {
       type: String,
@@ -72,6 +75,17 @@ export default defineComponent({
   data: () => ({
     folderItem: {} as Item,
   }),
+  computed: {
+    ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
+  },
+  watch: {
+    refreshTargetId(id?: string) {
+      if (id && this.$props.id === id) {
+        this.refresh();
+        store.commit(SET_REFRESH_TARGET, "");
+      }
+    },
+  },
   async mounted() {
     this.refresh();
   },
