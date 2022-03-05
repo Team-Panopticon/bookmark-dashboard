@@ -5,6 +5,7 @@
   "manifest_version": 3,
   "permissions": ["activeTab", "bookmarks"],
   "action": {
+    "default_title": "Bookmark Dashboard",
     "default_popup": "popup.html"
   },
   "chrome_url_overrides": {
