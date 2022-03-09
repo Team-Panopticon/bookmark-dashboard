@@ -65,7 +65,6 @@ import {
 } from "../store/modules/updateModal";
 import store, { SET_REFRESH_TARGET } from "../store/index";
 
-import { RENEW_BOOKMARK_TREE } from "../store/index";
 import BookmarkApi from "../utils/bookmarkApi";
 export default defineComponent({
   computed: {
@@ -94,7 +93,7 @@ export default defineComponent({
     },
   },
   methods: {
-    ...mapActions([CLOSE_BOOKMARK_UPDATE, RENEW_BOOKMARK_TREE]),
+    ...mapActions([CLOSE_BOOKMARK_UPDATE]),
     ...mapMutations([SET_BOOKMARK_UPDATE_INFO, SET_BOOKMARK_UPDATE_SHOW]),
     closeModal() {
       this[CLOSE_BOOKMARK_UPDATE]();
