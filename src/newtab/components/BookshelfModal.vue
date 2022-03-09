@@ -202,4 +202,8 @@ export default defineComponent({
   flex: 1;
   overflow-y: auto;
 }
+.v-breadcrumbs {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 </style>

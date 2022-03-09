@@ -48,6 +48,10 @@ export default defineComponent({
   display: flex;
   justify-content: space-between;
 }
+::v-deep .v-card-header {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
 .app-container {
   width: 100%;
   height: 100%;
