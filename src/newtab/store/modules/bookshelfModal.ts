@@ -66,20 +66,20 @@ const createbookshelfModal: Module<State, RootState> = {
   mutations: {
     [OPEN_BOOKSHELF_MODALS](state, bookshelfModalData: BookshelfModalParams) {
       const { id } = bookshelfModalData;
-      const currentTime = new Date().toString();
-      state.bookshelfModals[currentTime] = {
+      const timeStampId = new Date().toString();
+      state.bookshelfModals[timeStampId] = {
         id: id,
         zIndex: (state.currentZIndex += OFFSET),
       };
+      console.debug("open bookshelfModal >> ", timeStampId);
     },
-    [FOCUS_BOOKSHELF_MODALS](state, bookshelfModalId: string) {
-      state.bookshelfModals[bookshelfModalId].zIndex = state.currentZIndex +=
-        OFFSET;
-      console.debug("focus bookshelfModal >> ", bookshelfModalId);
+    [FOCUS_BOOKSHELF_MODALS](state, timeStampId: string) {
+      state.bookshelfModals[timeStampId].zIndex = state.currentZIndex += OFFSET;
+      console.debug("focus bookshelfModal >> ", timeStampId);
     },
-    [CLOSE_BOOKSHELF_MODALS](state, bookshelfModalId: string) {
-      delete state.bookshelfModals[bookshelfModalId];
-      console.debug("open bookshelfModal >> ", bookshelfModalId);
+    [CLOSE_BOOKSHELF_MODALS](state, timeStampId: string) {
+      delete state.bookshelfModals[timeStampId];
+      console.debug("close bookshelfModal >> ", timeStampId);
     },
     [UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION](state, position: Position) {
       const targetPosition = {
