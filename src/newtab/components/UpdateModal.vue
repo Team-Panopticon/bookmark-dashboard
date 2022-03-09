@@ -15,7 +15,7 @@
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-      <v-card-text class="text-h5 font-weight-bold">
+      <v-card-text class="text-h5">
         <v-form :key="bookmarkUpdateModalInfo">
           <v-text-field
             v-model="bookmarkUpdateModalInfo.title"
@@ -103,4 +103,8 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.v-card-text {
+  opacity: 0.9;
+}
+</style>

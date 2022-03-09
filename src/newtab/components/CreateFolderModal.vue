@@ -12,7 +12,7 @@
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-      <v-card-text class="text-h5 font-weight-bold">
+      <v-card-text class="text-h5">
         <v-form :key="createFolder">
           <v-text-field
             v-model="folderName"
@@ -96,7 +96,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-::v-deep .v-field--active .v-field-label--floating {
-  transform: scale(0.75);
+.v-card-text {
+  opacity: 0.9;
 }
 </style>
