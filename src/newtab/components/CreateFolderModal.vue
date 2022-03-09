@@ -5,15 +5,29 @@
     content-class="modal-content"
     z-index="1100"
   >
-    <v-card class="modal-inner">
-      <h2 class="modal-title">Create Folder</h2>
-      <v-text-field label="Folder Name" v-model="folderName"></v-text-field>
-      <div class="button-group">
-        <v-btn color="success" class="mr-4" @click="createFolder(folderName)"
-          >Create Folder</v-btn
-        >
-        <v-btn color="error" @click="closeCreateFolderModal">Cancel</v-btn>
-      </div>
+    <v-card class="modal-inner" outlined title elevation="7">
+      <v-card-header class="modal-banner bg-primary">
+        <div class="modal__title d-flex">Create Folder</div>
+        <button class="modal__close" @click="closeCreateFolderModal">
+          <v-icon>mdi-close</v-icon>
+        </button>
+      </v-card-header>
+      <v-card-text class="text-h5 font-weight-bold">
+        <v-form :key="createFolder">
+          <v-text-field
+            v-model="folderName"
+            counter
+            label="Folder name"
+            required
+            outlined="true"
+            v-on:click.stop.self
+          ></v-text-field>
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="createFolder(folderName)">Create Folder</v-btn>
+        <v-btn @click="closeCreateFolderModal">Cancel</v-btn>
+      </v-card-actions>
     </v-card>
   </vue-final-modal>
 </template>
@@ -92,17 +106,13 @@ export default defineComponent({
     position: relative;
   }
 }
-.modal-inner {
-  padding: 20px;
-}
-.modal-title {
-  margin-bottom: 16px;
-  text-align: center;
-}
-.button-group {
+
+.modal-banner {
   display: flex;
-  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
 }
+
 ::v-deep .v-field--active .v-field-label--floating {
   transform: scale(0.75);
 }

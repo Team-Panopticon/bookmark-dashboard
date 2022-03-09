@@ -4,15 +4,8 @@
     classes="modal-container"
     content-class="modal-content"
     overlay-class="modal-overlay"
-    :drag="true"
-    drag-selector=".modal-banner"
-    :resize="true"
     :max-height="700"
     :max-width="700"
-    :hide-overlay="true"
-    :click-to-close="false"
-    :esc-to-close="false"
-    :prevent-click="true"
     z-index="9999"
   >
     <v-card class="modal-inner" outlined title elevation="7">
@@ -22,7 +15,6 @@
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-
       <v-card-text class="text-h5 font-weight-bold">
         <v-form :key="bookmarkUpdateModalInfo">
           <v-text-field
@@ -121,10 +113,6 @@ export default defineComponent({
   position: relative;
   width: 500px;
   height: 500px;
-}
-
-.modal-inner {
-  border: 1px solid lightgray;
 }
 
 .modal-banner {
