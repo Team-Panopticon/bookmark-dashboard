@@ -6,6 +6,7 @@ export const GET_BOOKSHELF_MODALS = "getBookshelfModal";
 export const OPEN_BOOKSHELF_MODALS = "openBookshelfModal";
 export const FOCUS_BOOKSHELF_MODALS = "focusBookshelfModal";
 export const CLOSE_BOOKSHELF_MODALS = "closeBookshelfModal";
+export const CLOSE_BOOKSHELF_MODALS_BY_ID = "closeBookshelfModalById";
 
 export const GET_BOOKSHELF_MODALS_CURRENT_POSITION =
   "getBookshelfModalsCurrentPosition";
@@ -80,6 +81,17 @@ const createbookshelfModal: Module<State, RootState> = {
     [CLOSE_BOOKSHELF_MODALS](state, timeStampId: string) {
       delete state.bookshelfModals[timeStampId];
       console.debug("close bookshelfModal >> ", timeStampId);
+    },
+    [CLOSE_BOOKSHELF_MODALS_BY_ID](state, id: string) {
+      const targetTimestampIds = Object.keys(state.bookshelfModals).filter(
+        (timeStampId: string) =>
+          state.bookshelfModals[timeStampId].id === id ? timeStampId : false
+      );
+      console.log(targetTimestampIds);
+      targetTimestampIds.forEach(
+        (targetTimeStampId) => delete state.bookshelfModals[targetTimeStampId]
+      );
+      console.debug("close bookshelfModal >> ", id);
     },
     [UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION](state, position: Position) {
       const targetPosition = {
