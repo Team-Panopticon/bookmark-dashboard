@@ -183,11 +183,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .vfm::v-deep {
-  .modal-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
   .modal-content {
     position: relative;
     width: 500px;
@@ -198,10 +193,6 @@ export default defineComponent({
   border: 1px solid lightgray;
   width: 100%;
   height: 100%;
-}
-.modal-banner {
-  display: flex;
-  justify-content: space-between;
 }
 .v-card {
   display: flex;

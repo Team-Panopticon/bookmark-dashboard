@@ -103,21 +103,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-::v-deep .modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-::v-deep .modal-content {
-  position: relative;
-  width: 500px;
-  height: 500px;
-}
-
-.modal-banner {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-}
-</style>
+<style scoped></style>

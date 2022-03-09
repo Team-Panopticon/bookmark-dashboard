@@ -96,23 +96,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.vfm::v-deep {
-  .modal-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .modal-content {
-    position: relative;
-  }
-}
-
-.modal-banner {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-}
-
 ::v-deep .v-field--active .v-field-label--floating {
   transform: scale(0.75);
 }

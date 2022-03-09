@@ -1,9 +1,11 @@
 <template>
-  <Bookshelf id="1" :isDesktop="true"></Bookshelf>
-  <CreateFolderModal></CreateFolderModal>
-  <BookshelfModalContainer></BookshelfModalContainer>
-  <ContextMenuContainer />
-  <UpdateModal />
+  <div class="app-container">
+    <Bookshelf id="1" :isDesktop="true"></Bookshelf>
+    <CreateFolderModal></CreateFolderModal>
+    <BookshelfModalContainer></BookshelfModalContainer>
+    <ContextMenuContainer />
+    <UpdateModal />
+  </div>
 </template>
 
 <script lang="ts">
@@ -41,15 +43,13 @@ export default defineComponent({
 ::v-deep .modal-content {
   position: relative;
   width: 500px;
-  height: 500px;
 }
-
-.modal-inner {
-  border: 1px solid lightgray;
-}
-
-.modal-banner {
+::v-deep .modal-banner {
   display: flex;
   justify-content: space-between;
+}
+.app-container {
+  width: 100%;
+  height: 100%;
 }
 </style>
