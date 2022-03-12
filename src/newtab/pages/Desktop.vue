@@ -10,9 +10,11 @@
 import { defineComponent } from "vue";
 import Bookshelf from "../components/Bookshelf.vue";
 import UpdateModal from "../components/UpdateModal.vue";
+import store, { SET_REFRESH_TARGET } from "../store";
 import CreateFolderModal from "../components/CreateFolderModal.vue";
 import BookshelfModalContainer from "../components/BookshelfModalContainer.vue";
 import ContextMenuContainer from "../components/ContextMenu/ContextMenuContainer.vue";
+import { Item } from "@/shared/types/store";
 
 export default defineComponent({
   components: {
@@ -22,7 +24,23 @@ export default defineComponent({
     ContextMenuContainer,
     UpdateModal,
   },
+  mounted() {
+    setBookmarksEventHandlers();
+  },
 });
+
+function setBookmarksEventHandlers() {
+  chrome.bookmarks.onCreated.addListener((id: string, bookmark: Item) => {
+    const { parentId } = bookmark;
+    store.commit(SET_REFRESH_TARGET, parentId);
+  });
+  chrome.bookmarks.onRemoved.addListener(
+    (id: string, removeInfo: chrome.bookmarks.BookmarkRemoveInfo) => {
+      const { parentId } = removeInfo;
+      store.commit(SET_REFRESH_TARGET, parentId);
+    }
+  );
+}
 </script>
 
 <style lang="scss" scoped>

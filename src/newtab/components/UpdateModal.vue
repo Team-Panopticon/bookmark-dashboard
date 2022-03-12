@@ -34,7 +34,7 @@
             v-on:click.stop.self
           ></v-text-field>
           <v-text-field
-            v-show="isBookmark"
+            v-show="isFolder"
             v-model="bookmarkUpdateModalInfo.url"
             label="URL"
             required
@@ -85,11 +85,11 @@ export default defineComponent({
         this[SET_BOOKMARK_UPDATE_SHOW](val);
       },
     },
-    isBookmark(): boolean {
-      return this[GET_BOOKMARK_UPDATE_INFO].url;
+    isFolder(): boolean {
+      return this[GET_BOOKMARK_UPDATE_INFO].isFolder;
     },
     modalTitle(): string {
-      return this.isBookmark ? "북마크 수정" : "폴더 이름 바꾸기";
+      return this.isFolder ? "폴더 이름 바꾸기" : "북마크 수정";
     },
   },
   methods: {

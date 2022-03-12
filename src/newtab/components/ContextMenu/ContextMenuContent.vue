@@ -29,7 +29,6 @@ import {
   SET_BOOKMARK_UPDATE_SHOW,
 } from "../../store/modules/updateModal";
 import { SET_CONTEXT_MENU_SHOW_STATE } from "../../store/modules/contextMenu";
-import { SET_REFRESH_TARGET } from "../../store/index";
 import BookmarkApi from "../../utils/bookmarkApi";
 import store from "../../store/index";
 
@@ -52,12 +51,13 @@ export default defineComponent({
       const {
         item: { id, title, url, parentId },
       } = target;
-
+      const isFolder = url ? true : false;
       store.commit(SET_BOOKMARK_UPDATE_INFO, {
         id,
         title,
         url,
         parentId,
+        isFolder,
       });
 
       store.commit(SET_BOOKMARK_UPDATE_SHOW, true);
@@ -66,7 +66,6 @@ export default defineComponent({
     async deleteItem(target: ContextMenuTarget) {
       if (confirm("Are you sure you want to delete?")) {
         await BookmarkApi.recursiveRemove(target.item.id);
-        store.commit(SET_REFRESH_TARGET, target.item.parentId);
       }
       store.commit(SET_CONTEXT_MENU_SHOW_STATE, false);
     },
@@ -78,12 +77,14 @@ export default defineComponent({
 .context-menu-wrapper {
   display: flex;
   flex-direction: column;
-
+  padding: 2px 2px;
   .context-menu-item {
-    padding: 4px 8px;
+    padding: 2px 8px;
+    min-width: 96px;
     text-align: start;
+    border-radius: 6px;
     &:hover {
-      background-color: rgba(54, 69, 79, 0.2);
+      background-color: rgb(90, 139, 219);
       cursor: pointer;
     }
   }
