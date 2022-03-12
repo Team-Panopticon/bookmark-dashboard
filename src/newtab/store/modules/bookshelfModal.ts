@@ -87,7 +87,6 @@ const createbookshelfModal: Module<State, RootState> = {
         (timeStampId: string) =>
           state.bookshelfModals[timeStampId].id === id ? timeStampId : false
       );
-      console.log(targetTimestampIds);
       targetTimestampIds.forEach(
         (targetTimeStampId) => delete state.bookshelfModals[targetTimeStampId]
       );
