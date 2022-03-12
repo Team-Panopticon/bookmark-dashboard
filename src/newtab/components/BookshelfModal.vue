@@ -20,7 +20,7 @@
         outlined
         title
         elevation="7"
-        @mousedown.capture="focusBookshelfModal(bookshelfModalId)"
+        @mousedown.capture="focusBookshelfModal(timeStampId)"
       >
         <v-card-header class="modal-banner bg-primary">
           <div class="modal__title d-flex">
@@ -35,7 +35,7 @@
           </div>
           <button
             class="modal__close"
-            @click="closeBookshelfModal(bookshelfModalId)"
+            @click="closeBookshelfModal(timeStampId)"
           >
             <v-icon>mdi-close</v-icon>
           </button>
@@ -75,7 +75,7 @@ interface BreadCrumb {
 export default defineComponent({
   components: { Bookshelf },
   props: {
-    bookshelfModalId: {
+    timeStampId: {
       type: String,
       required: true,
     },

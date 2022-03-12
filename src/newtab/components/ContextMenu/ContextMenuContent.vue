@@ -31,6 +31,7 @@ import {
 import { SET_CONTEXT_MENU_SHOW_STATE } from "../../store/modules/contextMenu";
 import BookmarkApi from "../../utils/bookmarkApi";
 import store from "../../store/index";
+import { CLOSE_BOOKSHELF_MODALS_BY_ID } from "@/newtab/store/modules/bookshelfModal";
 
 export default defineComponent({
   props: {
@@ -66,8 +67,9 @@ export default defineComponent({
     async deleteItem(target: ContextMenuTarget) {
       if (confirm("Are you sure you want to delete?")) {
         await BookmarkApi.recursiveRemove(target.item.id);
+        store.commit(CLOSE_BOOKSHELF_MODALS_BY_ID, target.item.id);
+        store.commit(SET_CONTEXT_MENU_SHOW_STATE, false);
       }
-      store.commit(SET_CONTEXT_MENU_SHOW_STATE, false);
     },
   },
 });
