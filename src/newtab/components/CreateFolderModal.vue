@@ -28,7 +28,6 @@ import {
   RESET_BOOKMARK_CREATE_INFO,
   SET_BOOKMARK_CREATE_SHOW,
 } from "../store/modules/createFolderModal";
-import store, { SET_REFRESH_TARGET } from "../store/index";
 import BookmarkApi from "../utils/bookmarkApi";
 
 export default defineComponent({
@@ -60,7 +59,6 @@ export default defineComponent({
       );
       if (createSuccessful) {
         this.folderName = "";
-        store.commit(SET_REFRESH_TARGET, this.createFolderModalInfo.parentId);
         this.resetCreateFolderModalInfo();
         this.setCreateFolderModalShow(false);
         this.renewBookmarkTree();
