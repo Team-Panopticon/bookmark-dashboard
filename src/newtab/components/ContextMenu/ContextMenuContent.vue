@@ -52,12 +52,13 @@ export default defineComponent({
       const {
         item: { id, title, url, parentId },
       } = target;
-
+      const isFolder = url ? true : false;
       store.commit(SET_BOOKMARK_UPDATE_INFO, {
         id,
         title,
         url,
         parentId,
+        isFolder,
       });
 
       store.commit(SET_BOOKMARK_UPDATE_SHOW, true);
