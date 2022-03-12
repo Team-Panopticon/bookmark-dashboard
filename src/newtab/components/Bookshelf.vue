@@ -5,7 +5,7 @@
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
   >
-    <div v-for="(item, i) in folderItem.children" v-bind:key="i">
+    <div v-for="item in folderItem.children" v-bind:key="item.id">
       <Tooltip :text="item.title">
         <v-btn
           class="btn"
