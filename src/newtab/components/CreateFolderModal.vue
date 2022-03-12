@@ -3,7 +3,7 @@
     v-model="show"
     classes="modal-container"
     content-class="modal-content"
-    z-index="1100"
+    z-index="9999"
   >
     <v-card class="modal-inner" outlined title elevation="7">
       <v-card-header class="modal-banner bg-primary">
