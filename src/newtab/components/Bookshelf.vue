@@ -11,7 +11,7 @@
           class="btn"
           tile
           elevation="0"
-          @dblclick="onDblClickFolder(item)"
+          @click="onClickFolder(item)"
           v-if="item.children"
           @contextmenu.prevent.stop="
             openContextMenu($event, { item: item, type: 'FOLDER' })
@@ -30,7 +30,7 @@
           class="btn"
           tile
           elevation="0"
-          @dblclick="openUrl(item.id, item.url)"
+          @click="openUrl(item.id, item.url)"
           @contextmenu.prevent.stop="
             openContextMenu($event, { item: item, type: 'FILE' })
           "
@@ -96,7 +96,7 @@ export default defineComponent({
       // TODO: 네이밍 변경(ex. updateModal)
       this[OPEN_BOOKMARK_UPDATE](this.folderItem);
     },
-    onDblClickFolder(item: Item) {
+    onClickFolder(item: Item) {
       const { id, title } = item;
       // const isRootItem = this.id === "1";
       if (this.isDesktop) {
