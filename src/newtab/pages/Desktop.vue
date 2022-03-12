@@ -9,9 +9,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Bookshelf from "../components/Bookshelf.vue";
-import { mapGetters } from "vuex";
 import UpdateModal from "../components/UpdateModal.vue";
-import store, { GET_BOOKMARK_TREE_ROOT, SET_REFRESH_TARGET } from "../store";
+import store, { SET_REFRESH_TARGET } from "../store";
 import CreateFolderModal from "../components/CreateFolderModal.vue";
 import BookshelfModalContainer from "../components/BookshelfModalContainer.vue";
 import ContextMenuContainer from "../components/ContextMenu/ContextMenuContainer.vue";
@@ -24,11 +23,6 @@ export default defineComponent({
     BookshelfModalContainer,
     ContextMenuContainer,
     UpdateModal,
-  },
-  computed: {
-    ...mapGetters({
-      bookmarkTreeRoot: GET_BOOKMARK_TREE_ROOT,
-    }),
   },
   mounted() {
     setBookmarksEventHandlers();

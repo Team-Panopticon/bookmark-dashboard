@@ -20,8 +20,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapActions, mapGetters, mapMutations } from "vuex";
-import { RENEW_BOOKMARK_TREE, SET_BOOKMARK_TREE } from "../store";
+import { mapGetters, mapMutations } from "vuex";
+import { SET_BOOKMARK_TREE } from "../store";
 import {
   GET_BOOKMARK_CREATE_INFO,
   GET_BOOKMARK_CREATE_SHOW,
@@ -61,7 +61,6 @@ export default defineComponent({
         this.folderName = "";
         this.resetCreateFolderModalInfo();
         this.setCreateFolderModalShow(false);
-        this.renewBookmarkTree();
       }
     },
     closeCreateFolderModal() {
@@ -71,9 +70,6 @@ export default defineComponent({
       resetCreateFolderModalInfo: RESET_BOOKMARK_CREATE_INFO,
       setCreateFolderModalShow: SET_BOOKMARK_CREATE_SHOW,
       setBookmarkTree: SET_BOOKMARK_TREE,
-    }),
-    ...mapActions({
-      renewBookmarkTree: RENEW_BOOKMARK_TREE,
     }),
   },
 });
