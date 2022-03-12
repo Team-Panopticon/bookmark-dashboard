@@ -37,9 +37,9 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn @click="update"> 저장 </v-btn>
+        <v-btn @click="update"> Save</v-btn>
 
-        <v-btn @click="closeModal"> 취소 </v-btn>
+        <v-btn @click="closeModal"> Cancel </v-btn>
       </v-card-actions>
     </v-card>
   </vue-final-modal>
@@ -82,7 +82,7 @@ export default defineComponent({
       return this[GET_BOOKMARK_UPDATE_INFO].url;
     },
     modalTitle(): string {
-      return this.isBookmark ? "북마크 수정" : "폴더 이름 바꾸기";
+      return this.isBookmark ? "Edit Bookmark" : "Change Folder Name";
     },
   },
   methods: {
