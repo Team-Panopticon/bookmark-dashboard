@@ -1,9 +1,11 @@
 <template>
-  <Bookshelf id="1" :isDesktop="true"></Bookshelf>
-  <CreateFolderModal></CreateFolderModal>
-  <BookshelfModalContainer></BookshelfModalContainer>
-  <ContextMenuContainer />
-  <UpdateModal />
+  <div class="app-container">
+    <Bookshelf id="1" :isDesktop="true"></Bookshelf>
+    <CreateFolderModal></CreateFolderModal>
+    <BookshelfModalContainer></BookshelfModalContainer>
+    <ContextMenuContainer />
+    <UpdateModal />
+  </div>
 </template>
 
 <script lang="ts">
@@ -52,15 +54,17 @@ function setBookmarksEventHandlers() {
 ::v-deep .modal-content {
   position: relative;
   width: 500px;
-  height: 500px;
 }
-
-.modal-inner {
-  border: 1px solid lightgray;
-}
-
-.modal-banner {
+::v-deep .modal-banner {
   display: flex;
   justify-content: space-between;
+}
+::v-deep .v-card-header {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.app-container {
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -4,15 +4,8 @@
     classes="modal-container"
     content-class="modal-content"
     overlay-class="modal-overlay"
-    :drag="true"
-    drag-selector=".modal-banner"
-    :resize="true"
     :max-height="700"
     :max-width="700"
-    :hide-overlay="true"
-    :click-to-close="false"
-    :esc-to-close="false"
-    :prevent-click="true"
     z-index="9999"
   >
     <v-card class="modal-inner" outlined title elevation="7">
@@ -22,8 +15,7 @@
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-
-      <v-card-text class="text-h5 font-weight-bold">
+      <v-card-text class="text-h5">
         <v-form :key="bookmarkUpdateModalInfo">
           <v-text-field
             v-model="bookmarkUpdateModalInfo.title"
@@ -45,9 +37,9 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn @click="update"> 저장 </v-btn>
+        <v-btn @click="update"> Save</v-btn>
 
-        <v-btn @click="closeModal"> 취소 </v-btn>
+        <v-btn @click="closeModal"> Cancel </v-btn>
       </v-card-actions>
     </v-card>
   </vue-final-modal>
@@ -89,7 +81,7 @@ export default defineComponent({
       return this[GET_BOOKMARK_UPDATE_INFO].isFolder;
     },
     modalTitle(): string {
-      return this.isFolder ? "폴더 이름 바꾸기" : "북마크 수정";
+      return this.isBookmark ? "Edit Bookmark" : "Change Folder Name";
     },
   },
   methods: {
@@ -111,24 +103,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-::v-deep .modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-::v-deep .modal-content {
-  position: relative;
-  width: 500px;
-  height: 500px;
-}
-
-.modal-inner {
-  border: 1px solid lightgray;
-}
-
-.modal-banner {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
+.v-card-text {
+  opacity: 0.9;
 }
 </style>
