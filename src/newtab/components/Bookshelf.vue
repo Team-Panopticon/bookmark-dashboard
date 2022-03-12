@@ -167,5 +167,6 @@ export default defineComponent({
   word-break: break-all;
   letter-spacing: 0.5px;
   color: #36454f;
+  text-transform: none;
 }
 </style>
