@@ -13,10 +13,11 @@ import { defineComponent } from "vue";
 import Bookshelf from "../components/Bookshelf.vue";
 import { mapGetters } from "vuex";
 import UpdateModal from "../components/UpdateModal.vue";
-import { GET_BOOKMARK_TREE_ROOT } from "../store";
+import store, { GET_BOOKMARK_TREE_ROOT, SET_REFRESH_TARGET } from "../store";
 import CreateFolderModal from "../components/CreateFolderModal.vue";
 import BookshelfModalContainer from "../components/BookshelfModalContainer.vue";
 import ContextMenuContainer from "../components/ContextMenu/ContextMenuContainer.vue";
+import { Item } from "@/shared/types/store";
 
 export default defineComponent({
   components: {
@@ -31,7 +32,23 @@ export default defineComponent({
       bookmarkTreeRoot: GET_BOOKMARK_TREE_ROOT,
     }),
   },
+  mounted() {
+    setBookmarksEventHandlers();
+  },
 });
+
+function setBookmarksEventHandlers() {
+  chrome.bookmarks.onCreated.addListener((id: string, bookmark: Item) => {
+    const { parentId } = bookmark;
+    store.commit(SET_REFRESH_TARGET, parentId);
+  });
+  chrome.bookmarks.onRemoved.addListener(
+    (id: string, removeInfo: chrome.bookmarks.BookmarkRemoveInfo) => {
+      const { parentId } = removeInfo;
+      store.commit(SET_REFRESH_TARGET, parentId);
+    }
+  );
+}
 </script>
 
 <style lang="scss" scoped>

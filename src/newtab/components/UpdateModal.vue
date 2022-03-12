@@ -26,7 +26,7 @@
             v-on:click.stop.self
           ></v-text-field>
           <v-text-field
-            v-show="isBookmark"
+            v-show="isFolder"
             v-model="bookmarkUpdateModalInfo.url"
             label="URL"
             required
@@ -78,8 +78,8 @@ export default defineComponent({
         this[SET_BOOKMARK_UPDATE_SHOW](val);
       },
     },
-    isBookmark(): boolean {
-      return this[GET_BOOKMARK_UPDATE_INFO].url;
+    isFolder(): boolean {
+      return this[GET_BOOKMARK_UPDATE_INFO].isFolder;
     },
     modalTitle(): string {
       return this.isBookmark ? "Edit Bookmark" : "Change Folder Name";
