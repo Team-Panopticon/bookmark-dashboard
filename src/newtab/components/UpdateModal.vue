@@ -81,7 +81,7 @@ export default defineComponent({
       return this[GET_BOOKMARK_UPDATE_INFO].isFolder;
     },
     modalTitle(): string {
-      return this.isBookmark ? "Edit Bookmark" : "Change Folder Name";
+      return this.isFolder ? "Change Folder Name" : "Edit Bookmark";
     },
   },
   methods: {
