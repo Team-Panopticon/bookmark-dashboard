@@ -25,7 +25,7 @@
         </v-form>
       </v-card-text>
       <v-card-actions>
-        <v-btn @click="createFolder(folderName)">Create Folder</v-btn>
+        <v-btn @click="createFolder(folderName)">Create</v-btn>
         <v-btn @click="closeCreateFolderModal">Cancel</v-btn>
       </v-card-actions>
     </v-card>
