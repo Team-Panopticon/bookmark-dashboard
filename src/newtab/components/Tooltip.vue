@@ -1,7 +1,9 @@
 <template>
-  <div class="tooltip" v-if="tooltipShow">
-    <span class="text">{{ tooltipText }}</span>
-  </div>
+  <Transition>
+    <div class="tooltip" v-if="tooltipShow">
+      <span class="text">{{ tooltipText }}</span>
+    </div>
+  </Transition>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
@@ -48,8 +50,6 @@ export default defineComponent({
   padding: 4px;
   pointer-events: none;
   word-wrap: break-word;
-  opacity: 0.85;
-  transition-property: opacity, transform;
   transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
   transition-duration: 75ms;
   transform: translateX(-50%) translateX(40px) translateY(5px);
@@ -69,5 +69,16 @@ export default defineComponent({
   border-width: 5px;
   border-style: solid;
   border-color: transparent transparent gray transparent;
+}
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+.v-enter-active {
+  transition-delay: 1000ms;
+}
+.v-enter-to,
+.v-leave-from {
+  opacity: 0.85;
 }
 </style>
