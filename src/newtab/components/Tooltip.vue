@@ -1,62 +1,60 @@
 <template>
-  <div class="tooltip-container">
-    <div class="slot-container">
-      <slot />
+  <Transition>
+    <div class="tooltip" v-if="tooltipShow">
+      <span class="text">{{ tooltipText }}</span>
     </div>
-    <div class="tooltip">
-      <span class="text">{{ text }}</span>
-    </div>
-  </div>
+  </Transition>
 </template>
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue";
+import { mapGetters } from "vuex";
+import {
+  GET_TOOLTIP_POSITION,
+  GET_TOOLTIP_SHOW,
+  GET_TOOLTIP_TEXT,
+} from "../store/modules/tooltip";
+
+export default defineComponent({
   props: {
     text: {
       type: String,
       required: true,
     },
   },
-};
+  computed: {
+    ...mapGetters({
+      tooltipPosition: GET_TOOLTIP_POSITION,
+      tooltipText: GET_TOOLTIP_TEXT,
+      tooltipShow: GET_TOOLTIP_SHOW,
+    }),
+    tooltipPositionPx() {
+      return {
+        x: `${this.tooltipPosition.x}px`,
+        y: `${this.tooltipPosition.y}px`,
+      };
+    },
+  },
+});
 </script>
-
 <style scoped>
-.slot-container {
-  width: 100%;
-}
-.tooltip-container {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip-container:hover .tooltip {
-  opacity: 0.85;
-
-  transition: opacity;
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  transition-duration: 150ms;
-  transition-delay: 1000ms;
-}
-
 .tooltip {
-  top: 108%;
-  left: 40px;
+  top: v-bind("tooltipPositionPx.y");
+  left: v-bind("tooltipPositionPx.x");
   color: #ffffff;
   text-align: center;
   border-radius: 4px;
   font-size: 0.875rem;
   line-height: 1.6;
-  min-width: 100%;
-  max-width: 200%;
+  min-width: 80px;
+  max-width: 160px;
   padding: 4px;
   pointer-events: none;
-  transition-property: opacity, transform;
   word-wrap: break-word;
-  opacity: 0;
   transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
   transition-duration: 75ms;
-  position: absolute;
-  z-index: 1000;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateX(40px) translateY(5px);
+  position: fixed;
+  z-index: 10000;
   background: gray;
 }
 .text {
@@ -71,5 +69,16 @@ export default {
   border-width: 5px;
   border-style: solid;
   border-color: transparent transparent gray transparent;
+}
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+.v-enter-active {
+  transition-delay: 1000ms;
+}
+.v-enter-to,
+.v-leave-from {
+  opacity: 0.85;
 }
 </style>

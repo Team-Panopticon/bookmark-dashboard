@@ -5,6 +5,7 @@
     <BookshelfModalContainer></BookshelfModalContainer>
     <ContextMenuContainer />
     <UpdateModal />
+    <Tooltip />
   </div>
 </template>
 
@@ -17,6 +18,7 @@ import CreateFolderModal from "../components/CreateFolderModal.vue";
 import BookshelfModalContainer from "../components/BookshelfModalContainer.vue";
 import ContextMenuContainer from "../components/ContextMenu/ContextMenuContainer.vue";
 import { Item } from "@/shared/types/store";
+import Tooltip from "../components/Tooltip.vue";
 
 export default defineComponent({
   components: {
@@ -25,6 +27,7 @@ export default defineComponent({
     BookshelfModalContainer,
     ContextMenuContainer,
     UpdateModal,
+    Tooltip,
   },
   mounted() {
     setBookmarksEventHandlers();
