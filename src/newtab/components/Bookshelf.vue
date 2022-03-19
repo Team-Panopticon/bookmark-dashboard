@@ -6,43 +6,44 @@
     "
   >
     <div v-for="item in folderItem.children" v-bind:key="item.id">
-      <Tooltip :text="item.title">
-        <v-btn
-          class="btn"
-          tile
-          elevation="0"
-          @click="onClickFolder(item)"
-          v-if="item.children"
-          @contextmenu.prevent.stop="
-            openContextMenu($event, { item: item, type: 'FOLDER' })
-          "
-        >
-          <div class="item-container">
-            <v-icon class="item-icon">mdi-folder</v-icon>
-            <p class="item-title">
-              {{ item.title }}
-            </p>
-          </div>
-        </v-btn>
-
-        <v-btn
-          v-else
-          class="btn"
-          tile
-          elevation="0"
-          @click="openUrl(item.id, item.url)"
-          @contextmenu.prevent.stop="
-            openContextMenu($event, { item: item, type: 'FILE' })
-          "
-        >
-          <div class="item-container">
-            <Favicon :url="item.url" />
-            <p class="item-title">
-              {{ item.title }}
-            </p>
-          </div>
-        </v-btn>
-      </Tooltip>
+      <v-btn
+        class="btn"
+        tile
+        elevation="0"
+        v-if="item.children"
+        @click="onClickFolder(item)"
+        @mouseover="openTooltip(item.title, $event)"
+        @mouseleave="closeTooltip()"
+        @contextmenu.prevent.stop="
+          openContextMenu($event, { item: item, type: 'FOLDER' })
+        "
+      >
+        <div class="item-container">
+          <v-icon class="item-icon">mdi-folder</v-icon>
+          <p class="item-title">
+            {{ item.title }}
+          </p>
+        </div>
+      </v-btn>
+      <v-btn
+        v-else
+        class="btn"
+        tile
+        elevation="0"
+        @click="openUrl(item.id, item.url)"
+        @mouseover="openTooltip(item.title, $event)"
+        @mouseleave="closeTooltip()"
+        @contextmenu.prevent.stop="
+          openContextMenu($event, { item: item, type: 'FILE' })
+        "
+      >
+        <div class="item-container">
+          <Favicon :url="item.url" />
+          <p class="item-title">
+            {{ item.title }}
+          </p>
+        </div>
+      </v-btn>
     </div>
   </div>
 </template>
@@ -57,10 +58,14 @@ import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
 import store, { GET_REFRESH_TARGET, SET_REFRESH_TARGET } from "../store/index";
 import { openContextMenu } from "../utils/contextMenu";
 import BookmarkApi from "../utils/bookmarkApi";
-import Tooltip from "../components/Tooltip.vue";
+import {
+  SET_TOOLTIP_POSITION,
+  SET_TOOLTIP_SHOW,
+  SET_TOOLTIP_TEXT,
+} from "../store/modules/tooltip";
 
 export default defineComponent({
-  components: { Favicon, Tooltip },
+  components: { Favicon },
   props: {
     id: {
       type: String,
@@ -90,7 +95,12 @@ export default defineComponent({
     this.refresh();
   },
   methods: {
-    ...mapMutations([OPEN_BOOKSHELF_MODALS]),
+    ...mapMutations([
+      OPEN_BOOKSHELF_MODALS,
+      SET_TOOLTIP_POSITION,
+      SET_TOOLTIP_TEXT,
+      SET_TOOLTIP_SHOW,
+    ]),
     ...mapActions([OPEN_BOOKMARK_UPDATE]), // updateMODAL
     openBookmarkModal() {
       // TODO: 네이밍 변경(ex. updateModal)
@@ -117,6 +127,24 @@ export default defineComponent({
     openContextMenu,
     async refresh() {
       this.folderItem = await BookmarkApi.getSubTree(this.id);
+    },
+    openTooltip(title: string, event: MouseEvent) {
+      const targetElement = event.target as HTMLElement;
+      const buttonElement = targetElement.closest("button");
+      if (!buttonElement) return;
+
+      const boundingRect = buttonElement.getBoundingClientRect();
+      const position = {
+        x: boundingRect.x,
+        y: boundingRect.y + boundingRect.height,
+      };
+
+      this[SET_TOOLTIP_POSITION](position);
+      this[SET_TOOLTIP_TEXT](title);
+      this[SET_TOOLTIP_SHOW](true);
+    },
+    closeTooltip() {
+      this[SET_TOOLTIP_SHOW](false);
     },
   },
 });
