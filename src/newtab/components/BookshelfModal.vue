@@ -47,7 +47,6 @@
             :key="viewItem.id"
             @routeInFolder="routeInFolder"
             :id="viewItem.id"
-            :title="viewItem.title"
           ></Bookshelf>
         </div>
       </v-card>
