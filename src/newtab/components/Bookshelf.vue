@@ -114,6 +114,7 @@ export default defineComponent({
       } else {
         this.routeInFolder(id);
       }
+      this[SET_TOOLTIP_SHOW](false);
     },
     routeInFolder(id: string) {
       this.$emit("routeInFolder", id);
@@ -123,6 +124,7 @@ export default defineComponent({
     },
     openUrl(id: string, url: string) {
       window.open(url, "_blank")?.focus();
+      this[SET_TOOLTIP_SHOW](false);
     },
     openContextMenu,
     async refresh() {

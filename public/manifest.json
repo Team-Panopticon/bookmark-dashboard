@@ -10,5 +10,10 @@
   },
   "chrome_url_overrides": {
     "newtab": "newtab.html"
+  },
+  "icons": { 
+    "16": "images/bookmark_dashboard_icon_16.png",
+    "48": "images/bookmark_dashboard_icon_48.png",
+   "128": "images/bookmark_dashboard_icon_128.png" 
   }
 }
