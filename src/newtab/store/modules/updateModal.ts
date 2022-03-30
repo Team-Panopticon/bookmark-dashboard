@@ -12,6 +12,7 @@ export interface IUpdateModalInfo {
   url?: string | undefined;
   title: string;
   parentId?: string;
+  isFolder: boolean;
 }
 export interface State {
   updateModalInfo: IUpdateModalInfo;
@@ -26,6 +27,7 @@ const updateModalModule: Module<State, RootState> = {
       url: undefined,
       title: "",
       parentId: "",
+      isFolder: false,
     },
     updateModalShow: false,
   },
@@ -54,11 +56,6 @@ const updateModalModule: Module<State, RootState> = {
 
     [CLOSE_BOOKMARK_UPDATE]({ commit }) {
       commit(SET_BOOKMARK_UPDATE_SHOW, false);
-      commit(SET_BOOKMARK_UPDATE_INFO, {
-        id: "",
-        url: undefined,
-        title: "",
-      });
     },
   },
 };

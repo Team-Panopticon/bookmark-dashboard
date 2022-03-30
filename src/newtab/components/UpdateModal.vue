@@ -4,15 +4,8 @@
     classes="modal-container"
     content-class="modal-content"
     overlay-class="modal-overlay"
-    :drag="true"
-    drag-selector=".modal-banner"
-    :resize="true"
     :max-height="700"
     :max-width="700"
-    :hide-overlay="true"
-    :click-to-close="false"
-    :esc-to-close="false"
-    :prevent-click="true"
     z-index="9999"
   >
     <v-card class="modal-inner" outlined title elevation="7">
@@ -22,8 +15,7 @@
           <v-icon>mdi-close</v-icon>
         </button>
       </v-card-header>
-
-      <v-card-text class="text-h5 font-weight-bold">
+      <v-card-text class="text-h5">
         <v-form :key="bookmarkUpdateModalInfo">
           <v-text-field
             v-model="bookmarkUpdateModalInfo.title"
@@ -34,7 +26,7 @@
             v-on:click.stop.self
           ></v-text-field>
           <v-text-field
-            v-show="isBookmark"
+            v-show="isFolder"
             v-model="bookmarkUpdateModalInfo.url"
             label="URL"
             required
@@ -45,9 +37,9 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn @click="update"> 저장 </v-btn>
+        <v-btn @click="update"> Save</v-btn>
 
-        <v-btn @click="closeModal"> 취소 </v-btn>
+        <v-btn @click="closeModal"> Cancel </v-btn>
       </v-card-actions>
     </v-card>
   </vue-final-modal>
@@ -65,7 +57,6 @@ import {
 } from "../store/modules/updateModal";
 import store, { SET_REFRESH_TARGET } from "../store/index";
 
-import { RENEW_BOOKMARK_TREE } from "../store/index";
 import BookmarkApi from "../utils/bookmarkApi";
 export default defineComponent({
   computed: {
@@ -86,15 +77,15 @@ export default defineComponent({
         this[SET_BOOKMARK_UPDATE_SHOW](val);
       },
     },
-    isBookmark(): boolean {
-      return this[GET_BOOKMARK_UPDATE_INFO].url;
+    isFolder(): boolean {
+      return this[GET_BOOKMARK_UPDATE_INFO].isFolder;
     },
     modalTitle(): string {
-      return this.isBookmark ? "북마크 수정" : "폴더 이름 바꾸기";
+      return this.isFolder ? "Change Folder Name" : "Edit Bookmark";
     },
   },
   methods: {
-    ...mapActions([CLOSE_BOOKMARK_UPDATE, RENEW_BOOKMARK_TREE]),
+    ...mapActions([CLOSE_BOOKMARK_UPDATE]),
     ...mapMutations([SET_BOOKMARK_UPDATE_INFO, SET_BOOKMARK_UPDATE_SHOW]),
     closeModal() {
       this[CLOSE_BOOKMARK_UPDATE]();
@@ -112,24 +103,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-::v-deep .modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-::v-deep .modal-content {
-  position: relative;
-  width: 500px;
-  height: 500px;
-}
-
-.modal-inner {
-  border: 1px solid lightgray;
-}
-
-.modal-banner {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
+.v-card-text {
+  opacity: 0.9;
 }
 </style>

@@ -1,14 +1,19 @@
 {
-  "name": "Test Extension",
-  "description": "Build an Extension!",
-  "version": "1.0",
+  "name": "Bookmark Dashboard",
+  "description": "Manage your Bookmark",
+  "version": "1.0.0",
   "manifest_version": 3,
-  "permissions": ["activeTab", "bookmarks"],
+  "permissions": ["bookmarks"],
   "action": {
     "default_title": "Bookmark Dashboard",
     "default_popup": "popup.html"
   },
   "chrome_url_overrides": {
     "newtab": "newtab.html"
+  },
+  "icons": {
+    "16": "images/bookmark_dashboard_icon_16.png",
+    "48": "images/bookmark_dashboard_icon_48.png",
+    "128": "images/bookmark_dashboard_icon_128.png"
   }
 }

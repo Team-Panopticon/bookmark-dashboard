@@ -3490,6 +3490,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-plugin-transform-remove-console@npm:^6.9.4":
+  version: 6.9.4
+  resolution: "babel-plugin-transform-remove-console@npm:6.9.4"
+  checksum: 1123c3816c6f89c064752199c8796f30265d937f5d8e1e43d3837f1c0e87ed0e6bbd0afa6117ce021c8b93ec1de7154e158674bb22331c7ed6609d10121359df
+  languageName: node
+  linkType: hard
+
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -3646,6 +3653,7 @@ __metadata:
     "@vue/compiler-sfc": ^3.0.0
     "@vue/eslint-config-prettier": ^6.0.0
     "@vue/eslint-config-typescript": ^7.0.0
+    babel-plugin-transform-remove-console: ^6.9.4
     core-js: ^3.6.5
     eslint: ^6.7.2
     eslint-plugin-prettier: ^3.3.1
@@ -3659,7 +3667,7 @@ __metadata:
     vue-cli-plugin-vuetify: ~2.4.5
     vue-final-modal: ^3.4.3
     vue-js-modal: ^2.0.1
-    vuetify: ^3.0.0-alpha.0
+    vuetify: ^3.0.0-alpha.13
     vuetify-loader: ^2.0.0-alpha.0
     vuex: next
     webfontloader: ^1.0.0
@@ -12159,12 +12167,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vuetify@npm:^3.0.0-alpha.0":
-  version: 3.0.0-alpha.12
-  resolution: "vuetify@npm:3.0.0-alpha.12"
+"vuetify@npm:^3.0.0-alpha.13":
+  version: 3.0.0-alpha.13
+  resolution: "vuetify@npm:3.0.0-alpha.13"
   peerDependencies:
+    "@formatjs/intl": ^1.0.0
     vue: ^3.2.19
-  checksum: cf14c1f7fc48afe92e21ad3c12b62f9393c0808ea4587ea936131a425c7cb3c5a8f3d4850d76f83bec6acce13e1b014fd99891185db675b8fdc9794d782fb2e4
+    vue-i18n: ^9.0.0
+  peerDependenciesMeta:
+    "@formatjs/intl":
+      optional: true
+    vue-i18n:
+      optional: true
+  checksum: 61ff6afdd980791ac7e33522887106718abd9885632b9fc4e731cc99615ac57437e065b5ebb2131e9b0fba3511542228a63c2af40e38591a8817ad2608627757
   languageName: node
   linkType: hard
 

@@ -20,7 +20,7 @@
         outlined
         title
         elevation="7"
-        @mousedown.capture="focusBookshelfModal(bookshelfModalId)"
+        @mousedown.capture="focusBookshelfModal(timeStampId)"
       >
         <v-card-header class="modal-banner bg-primary">
           <div class="modal__title d-flex">
@@ -35,7 +35,7 @@
           </div>
           <button
             class="modal__close"
-            @click="closeBookshelfModal(bookshelfModalId)"
+            @click="closeBookshelfModal(timeStampId)"
           >
             <v-icon>mdi-close</v-icon>
           </button>
@@ -47,7 +47,6 @@
             :key="viewItem.id"
             @routeInFolder="routeInFolder"
             :id="viewItem.id"
-            :title="viewItem.title"
           ></Bookshelf>
         </div>
       </v-card>
@@ -75,7 +74,7 @@ interface BreadCrumb {
 export default defineComponent({
   components: { Bookshelf },
   props: {
-    bookshelfModalId: {
+    timeStampId: {
       type: String,
       required: true,
     },
@@ -183,11 +182,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .vfm::v-deep {
-  .modal-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
   .modal-content {
     position: relative;
     width: 500px;
@@ -199,10 +193,6 @@ export default defineComponent({
   width: 100%;
   height: 100%;
 }
-.modal-banner {
-  display: flex;
-  justify-content: space-between;
-}
 .v-card {
   display: flex;
   flex-direction: column;
@@ -210,5 +200,9 @@ export default defineComponent({
 .v-card-content {
   flex: 1;
   overflow-y: auto;
+}
+.v-breadcrumbs {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 </style>

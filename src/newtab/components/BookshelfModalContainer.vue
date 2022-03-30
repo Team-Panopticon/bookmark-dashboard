@@ -1,9 +1,9 @@
 <template>
   <BookshelfModal
-    v-for="({ zIndex, title, id }, bookshelfModalId) in modals"
-    :key="bookshelfModalId"
+    v-for="({ zIndex, title, id }, timeStampId) in modals"
+    :key="timeStampId"
     :id="id"
-    :bookshelfModalId="bookshelfModalId"
+    :timeStampId="timeStampId"
     :title="title"
     :zIndex="zIndex"
   ></BookshelfModal>

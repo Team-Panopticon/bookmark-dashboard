@@ -1,12 +1,14 @@
 {
   "name": "bookmark-dashboard",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "packageManager": "yarn@3.1.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service build --watch",
     "dev": "vue-cli-service build --watch",
-    "build": "vue-cli-service build && rm -rf ./dist/index.*",
+    "build": "vue-cli-service build --mode production && rm -rf ./dist/index.*",
+    "zip": "zip -r ./dist.zip ./dist",
+    "publish": "yarn build && yarn zip",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -16,7 +18,7 @@
     "vue": "3.2.24",
     "vue-final-modal": "^3.4.3",
     "vue-js-modal": "^2.0.1",
-    "vuetify": "^3.0.0-alpha.0",
+    "vuetify": "^3.0.0-alpha.13",
     "vuex": "next",
     "webfontloader": "^1.0.0"
   },
@@ -33,6 +35,7 @@
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^7.0.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.0.0",
