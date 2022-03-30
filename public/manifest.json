@@ -1,9 +1,9 @@
 {
-  "name": "Test Extension",
-  "description": "Build an Extension!",
+  "name": "Bookmark Dashboard",
+  "description": "Manage your Bookmark",
   "version": "1.0.0",
   "manifest_version": 3,
-  "permissions": ["activeTab", "bookmarks"],
+  "permissions": ["bookmarks"],
   "action": {
     "default_title": "Bookmark Dashboard",
     "default_popup": "popup.html"
