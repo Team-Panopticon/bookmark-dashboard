@@ -155,7 +155,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, auto));
+  grid-template-columns: repeat(auto-fill, 72px);
   grid-auto-rows: 100px;
   padding: 20px;
   gap: 16px;
