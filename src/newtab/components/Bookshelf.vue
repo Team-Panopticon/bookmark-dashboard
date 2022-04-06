@@ -8,7 +8,6 @@
     <div v-for="item in folderItem.children" v-bind:key="item.id">
       <v-btn
         class="btn"
-        tile
         elevation="0"
         v-if="item.children"
         @click="onClickFolder(item)"
@@ -51,18 +50,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Favicon from "./Favicon.vue";
-import { mapMutations, mapActions, mapGetters } from "vuex";
-import { Item } from "../../shared/types/store";
-import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
-import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
-import store, { GET_REFRESH_TARGET, SET_REFRESH_TARGET } from "../store/index";
-import { openContextMenu } from "../utils/contextMenu";
-import BookmarkApi from "../utils/bookmarkApi";
-import {
-  SET_TOOLTIP_POSITION,
-  SET_TOOLTIP_SHOW,
-  SET_TOOLTIP_TEXT,
-} from "../store/modules/tooltip";
+import { setupBookshelf } from "./composition/setupBookshelf";
 
 export default defineComponent({
   components: { Favicon },
@@ -77,77 +65,8 @@ export default defineComponent({
       default: false,
     },
   },
-  data: () => ({
-    folderItem: {} as Item,
-  }),
-  computed: {
-    ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
-  },
-  watch: {
-    refreshTargetId(id?: string) {
-      if (id && this.$props.id === id) {
-        this.refresh();
-        store.commit(SET_REFRESH_TARGET, "");
-      }
-    },
-  },
-  async mounted() {
-    this.refresh();
-  },
-  methods: {
-    ...mapMutations([
-      OPEN_BOOKSHELF_MODALS,
-      SET_TOOLTIP_POSITION,
-      SET_TOOLTIP_TEXT,
-      SET_TOOLTIP_SHOW,
-    ]),
-    ...mapActions([OPEN_BOOKMARK_UPDATE]), // updateMODAL
-    openBookmarkModal() {
-      // TODO: 네이밍 변경(ex. updateModal)
-      this[OPEN_BOOKMARK_UPDATE](this.folderItem);
-    },
-    onClickFolder(item: Item) {
-      const { id, title } = item;
-      // const isRootItem = this.id === "1";
-      if (this.isDesktop) {
-        this._openBookshelfModal(id, title);
-      } else {
-        this.routeInFolder(id);
-      }
-      this[SET_TOOLTIP_SHOW](false);
-    },
-    routeInFolder(id: string) {
-      this.$emit("routeInFolder", id);
-    },
-    _openBookshelfModal(id: string, title: string) {
-      this.openBookshelfModal({ id, title });
-    },
-    openUrl(id: string, url: string) {
-      window.open(url, "_blank")?.focus();
-      this[SET_TOOLTIP_SHOW](false);
-    },
-    openContextMenu,
-    async refresh() {
-      this.folderItem = await BookmarkApi.getSubTree(this.id);
-    },
-    openTooltip(title: string, event: MouseEvent) {
-      const targetElement = event.target as HTMLElement;
-      const buttonElement = targetElement.closest("button");
-      if (!buttonElement) return;
-
-      const boundingRect = buttonElement.getBoundingClientRect();
-      const position = {
-        x: boundingRect.x,
-        y: boundingRect.y + boundingRect.height,
-      };
-
-      this[SET_TOOLTIP_POSITION](position);
-      this[SET_TOOLTIP_TEXT](title);
-      this[SET_TOOLTIP_SHOW](true);
-    },
-    closeTooltip() {
-      this[SET_TOOLTIP_SHOW](false);
-    },
+  setup(props, context) {
+    return setupBookshelf(props, context);
   },
 });
 </script>
