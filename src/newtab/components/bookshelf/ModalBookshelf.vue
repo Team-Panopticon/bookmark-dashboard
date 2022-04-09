@@ -51,6 +51,9 @@
 import { defineComponent } from "vue";
 import Favicon from "../Favicon.vue";
 import { setupBookshelf } from "../composition/setupBookshelf";
+import { Item } from "@/shared/types/store";
+import store from "../../store/index";
+import { SET_TOOLTIP_SHOW } from "@/newtab/store/modules/tooltip";
 
 export default defineComponent({
   components: { Favicon },
@@ -59,14 +62,24 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    isDesktop: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
-  setup(props, context) {
-    return setupBookshelf(props, context);
+  setup(props) {
+    const { folderItem, openTooltip, closeTooltip, openUrl, openContextMenu } =
+      setupBookshelf(props);
+    return {
+      folderItem,
+      openTooltip,
+      closeTooltip,
+      openUrl,
+      openContextMenu,
+    };
+  },
+  methods: {
+    onClickFolder(item: Item) {
+      const { id } = item;
+      this.$emit("routeInFolder", id);
+      store.commit(SET_TOOLTIP_SHOW, false);
+    },
   },
 });
 </script>
