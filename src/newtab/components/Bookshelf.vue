@@ -4,8 +4,13 @@
     @contextmenu.prevent.stop="
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
+    :data-parent-id="id"
   >
-    <div v-for="item in folderItem.children" v-bind:key="item.id">
+    <div
+      v-for="item in folderItem.children"
+      v-bind:key="item.id"
+      :data-index="item.index"
+    >
       <v-btn
         class="btn"
         tile
@@ -36,6 +41,7 @@
         @contextmenu.prevent.stop="
           openContextMenu($event, { item: item, type: 'FILE' })
         "
+        :data-index="item.index"
       >
         <div class="item-container">
           <Favicon :url="item.url" />
