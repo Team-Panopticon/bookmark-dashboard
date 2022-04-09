@@ -42,12 +42,12 @@
         </v-card-header>
 
         <div class="v-card-content">
-          <Bookshelf
+          <ModalBookshelf
             v-if="viewItem.id"
             :key="viewItem.id"
             @routeInFolder="routeInFolder"
             :id="viewItem.id"
-          ></Bookshelf>
+          ></ModalBookshelf>
         </div>
       </v-card>
     </vue-final-modal>
@@ -64,7 +64,7 @@ import {
   GET_BOOKSHELF_MODALS_CURRENT_POSITION,
   UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION,
 } from "../store/modules/bookshelfModal";
-import Bookshelf from "./Bookshelf.vue";
+import ModalBookshelf from "./bookshelf/ModalBookshelf.vue";
 import BookmarkApi from "../utils/bookmarkApi";
 interface BreadCrumb {
   disabled: boolean;
@@ -72,7 +72,7 @@ interface BreadCrumb {
 }
 
 export default defineComponent({
-  components: { Bookshelf },
+  components: { ModalBookshelf },
   props: {
     timeStampId: {
       type: String,

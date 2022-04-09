@@ -49,8 +49,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Favicon from "./Favicon.vue";
-import { setupBookshelf } from "./composition/setupBookshelf";
+import Favicon from "../Favicon.vue";
+import { setupBookshelf } from "../composition/setupBookshelf";
 
 export default defineComponent({
   components: { Favicon },
