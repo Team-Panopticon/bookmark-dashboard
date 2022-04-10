@@ -10,6 +10,8 @@
       v-for="item in folderItem.children"
       v-bind:key="item.id"
       :data-index="item.index"
+      @mousedown="mousedown"
+      class="btn-wrapper"
     >
       <v-btn
         class="btn"
@@ -101,6 +103,24 @@ export default defineComponent({
     this.refresh();
   },
   methods: {
+    mousedown(e: MouseEvent) {
+      e.preventDefault();
+
+      const target = e.target as HTMLElement;
+      const btnWrapper = target.closest(".btn-wrapper") as HTMLElement;
+      const offsetX = btnWrapper.getBoundingClientRect().x - e.pageX;
+      const offsetY = btnWrapper.getBoundingClientRect().y - e.pageY;
+      btnWrapper.style.position = "absolute";
+      const mousemoveHandler = (e: MouseEvent) => {
+        btnWrapper.style.zIndex = "9999";
+        btnWrapper.style.left = `${e.clientX + offsetX}px`;
+        btnWrapper.style.top = `${e.clientY + offsetY}px`;
+      };
+      window.addEventListener("mousemove", mousemoveHandler);
+      window.addEventListener("mouseup", (e) => {
+        window.removeEventListener("mousemove", mousemoveHandler);
+      });
+    },
     ...mapMutations([
       OPEN_BOOKSHELF_MODALS,
       SET_TOOLTIP_POSITION,
