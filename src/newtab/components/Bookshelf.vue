@@ -106,7 +106,9 @@ export default defineComponent({
   methods: {
     mousedown(mousedown: MouseEvent) {
       mousedown.preventDefault();
-      const gridContainer = document.querySelector(".grid-container");
+      const gridContainer = document.querySelector(
+        ".grid-container"
+      ) as HTMLElement;
       const startX = mousedown.pageX;
       const startY = mousedown.pageY;
       const target = mousedown.target as HTMLElement;
@@ -116,7 +118,9 @@ export default defineComponent({
       const offsetY = btnWrapper.getBoundingClientRect().y - startY;
       btnWrapper.classList.remove("btn-wrapper");
       let targetIdx: undefined | number = undefined;
+
       const mousemoveHandler = (e: MouseEvent) => {
+        let ghost: null | HTMLElement = document.querySelector(".ghost");
         e.preventDefault();
         btnWrapper.style.zIndex = "9999";
         btnWrapper.style.left = `${e.clientX + offsetX}px`;
@@ -129,16 +133,25 @@ export default defineComponent({
 
         const changingElement = btnWrappers[0] as HTMLElement;
         const newTargetIdx = Number(changingElement?.dataset.index);
-        let ghost = undefined;
-        if (newTargetIdx != targetIdx && gridContainer) {
-          const newGhost = document.createElement("div");
-          if (ghost) {
-            gridContainer.removeChild(ghost);
-            ghost = newGhost;
+        const newGhost = document.createElement("div");
+        newGhost.classList.add("btn-wrapper");
+        newGhost.classList.add("ghost");
+        newGhost.dataset.index = "-1";
+        // 새로운 버튼위로 올라갔을때
+        if (!isNaN(newTargetIdx) && newTargetIdx !== -1) {
+          if (ghost != null) {
+            ghost.remove();
           }
-          newGhost.classList.add("btn-wrapper");
-          newGhost.classList.add("ghost");
           gridContainer.insertBefore(newGhost, changingElement);
+        }
+        // 버튼 외부영역
+        if (isNaN(newTargetIdx)) {
+          if (ghost != null) {
+            ghost.remove();
+          }
+          gridContainer.insertBefore(newGhost, null);
+        }
+        if (newTargetIdx !== -1) {
           targetIdx = Number(changingElement?.dataset.index);
         }
       };
@@ -150,8 +163,12 @@ export default defineComponent({
         const moveX = Math.abs(startX - endX);
         const moveY = Math.abs(startY - endY);
         if (moveX + moveY > 20) {
-          if (targetIdx != undefined && id) {
-            BookmarkApi.move(id, this.id, targetIdx);
+          if (id && this.folderItem.children) {
+            BookmarkApi.move(
+              id,
+              this.id,
+              !targetIdx ? this.folderItem.children.length : targetIdx
+            );
           }
         } else {
           console.log("움직임 없음");
@@ -220,19 +237,23 @@ export default defineComponent({
 <style lang="scss" scoped>
 .btn-wrapper {
   background: none;
-  transition: transform 800ms ease;
+  transition: all 800ms ease;
 }
 .ghost {
+  border: 1px soldi black;
+  width: 0px;
   background-color: red;
 }
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(72px, auto));
   grid-auto-rows: 100px;
+  grid-gap: inherit;
   padding: 20px;
   gap: 16px;
   width: 100%;
   height: 100%;
+  transition: all 2s ease;
 }
 
 .btn {
