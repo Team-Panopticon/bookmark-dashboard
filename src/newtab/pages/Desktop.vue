@@ -45,6 +45,12 @@ function setBookmarksEventHandlers() {
       store.commit(SET_REFRESH_TARGET, parentId);
     }
   );
+  chrome.bookmarks.onMoved.addListener(
+    (id: string, moveInfo: chrome.bookmarks.BookmarkMoveInfo) => {
+      const { parentId } = moveInfo;
+      store.commit(SET_REFRESH_TARGET, parentId);
+    }
+  );
 }
 </script>
 

@@ -1,6 +1,8 @@
 <template>
   <div
+    :key="lastUpdated"
     class="grid-container"
+    ref="grid-container"
     @contextmenu.prevent.stop="
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
@@ -10,15 +12,14 @@
       v-for="item in folderItem.children"
       v-bind:key="item.id"
       :data-index="item.index"
+      :data-id="item.id"
       @mousedown="mousedown"
       class="btn-wrapper"
     >
       <v-btn
         class="btn"
-        tile
         elevation="0"
         v-if="item.children"
-        @click="onClickFolder(item)"
         @mouseover="openTooltip(item.title, $event)"
         @mouseleave="closeTooltip()"
         @contextmenu.prevent.stop="
@@ -35,9 +36,8 @@
       <v-btn
         v-else
         class="btn"
-        tile
+        plain
         elevation="0"
-        @click="openUrl(item.id, item.url)"
         @mouseover="openTooltip(item.title, $event)"
         @mouseleave="closeTooltip()"
         @contextmenu.prevent.stop="
@@ -87,6 +87,7 @@ export default defineComponent({
   },
   data: () => ({
     folderItem: {} as Item,
+    lastUpdated: new Date().getTime(),
   }),
   computed: {
     ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
@@ -103,22 +104,60 @@ export default defineComponent({
     this.refresh();
   },
   methods: {
-    mousedown(e: MouseEvent) {
-      e.preventDefault();
-
-      const target = e.target as HTMLElement;
+    mousedown(mousedown: MouseEvent) {
+      mousedown.preventDefault();
+      const gridContainer = document.querySelector(".grid-container");
+      const startX = mousedown.pageX;
+      const startY = mousedown.pageY;
+      const target = mousedown.target as HTMLElement;
       const btnWrapper = target.closest(".btn-wrapper") as HTMLElement;
-      const offsetX = btnWrapper.getBoundingClientRect().x - e.pageX;
-      const offsetY = btnWrapper.getBoundingClientRect().y - e.pageY;
-      btnWrapper.style.position = "absolute";
+      const id = btnWrapper.dataset.id;
+      const offsetX = btnWrapper.getBoundingClientRect().x - startX;
+      const offsetY = btnWrapper.getBoundingClientRect().y - startY;
+      btnWrapper.classList.remove("btn-wrapper");
+      let targetIdx: undefined | number = undefined;
       const mousemoveHandler = (e: MouseEvent) => {
+        e.preventDefault();
         btnWrapper.style.zIndex = "9999";
         btnWrapper.style.left = `${e.clientX + offsetX}px`;
         btnWrapper.style.top = `${e.clientY + offsetY}px`;
+        btnWrapper.style.position = "absolute";
+        let els = document.elementsFromPoint(e.pageX, e.pageY);
+        const btnWrappers = els.filter((el) => {
+          return el.classList.contains("btn-wrapper");
+        });
+
+        const changingElement = btnWrappers[0] as HTMLElement;
+        const newTargetIdx = Number(changingElement?.dataset.index);
+        let ghost = undefined;
+        if (newTargetIdx != targetIdx && gridContainer) {
+          const newGhost = document.createElement("div");
+          if (ghost) {
+            gridContainer.removeChild(ghost);
+            ghost = newGhost;
+          }
+          newGhost.classList.add("btn-wrapper");
+          newGhost.classList.add("ghost");
+          gridContainer.insertBefore(newGhost, changingElement);
+          targetIdx = Number(changingElement?.dataset.index);
+        }
       };
-      window.addEventListener("mousemove", mousemoveHandler);
-      window.addEventListener("mouseup", (e) => {
-        window.removeEventListener("mousemove", mousemoveHandler);
+      document.addEventListener("mousemove", mousemoveHandler);
+      document.addEventListener("mouseup", (mouseupEvt) => {
+        btnWrapper.classList.add("btn-wrapper");
+        const endX = mouseupEvt.pageX;
+        const endY = mouseupEvt.pageY;
+        const moveX = Math.abs(startX - endX);
+        const moveY = Math.abs(startY - endY);
+        if (moveX + moveY > 20) {
+          if (targetIdx != undefined && id) {
+            BookmarkApi.move(id, this.id, targetIdx);
+          }
+        } else {
+          console.log("움직임 없음");
+          //TODO : 움직임 없을시 클릭이벤트 발생
+        }
+        document.removeEventListener("mousemove", mousemoveHandler);
       });
     },
     ...mapMutations([
@@ -134,7 +173,6 @@ export default defineComponent({
     },
     onClickFolder(item: Item) {
       const { id, title } = item;
-      // const isRootItem = this.id === "1";
       if (this.isDesktop) {
         this._openBookshelfModal(id, title);
       } else {
@@ -155,6 +193,7 @@ export default defineComponent({
     openContextMenu,
     async refresh() {
       this.folderItem = await BookmarkApi.getSubTree(this.id);
+      this.lastUpdated = await new Date().getTime();
     },
     openTooltip(title: string, event: MouseEvent) {
       const targetElement = event.target as HTMLElement;
@@ -179,6 +218,13 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.btn-wrapper {
+  background: none;
+  transition: transform 800ms ease;
+}
+.ghost {
+  background-color: red;
+}
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(72px, auto));
@@ -193,9 +239,10 @@ export default defineComponent({
   width: 80px;
   height: auto;
   padding: 4px 0;
+  background: none;
 }
 .btn:focus {
-  background-color: rgb(225, 225, 225);
+  background-color: rgba(225, 225, 225, 0.3);
 }
 
 .item-container {
