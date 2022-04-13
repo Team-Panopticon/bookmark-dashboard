@@ -1,6 +1,5 @@
 <template>
   <div
-    :key="lastUpdated"
     class="grid-container"
     ref="grid-container"
     @contextmenu.prevent.stop="
@@ -112,6 +111,7 @@ export default defineComponent({
       const startX = mousedown.pageX;
       const startY = mousedown.pageY;
       const target = mousedown.target as HTMLElement;
+      let changingEl: null | HTMLElement = null;
       const btnWrapper = target.closest(".btn-wrapper") as HTMLElement;
       const id = btnWrapper.dataset.id;
       const offsetX = btnWrapper.getBoundingClientRect().x - startX;
@@ -131,8 +131,8 @@ export default defineComponent({
           return el.classList.contains("btn-wrapper");
         });
 
-        const changingElement = btnWrappers[0] as HTMLElement;
-        const newTargetIdx = Number(changingElement?.dataset.index);
+        changingEl = btnWrappers[0] as HTMLElement;
+        const newTargetIdx = Number(changingEl?.dataset.index);
         const newGhost = document.createElement("div");
         newGhost.classList.add("btn-wrapper");
         newGhost.classList.add("ghost");
@@ -142,7 +142,13 @@ export default defineComponent({
           if (ghost != null) {
             ghost.remove();
           }
-          gridContainer.insertBefore(newGhost, changingElement);
+
+          // TODO: changingEl의 왼쪽인지 오른쪽인지 판단
+          const { width, x } = changingEl.getBoundingClientRect();
+          const temp = width / 2 + x;
+
+          // 마우스포인트가
+          gridContainer.insertBefore(newGhost, changingEl);
         }
         // 버튼 외부영역
         if (isNaN(newTargetIdx)) {
@@ -152,16 +158,31 @@ export default defineComponent({
           gridContainer.insertBefore(newGhost, null);
         }
         if (newTargetIdx !== -1) {
-          targetIdx = Number(changingElement?.dataset.index);
+          targetIdx = Number(changingEl?.dataset.index);
         }
       };
       document.addEventListener("mousemove", mousemoveHandler);
-      document.addEventListener("mouseup", (mouseupEvt) => {
+      const handleMouseUp = (mouseupEvt: MouseEvent) => {
         btnWrapper.classList.add("btn-wrapper");
         const endX = mouseupEvt.pageX;
         const endY = mouseupEvt.pageY;
         const moveX = Math.abs(startX - endX);
         const moveY = Math.abs(startY - endY);
+
+        btnWrapper.style.position = "relative";
+        btnWrapper.style.top = "unset";
+        btnWrapper.style.left = "unset";
+        btnWrapper.style.zIndex = "inherit";
+
+        if (changingEl) {
+          gridContainer.insertBefore(btnWrapper, changingEl);
+        } else {
+          gridContainer.insertBefore(btnWrapper, null);
+        }
+
+        const ghosts = document.querySelectorAll(".ghost");
+        ghosts.forEach((ghost) => ghost.remove());
+
         if (moveX + moveY > 20) {
           if (id && this.folderItem.children) {
             BookmarkApi.move(
@@ -174,8 +195,11 @@ export default defineComponent({
           console.log("움직임 없음");
           //TODO : 움직임 없을시 클릭이벤트 발생
         }
+        document.removeEventListener("mouseup", handleMouseUp);
         document.removeEventListener("mousemove", mousemoveHandler);
-      });
+      };
+
+      document.addEventListener("mouseup", handleMouseUp);
     },
     ...mapMutations([
       OPEN_BOOKSHELF_MODALS,
@@ -238,6 +262,7 @@ export default defineComponent({
 .btn-wrapper {
   background: none;
   transition: all 800ms ease;
+  padding: 8px;
 }
 .ghost {
   border: 1px soldi black;
@@ -246,11 +271,10 @@ export default defineComponent({
 }
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, auto));
+  grid-template-columns: repeat(auto-fill, minmax(96px, auto));
   grid-auto-rows: 100px;
   grid-gap: inherit;
   padding: 20px;
-  gap: 16px;
   width: 100%;
   height: 100%;
   transition: all 2s ease;
