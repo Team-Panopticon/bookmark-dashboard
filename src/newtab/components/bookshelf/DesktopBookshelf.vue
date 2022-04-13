@@ -5,7 +5,11 @@
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
   >
-    <div v-for="item in folderItem.children" v-bind:key="item.id">
+    <div
+      v-for="item in folderItem.children"
+      v-bind:key="item.id"
+      :style="{ gridRow: item.row, gridColumn: item.col }"
+    >
       <v-btn
         class="btn"
         elevation="0"
@@ -56,6 +60,61 @@ import { Item } from "@/shared/types/store";
 import store from "../../store/index";
 import { SET_TOOLTIP_SHOW } from "@/newtab/store/modules/tooltip";
 
+interface LayoutData {
+  [id: string]: ItemLayout; // key는 Item의 id, desktop === 1
+}
+
+interface ItemLayout {
+  row: number;
+  col: number;
+}
+
+const layoutDummy: LayoutData = {
+  "118": {
+    row: 1,
+    col: 1,
+  },
+  "181": {
+    row: 2,
+    col: 1,
+  },
+  "122": {
+    row: 3,
+    col: 1,
+  },
+  "176": {
+    row: 4,
+    col: 2,
+  },
+  "185": {
+    row: 5,
+    col: 3,
+  },
+  "193": {
+    row: 1,
+    col: 4,
+  },
+  "191": {
+    row: 1,
+    col: 4,
+  },
+  "196": {
+    row: 3,
+    col: 2,
+  },
+};
+
+const appendLayoutData = (folderItem: Item): Item => {
+  const layOutData = layoutDummy;
+  folderItem.children?.forEach((item: Item) => {
+    const { row, col } = layOutData[item.id];
+    item.row = row;
+    item.col = col;
+  });
+
+  return folderItem;
+};
+
 export default defineComponent({
   components: { Favicon },
   props: {
@@ -66,7 +125,8 @@ export default defineComponent({
   },
   setup(props) {
     const { folderItem, openTooltip, closeTooltip, openUrl, openContextMenu } =
-      setupBookshelf(props);
+      setupBookshelf(props, appendLayoutData);
+
     return {
       folderItem,
       openTooltip,

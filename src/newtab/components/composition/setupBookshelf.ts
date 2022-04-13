@@ -22,7 +22,10 @@ type Props = {
   id: string;
 };
 
-export const setupBookshelf = (props: Props): SetupBookshelf => {
+export const setupBookshelf = (
+  props: Props,
+  onRefresh?: (folderItem: Item) => Item
+): SetupBookshelf => {
   const store = useStore();
   const { id } = props;
 
@@ -34,6 +37,9 @@ export const setupBookshelf = (props: Props): SetupBookshelf => {
 
   const refresh = async () => {
     folderItem.value = await BookmarkApi.getSubTree(id);
+    if (onRefresh) {
+      folderItem.value = onRefresh(folderItem.value);
+    }
   };
   watch(refreshTargetId, (newId) => {
     if (newId && props.id === newId) {
