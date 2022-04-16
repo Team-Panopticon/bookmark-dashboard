@@ -14,6 +14,7 @@
   "dependencies": {
     "@mdi/font": "5.9.55",
     "core-js": "^3.6.5",
+    "idb": "^7.0.1",
     "roboto-fontface": "*",
     "vue": "3.2.24",
     "vue-final-modal": "^3.4.3",

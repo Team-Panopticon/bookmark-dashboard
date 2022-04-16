@@ -24,7 +24,7 @@ type Props = {
 
 export const setupBookshelf = (
   props: Props,
-  onRefresh?: (folderItem: Item) => Item
+  onRefresh?: (folderItem: Item) => Promise<Item>
 ): SetupBookshelf => {
   const store = useStore();
   const { id } = props;
@@ -38,7 +38,7 @@ export const setupBookshelf = (
   const refresh = async () => {
     folderItem.value = await BookmarkApi.getSubTree(id);
     if (onRefresh) {
-      folderItem.value = onRefresh(folderItem.value);
+      folderItem.value = await onRefresh(folderItem.value);
     }
   };
   watch(refreshTargetId, (newId) => {
