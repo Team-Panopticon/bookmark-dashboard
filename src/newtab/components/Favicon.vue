@@ -33,8 +33,11 @@ export default defineComponent({
     this.imgSrc = PREFIX + this.url;
   },
   methods: {
-    loadImage() {
+    loadImage({ target }: { target: HTMLImageElement }) {
       this.isLoading = false;
+      if (target.naturalWidth === 16) {
+        this.imgSrc = "";
+      }
     },
 
     notFoundImage() {
