@@ -108,24 +108,37 @@ export default defineComponent({
       const gridContainer = document.querySelector(
         ".grid-container"
       ) as HTMLElement;
+      console.log(mousedown);
+
       const startX = mousedown.pageX;
       const startY = mousedown.pageY;
       const target = mousedown.target as HTMLElement;
       let changingEl: null | HTMLElement = null;
       const btnWrapper = target.closest(".btn-wrapper") as HTMLElement;
       const id = btnWrapper.dataset.id;
-      const offsetX = btnWrapper.getBoundingClientRect().x - startX;
-      const offsetY = btnWrapper.getBoundingClientRect().y - startY;
+      console.log(btnWrapper.getBoundingClientRect());
+      const { x: targetX, y: targetY } = btnWrapper.getBoundingClientRect();
+      // Todo 패딩값 8px style에서 가져오기
+      const offsetX = startX - targetX - 8;
+      const offsetY = startY - targetY - 8;
+      // offsetX, offsetY 아이콘의 어디에 마우스가 있는지?
+      const ghost = btnWrapper.cloneNode(true) as HTMLElement;
+      ghost.classList.add("ghost-component");
+      ghost.dataset.index = "-1";
       btnWrapper.classList.remove("btn-wrapper");
+      gridContainer.insertBefore(ghost, btnWrapper);
+      btnWrapper.style.zIndex = "9999";
+      btnWrapper.style.left = `${startX - offsetX}px`;
+      btnWrapper.style.top = `${startY - offsetY}px`;
+      btnWrapper.style.position = "absolute";
+
       let targetIdx: undefined | number = undefined;
 
       const mousemoveHandler = (e: MouseEvent) => {
-        let ghost: null | HTMLElement = document.querySelector(".ghost");
         e.preventDefault();
-        btnWrapper.style.zIndex = "9999";
-        btnWrapper.style.left = `${e.clientX + offsetX}px`;
-        btnWrapper.style.top = `${e.clientY + offsetY}px`;
-        btnWrapper.style.position = "absolute";
+        btnWrapper.style.left = `${e.clientX - offsetX}px`;
+        btnWrapper.style.top = `${e.clientY - offsetY}px`;
+
         let els = document.elementsFromPoint(e.pageX, e.pageY);
         const btnWrappers = els.filter((el) => {
           return el.classList.contains("btn-wrapper");
@@ -133,29 +146,22 @@ export default defineComponent({
 
         changingEl = btnWrappers[0] as HTMLElement;
         const newTargetIdx = Number(changingEl?.dataset.index);
-        const newGhost = document.createElement("div");
-        newGhost.classList.add("btn-wrapper");
-        newGhost.classList.add("ghost");
-        newGhost.dataset.index = "-1";
         // 새로운 버튼위로 올라갔을때
         if (!isNaN(newTargetIdx) && newTargetIdx !== -1) {
-          if (ghost != null) {
-            ghost.remove();
-          }
+          // if (ghost != null) {
+          //   ghost.remove();
+          // }
 
           // TODO: changingEl의 왼쪽인지 오른쪽인지 판단
           const { width, x } = changingEl.getBoundingClientRect();
           const temp = width / 2 + x;
 
           // 마우스포인트가
-          gridContainer.insertBefore(newGhost, changingEl);
+          // gridContainer.insertBefore(newGhost, changingEl);
         }
         // 버튼 외부영역
         if (isNaN(newTargetIdx)) {
-          if (ghost != null) {
-            ghost.remove();
-          }
-          gridContainer.insertBefore(newGhost, null);
+          // gridContainer.insertBefore(newGhost, null);
         }
         if (newTargetIdx !== -1) {
           targetIdx = Number(changingEl?.dataset.index);
@@ -180,9 +186,6 @@ export default defineComponent({
           gridContainer.insertBefore(btnWrapper, null);
         }
 
-        const ghosts = document.querySelectorAll(".ghost");
-        ghosts.forEach((ghost) => ghost.remove());
-
         if (moveX + moveY > 20) {
           if (id && this.folderItem.children) {
             BookmarkApi.move(
@@ -192,9 +195,9 @@ export default defineComponent({
             );
           }
         } else {
-          console.log("움직임 없음");
-          //TODO : 움직임 없을시 클릭이벤트 발생
+          gridContainer.insertBefore(ghost, btnWrapper);
         }
+        ghost.remove();
         document.removeEventListener("mouseup", handleMouseUp);
         document.removeEventListener("mousemove", mousemoveHandler);
       };
@@ -264,11 +267,11 @@ export default defineComponent({
   transition: all 800ms ease;
   padding: 8px;
 }
-.ghost {
-  border: 1px soldi black;
-  width: 0px;
-  background-color: red;
+
+.ghost-component {
+  opacity: 0.5;
 }
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(96px, auto));
