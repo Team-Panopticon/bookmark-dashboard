@@ -66,7 +66,7 @@ import { layoutDB } from "../../utils/layoutDB";
 const appendLayoutData = async (folderItem: Item): Promise<Item> => {
   const layOutData = await layoutDB.getLayout();
   folderItem.children?.forEach((item: Item) => {
-    const { row, col } = layOutData[item.id];
+    const { row, col } = layOutData[item.id] ?? {};
     item.row = row;
     item.col = col;
   });

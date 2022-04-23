@@ -102,12 +102,8 @@ class LayoutDB {
     return layoutMap;
   }
 
-  setLayout() {
-    // Desktop layout data 전체 세팅
-  }
-
-  setItemLayoutById(id: string) {
-    // layout 하나 변경
+  async setItemLayoutById({ id, row, col }: ItemLayout) {
+    await this.db.put(OBJECT_STORE_NAME, { id, row, col });
   }
 }
 
