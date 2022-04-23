@@ -7,6 +7,7 @@
     "
     :data-parent-id="id"
   >
+    <div class="divider hide"></div>
     <div
       v-for="item in folderItem.children"
       v-bind:key="item.id"
@@ -108,7 +109,6 @@ export default defineComponent({
       const gridContainer = document.querySelector(
         ".grid-container"
       ) as HTMLElement;
-      console.log(mousedown);
 
       const startX = mousedown.pageX;
       const startY = mousedown.pageY;
@@ -116,13 +116,19 @@ export default defineComponent({
       let changingEl: null | HTMLElement = null;
       const btnWrapper = target.closest(".btn-wrapper") as HTMLElement;
       const id = btnWrapper.dataset.id;
-      console.log(btnWrapper.getBoundingClientRect());
-      const { x: targetX, y: targetY } = btnWrapper.getBoundingClientRect();
+      const index = Number(btnWrapper.dataset.index);
+      const {
+        x: targetX,
+        y: targetY,
+        height,
+      } = btnWrapper.getBoundingClientRect();
       // Todo 패딩값 8px style에서 가져오기
       const offsetX = startX - targetX - 8;
       const offsetY = startY - targetY - 8;
       // offsetX, offsetY 아이콘의 어디에 마우스가 있는지?
       const ghost = btnWrapper.cloneNode(true) as HTMLElement;
+      const divider = document.querySelector(".divider") as HTMLElement;
+      divider.style.height = `${height}px`;
       ghost.classList.add("ghost-component");
       ghost.dataset.index = "-1";
       btnWrapper.classList.remove("btn-wrapper");
@@ -133,6 +139,7 @@ export default defineComponent({
       btnWrapper.style.position = "absolute";
 
       let targetIdx: undefined | number = undefined;
+      let positionFlag = 0;
 
       const mousemoveHandler = (e: MouseEvent) => {
         e.preventDefault();
@@ -148,27 +155,49 @@ export default defineComponent({
         const newTargetIdx = Number(changingEl?.dataset.index);
         // 새로운 버튼위로 올라갔을때
         if (!isNaN(newTargetIdx) && newTargetIdx !== -1) {
-          // if (ghost != null) {
-          //   ghost.remove();
-          // }
+          const { width, x, y } = changingEl.getBoundingClientRect();
+          const quarter = width / 4;
+          const currentPosition = e.pageX;
+          const isLeftSide = currentPosition < quarter + x;
+          const isCenter =
+            currentPosition >= quarter + x &&
+            currentPosition <= quarter * 3 + x;
+          // const isRightSide = currentPosition > quarter * 3 + x;
 
-          // TODO: changingEl의 왼쪽인지 오른쪽인지 판단
-          const { width, x } = changingEl.getBoundingClientRect();
-          const temp = width / 2 + x;
+          if (isLeftSide) {
+            targetIdx = newTargetIdx;
+            divider.classList.remove("hide");
+            divider.style.left = `${x}px`;
+            divider.style.top = `${y}px`;
+            positionFlag = -1;
+          } else if (isCenter) {
+            console.log("Center");
+            // TODO: 대상이 폴더인 경우 안에 삽입
+            // TODO: 대상이 파일인 경우 아무것도 안하거나
+            divider.classList.add("hide");
+            positionFlag = 0;
+          } else {
+            targetIdx = newTargetIdx + 1;
+            divider.classList.remove("hide");
+            divider.style.left = `${width + x}px`;
+            divider.style.top = `${y}px`;
+            positionFlag = 1;
+          }
 
           // 마우스포인트가
           // gridContainer.insertBefore(newGhost, changingEl);
+        } else {
+          divider.classList.add("hide");
         }
         // 버튼 외부영역
-        if (isNaN(newTargetIdx)) {
-          // gridContainer.insertBefore(newGhost, null);
-        }
+
         if (newTargetIdx !== -1) {
           targetIdx = Number(changingEl?.dataset.index);
         }
       };
       document.addEventListener("mousemove", mousemoveHandler);
       const handleMouseUp = (mouseupEvt: MouseEvent) => {
+        divider.classList.add("hide");
         btnWrapper.classList.add("btn-wrapper");
         const endX = mouseupEvt.pageX;
         const endY = mouseupEvt.pageY;
@@ -180,22 +209,27 @@ export default defineComponent({
         btnWrapper.style.left = "unset";
         btnWrapper.style.zIndex = "inherit";
 
-        if (changingEl) {
-          gridContainer.insertBefore(btnWrapper, changingEl);
-        } else {
-          gridContainer.insertBefore(btnWrapper, null);
-        }
-
-        if (moveX + moveY > 20) {
-          if (id && this.folderItem.children) {
-            BookmarkApi.move(
-              id,
-              this.id,
-              !targetIdx ? this.folderItem.children.length : targetIdx
-            );
+        if (targetIdx && index) {
+          console.log(Number(changingEl?.dataset.index) + " " + targetIdx);
+          if (positionFlag == 1) {
+            changingEl?.after(btnWrapper);
+          } else if (positionFlag == -1) {
+            gridContainer.insertBefore(btnWrapper, changingEl);
+          } else {
+            console.log("폴더면 폴더안에 삽입");
           }
-        } else {
-          gridContainer.insertBefore(ghost, btnWrapper);
+
+          if (moveX + moveY > 20) {
+            if (id && this.folderItem.children) {
+              BookmarkApi.move(
+                id,
+                this.id,
+                !targetIdx ? this.folderItem.children.length : targetIdx
+              );
+            }
+          } else {
+            gridContainer.insertBefore(ghost, btnWrapper);
+          }
         }
         ghost.remove();
         document.removeEventListener("mouseup", handleMouseUp);
@@ -262,10 +296,20 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.divider {
+  position: absolute;
+  border-left: 2px solid grey;
+}
+
+.hide {
+  border: none;
+}
+
 .btn-wrapper {
+  display: flex;
+  justify-content: center;
   background: none;
   transition: all 800ms ease;
-  padding: 8px;
 }
 
 .ghost-component {
