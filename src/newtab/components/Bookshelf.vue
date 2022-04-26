@@ -9,10 +9,11 @@
   >
     <div class="divider hide"></div>
     <div
-      v-for="item in folderItem.children"
+      v-for="item in children"
       v-bind:key="item.id"
       :data-index="item.index"
       :data-id="item.id"
+      :data-type="item.type"
       @mousedown="mousedown"
       class="btn-wrapper"
     >
@@ -90,6 +91,11 @@ export default defineComponent({
   }),
   computed: {
     ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
+    children() {
+      return this.folderItem.children?.map((e) => {
+        return { ...e, type: e.children ? "FOLDER" : "FILE" };
+      });
+    },
   },
   watch: {
     refreshTargetId(id?: string) {
@@ -111,10 +117,10 @@ export default defineComponent({
 
       const startX = mousedown.pageX;
       const startY = mousedown.pageY;
-      const target = mousedown.target as HTMLElement;
+      const changing = mousedown.target as HTMLElement;
       let changingEl: null | HTMLElement = null;
-      const btnWrapper = target.closest(".btn-wrapper") as HTMLElement;
-      const id = btnWrapper.dataset.id;
+      const btnWrapper = changing.closest(".btn-wrapper") as HTMLElement;
+      const changingId = btnWrapper.dataset.id;
       const index = Number(btnWrapper.dataset.index);
       const {
         x: targetX,
@@ -138,6 +144,7 @@ export default defineComponent({
       btnWrapper.style.position = "absolute";
 
       let targetIdx: undefined | number = undefined;
+      let targetId: undefined | string = undefined;
       let positionFlag = 0;
 
       const mousemoveHandler = (e: MouseEvent) => {
@@ -152,6 +159,8 @@ export default defineComponent({
 
         changingEl = btnWrappers[0] as HTMLElement;
         const newTargetIdx = Number(changingEl?.dataset.index);
+
+        targetId = changingEl?.dataset.id;
         // 새로운 버튼위로 올라갔을때
         if (!isNaN(newTargetIdx)) {
           const { width, x, y } = changingEl.getBoundingClientRect();
@@ -217,21 +226,28 @@ export default defineComponent({
           } else if (positionFlag == -1) {
             gridContainer.insertBefore(btnWrapper, changingEl);
           } else {
-            console.log("폴더면 폴더안에 삽입");
+            if (
+              changingId &&
+              targetId &&
+              changingEl?.dataset.type == "FOLDER"
+            ) {
+              BookmarkApi.move(changingId, targetId);
+              this.refresh();
+            }
           }
 
-          if (moveX + moveY > 20) {
-            if (id && this.folderItem.children) {
-              console.log("move api called");
-              BookmarkApi.move(
-                id,
-                this.id,
-                !targetIdx ? this.folderItem.children.length : targetIdx
-              );
-            }
-          } else {
-            gridContainer.insertBefore(ghost, btnWrapper);
-          }
+          // if (moveX + moveY > 20) {
+          //   if (id && this.folderItem.children) {
+          //     console.log("move api called");
+          //     BookmarkApi.move(
+          //       targetId,
+          //       this.id,
+          //       !targetIdx ? this.folderItem.children.length : targetIdx
+          //     );
+          //   }
+          // } else {
+          //   gridContainer.insertBefore(ghost, btnWrapper);
+          // }
         }
         ghost.remove();
         document.removeEventListener("mouseup", handleMouseUp);
