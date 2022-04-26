@@ -43,7 +43,6 @@
         @contextmenu.prevent.stop="
           openContextMenu($event, { item: item, type: 'FILE' })
         "
-        :data-index="item.index"
       >
         <div class="item-container">
           <Favicon :url="item.url" />
@@ -154,7 +153,7 @@ export default defineComponent({
         changingEl = btnWrappers[0] as HTMLElement;
         const newTargetIdx = Number(changingEl?.dataset.index);
         // 새로운 버튼위로 올라갔을때
-        if (!isNaN(newTargetIdx) && newTargetIdx !== -1) {
+        if (!isNaN(newTargetIdx)) {
           const { width, x, y } = changingEl.getBoundingClientRect();
           const quarter = width / 4;
           const currentPosition = e.pageX;
@@ -163,20 +162,23 @@ export default defineComponent({
             currentPosition >= quarter + x &&
             currentPosition <= quarter * 3 + x;
           // const isRightSide = currentPosition > quarter * 3 + x;
+          const innerBtn = changingEl.querySelector(".btn") as HTMLElement;
 
           if (isLeftSide) {
+            innerBtn.blur();
             targetIdx = newTargetIdx;
             divider.classList.remove("hide");
             divider.style.left = `${x}px`;
             divider.style.top = `${y}px`;
             positionFlag = -1;
           } else if (isCenter) {
-            console.log("Center");
             // TODO: 대상이 폴더인 경우 안에 삽입
             // TODO: 대상이 파일인 경우 아무것도 안하거나
+            innerBtn.focus();
             divider.classList.add("hide");
             positionFlag = 0;
           } else {
+            innerBtn.blur();
             targetIdx = newTargetIdx + 1;
             divider.classList.remove("hide");
             divider.style.left = `${width + x}px`;
@@ -210,7 +212,6 @@ export default defineComponent({
         btnWrapper.style.zIndex = "inherit";
 
         if (targetIdx && index) {
-          console.log(Number(changingEl?.dataset.index) + " " + targetIdx);
           if (positionFlag == 1) {
             changingEl?.after(btnWrapper);
           } else if (positionFlag == -1) {
@@ -221,6 +222,7 @@ export default defineComponent({
 
           if (moveX + moveY > 20) {
             if (id && this.folderItem.children) {
+              console.log("move api called");
               BookmarkApi.move(
                 id,
                 this.id,
