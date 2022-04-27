@@ -108,7 +108,7 @@ export default defineComponent({
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, 88px);
-  grid-auto-rows: 100px;
+  grid-auto-rows: 108px;
   padding: 20px;
   width: 100%;
   height: 100%;
@@ -118,7 +118,7 @@ export default defineComponent({
 .btn {
   width: 88px;
   height: auto;
-  padding: 4px;
+  padding: 8px;
 }
 .btn:focus {
   background-color: rgb(225, 225, 225);
