@@ -14,7 +14,7 @@
       :data-index="item.index"
       :data-id="item.id"
       :data-type="item.type"
-      @mousedown="mousedown"
+      @mousedown="mousedown(item, $event)"
       class="btn-wrapper"
     >
       <v-btn
@@ -109,12 +109,18 @@ export default defineComponent({
     this.refresh();
   },
   methods: {
-    mousedown(mousedown: MouseEvent) {
+    // 1. down 했을때 위치
+    // 2. move 시킬때 첫 위치와 move 위치의 크기값이 일정 이하일때는 클릭
+    // 이동거리 100 이하 && 0.1초 이내
+    // 3. 클릭
+
+    mousedown(item: Item, mousedown: MouseEvent) {
       mousedown.preventDefault();
       const gridContainer = document.querySelector(
         ".grid-container"
       ) as HTMLElement;
 
+      const startTime = new Date().getTime();
       const startX = mousedown.pageX;
       const startY = mousedown.pageY;
       const changing = mousedown.target as HTMLElement;
@@ -149,9 +155,13 @@ export default defineComponent({
 
       const mousemoveHandler = (e: MouseEvent) => {
         e.preventDefault();
+
+        if (new Date().getTime() - startTime < 100) {
+          return;
+        }
+
         btnWrapper.style.left = `${e.clientX - offsetX}px`;
         btnWrapper.style.top = `${e.clientY - offsetY}px`;
-
         let els = document.elementsFromPoint(e.pageX, e.pageY);
         const btnWrappers = els.filter((el) => {
           return el.classList.contains("btn-wrapper");
@@ -210,15 +220,28 @@ export default defineComponent({
       const handleMouseUp = (mouseupEvt: MouseEvent) => {
         divider.classList.add("hide");
         btnWrapper.classList.add("btn-wrapper");
-        const endX = mouseupEvt.pageX;
-        const endY = mouseupEvt.pageY;
-        const moveX = Math.abs(startX - endX);
-        const moveY = Math.abs(startY - endY);
 
         btnWrapper.style.position = "relative";
         btnWrapper.style.top = "unset";
         btnWrapper.style.left = "unset";
         btnWrapper.style.zIndex = "inherit";
+
+        ghost.remove();
+
+        const endX = mouseupEvt.pageX;
+        const endY = mouseupEvt.pageY;
+        const moveX = Math.abs(startX - endX);
+        const moveY = Math.abs(startY - endY);
+
+        document.removeEventListener("mouseup", handleMouseUp);
+        document.removeEventListener("mousemove", mousemoveHandler);
+
+        if (new Date().getTime() - startTime < 100 && moveX + moveY < 20) {
+          if (!item.url) {
+            this.onClickFolder(item);
+          }
+          return;
+        }
 
         if (targetIdx && index) {
           if (positionFlag == 1) {
@@ -235,23 +258,7 @@ export default defineComponent({
               this.refresh();
             }
           }
-
-          // if (moveX + moveY > 20) {
-          //   if (id && this.folderItem.children) {
-          //     console.log("move api called");
-          //     BookmarkApi.move(
-          //       targetId,
-          //       this.id,
-          //       !targetIdx ? this.folderItem.children.length : targetIdx
-          //     );
-          //   }
-          // } else {
-          //   gridContainer.insertBefore(ghost, btnWrapper);
-          // }
         }
-        ghost.remove();
-        document.removeEventListener("mouseup", handleMouseUp);
-        document.removeEventListener("mousemove", mousemoveHandler);
       };
 
       document.addEventListener("mouseup", handleMouseUp);
