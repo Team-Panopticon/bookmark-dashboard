@@ -242,8 +242,8 @@ export default defineComponent({
           }
           return;
         }
-
-        if (targetIdx && index) {
+        // Todo
+        if (targetIdx !== -1 && index !== -1) {
           if (positionFlag == 1) {
             changingEl?.after(btnWrapper);
           } else if (positionFlag == -1) {
