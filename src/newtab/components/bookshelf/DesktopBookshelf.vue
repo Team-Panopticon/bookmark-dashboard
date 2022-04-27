@@ -107,21 +107,24 @@ export default defineComponent({
 <style lang="scss" scoped>
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 72px);
+  grid-template-columns: repeat(auto-fill, 88px);
   grid-auto-rows: 100px;
   padding: 20px;
-  gap: 16px;
   width: 100%;
   height: 100%;
 }
 
 .btn {
-  width: 80px;
+  width: 88px;
   height: auto;
-  padding: 4px 0;
+  padding: 4px;
 }
 .btn:focus {
   background-color: rgb(225, 225, 225);
+}
+
+.item {
+  width: 88px;
 }
 
 .item-container {
