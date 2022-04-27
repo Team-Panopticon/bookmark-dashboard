@@ -112,6 +112,7 @@ export default defineComponent({
   padding: 20px;
   width: 100%;
   height: 100%;
+  overflow-y: "auto";
 }
 
 .btn {
