@@ -135,7 +135,7 @@ export default defineComponent({
       } = btnWrapper.getBoundingClientRect();
       // Todo 패딩값 8px style에서 가져오기
       const offsetX = startX - targetX - 8;
-      const offsetY = startY - targetY - 8;
+      const offsetY = startY - targetY;
       // offsetX, offsetY 아이콘의 어디에 마우스가 있는지?
       const ghost = btnWrapper.cloneNode(true) as HTMLElement;
       const divider = document.querySelector(".divider") as HTMLElement;
@@ -217,7 +217,7 @@ export default defineComponent({
         }
       };
       document.addEventListener("mousemove", mousemoveHandler);
-      const handleMouseUp = (mouseupEvt: MouseEvent) => {
+      const handleMouseUp = async (mouseupEvt: MouseEvent) => {
         divider.classList.add("hide");
         btnWrapper.classList.add("btn-wrapper");
 
@@ -254,8 +254,10 @@ export default defineComponent({
               targetId &&
               changingEl?.dataset.type == "FOLDER"
             ) {
-              BookmarkApi.move(changingId, targetId);
-              this.refresh();
+              if (changingId !== targetId) {
+                await BookmarkApi.move(changingId, targetId);
+                this.refresh();
+              }
             }
           }
         }
