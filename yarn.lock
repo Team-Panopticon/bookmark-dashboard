@@ -3668,7 +3668,7 @@ __metadata:
     vue-cli-plugin-vuetify: ~2.4.5
     vue-final-modal: ^3.4.3
     vue-js-modal: ^2.0.1
-    vuetify: ^3.0.0-alpha.13
+    vuetify: ^3.0.0-beta.1
     vuetify-loader: ^2.0.0-alpha.0
     vuex: next
     webfontloader: ^1.0.0
@@ -12175,19 +12175,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vuetify@npm:^3.0.0-alpha.13":
-  version: 3.0.0-alpha.13
-  resolution: "vuetify@npm:3.0.0-alpha.13"
+"vuetify@npm:^3.0.0-beta.1":
+  version: 3.0.0-beta.1
+  resolution: "vuetify@npm:3.0.0-beta.1"
   peerDependencies:
-    "@formatjs/intl": ^1.0.0
-    vue: ^3.2.19
+    "@formatjs/intl": ^1.0.0 || ^2.0.0
+    vue: ^3.2.31
     vue-i18n: ^9.0.0
   peerDependenciesMeta:
     "@formatjs/intl":
       optional: true
     vue-i18n:
       optional: true
-  checksum: 61ff6afdd980791ac7e33522887106718abd9885632b9fc4e731cc99615ac57437e065b5ebb2131e9b0fba3511542228a63c2af40e38591a8817ad2608627757
+  checksum: 693079d3cf8efceae1b82376ebc40cb84f521859d820224bdea837051d3d0bfee151f2858e17f394c9e2716ccef63f66406a571dc2cdde71d7b9463154c3b4c3
   languageName: node
   linkType: hard
 

@@ -200,6 +200,7 @@ export default defineComponent({
 .v-card-content {
   flex: 1;
   overflow-y: auto;
+  padding: 0;
 }
 .v-breadcrumbs {
   padding-top: 0;

@@ -154,5 +154,6 @@ export default defineComponent({
   letter-spacing: 0.5px;
   color: #36454f;
   text-transform: none;
+  white-space: normal;
 }
 </style>
