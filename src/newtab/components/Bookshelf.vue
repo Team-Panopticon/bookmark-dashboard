@@ -7,7 +7,7 @@
     "
     :data-parent-id="id"
   >
-    <div class="divider hide"></div>
+    <div ref="divider" class="divider hide"></div>
     <div
       v-for="item in children"
       v-bind:key="item.id"
@@ -109,16 +109,14 @@ export default defineComponent({
     this.refresh();
   },
   methods: {
-    // 1. down 했을때 위치
-    // 2. move 시킬때 첫 위치와 move 위치의 크기값이 일정 이하일때는 클릭
-    // 이동거리 100 이하 && 0.1초 이내
-    // 3. 클릭
-
+    /** 
+      1. down 했을때 위치
+      2. move 시킬때 첫 위치와 move 위치의 크기값이 일정 이하일때는 클릭 이동거리 100 이하 && 0.15초 이내
+      3. 클릭
+    **/
     mousedown(item: Item, mousedown: MouseEvent) {
       mousedown.preventDefault();
-      const gridContainer = document.querySelector(
-        ".grid-container"
-      ) as HTMLElement;
+      const gridContainer = this.$refs["grid-container"] as HTMLElement;
 
       const startTime = new Date().getTime();
       const startX = mousedown.pageX;
@@ -133,12 +131,15 @@ export default defineComponent({
         y: targetY,
         height,
       } = btnWrapper.getBoundingClientRect();
-      // Todo 패딩값 8px style에서 가져오기
+      /** 
+        TODO: 스타일이 바뀌는 경우 패딩값 style에서 가져오기
+        offsetX, offsetY 아이콘의 어디에 마우스가 있는지?
+      **/
+
       const offsetX = startX - targetX - 8;
       const offsetY = startY - targetY;
-      // offsetX, offsetY 아이콘의 어디에 마우스가 있는지?
       const ghost = btnWrapper.cloneNode(true) as HTMLElement;
-      const divider = document.querySelector(".divider") as HTMLElement;
+      const divider = this.$refs["divider"] as HTMLElement;
       divider.style.height = `${height}px`;
       ghost.classList.add("ghost-component");
       ghost.dataset.index = "-1";
@@ -156,7 +157,7 @@ export default defineComponent({
       const mousemoveHandler = (e: MouseEvent) => {
         e.preventDefault();
 
-        if (new Date().getTime() - startTime < 100) {
+        if (new Date().getTime() - startTime < 150) {
           return;
         }
 
@@ -191,8 +192,6 @@ export default defineComponent({
             divider.style.top = `${y}px`;
             positionFlag = -1;
           } else if (isCenter) {
-            // TODO: 대상이 폴더인 경우 안에 삽입
-            // TODO: 대상이 파일인 경우 아무것도 안하거나
             innerBtn.focus();
             divider.classList.add("hide");
             positionFlag = 0;
@@ -204,14 +203,11 @@ export default defineComponent({
             divider.style.top = `${y}px`;
             positionFlag = 1;
           }
-
-          // 마우스포인트가
-          // gridContainer.insertBefore(newGhost, changingEl);
         } else {
           divider.classList.add("hide");
         }
-        // 버튼 외부영역
 
+        // 버튼 외부영역
         if (newTargetIdx !== -1) {
           targetIdx = Number(changingEl?.dataset.index);
         }
@@ -236,13 +232,15 @@ export default defineComponent({
         document.removeEventListener("mouseup", handleMouseUp);
         document.removeEventListener("mousemove", mousemoveHandler);
 
-        if (new Date().getTime() - startTime < 100 && moveX + moveY < 20) {
+        if (new Date().getTime() - startTime < 150 && moveX + moveY < 20) {
           if (!item.url) {
             this.onClickFolder(item);
+          } else {
+            this.openUrl(item.url);
           }
           return;
         }
-        // Todo
+
         if (targetIdx !== -1 && index !== -1) {
           if (positionFlag == 1) {
             changingEl?.after(btnWrapper);
@@ -252,12 +250,11 @@ export default defineComponent({
             if (
               changingId &&
               targetId &&
+              changingId !== targetId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
               changingEl?.dataset.type == "FOLDER"
             ) {
-              if (changingId !== targetId) {
-                await BookmarkApi.move(changingId, targetId);
-                this.refresh();
-              }
+              await BookmarkApi.move(changingId, targetId);
+              this.refresh();
             }
           }
         }
@@ -291,7 +288,7 @@ export default defineComponent({
     _openBookshelfModal(id: string, title: string) {
       this.openBookshelfModal({ id, title });
     },
-    openUrl(id: string, url: string) {
+    openUrl(url: string) {
       window.open(url, "_blank")?.focus();
       this[SET_TOOLTIP_SHOW](false);
     },
@@ -332,13 +329,6 @@ export default defineComponent({
   border: none;
 }
 
-.btn-wrapper {
-  display: flex;
-  justify-content: center;
-  background: none;
-  transition: all 800ms ease;
-}
-
 .ghost-component {
   opacity: 0.5;
 }
@@ -351,15 +341,20 @@ export default defineComponent({
   padding: 20px;
   width: 100%;
   height: 100%;
-  transition: all 2s ease;
+  transition: all 12s;
 }
-
+.btn-wrapper {
+  display: flex;
+  justify-content: center;
+  background: none;
+}
 .btn {
   width: 80px;
   height: auto;
   padding: 4px 0;
   background: none;
 }
+
 .btn:focus {
   background-color: rgba(225, 225, 225, 0.3);
 }
