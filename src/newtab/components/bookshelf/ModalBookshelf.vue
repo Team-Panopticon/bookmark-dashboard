@@ -4,6 +4,7 @@
     @contextmenu.prevent.stop="
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
+    @click="sortItems('title')"
   >
     <div v-for="item in folderItem.children" v-bind:key="item.id">
       <v-btn
@@ -75,6 +76,12 @@ export default defineComponent({
     };
   },
   methods: {
+    sortItems(key: keyof chrome.bookmarks.BookmarkTreeNode, reverse = false) {
+      this.folderItem.children?.sort((a, b) => {
+        const result = String(a[key ?? ""]).localeCompare(String(b[key ?? ""]));
+        return reverse ? -result : result;
+      });
+    },
     onClickFolder(item: Item) {
       const { id } = item;
       this.$emit("routeInFolder", id);
