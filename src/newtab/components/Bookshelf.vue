@@ -14,7 +14,7 @@
       :data-index="item.index"
       :data-id="item.id"
       :data-type="item.type"
-      @mousedown="mousedown(item, $event)"
+      @mousedown="mousedownHandler(item, $event)"
       class="btn-wrapper"
     >
       <v-btn
@@ -114,45 +114,54 @@ export default defineComponent({
       2. move 시킬때 첫 위치와 move 위치의 크기값이 일정 이하일때는 클릭 이동거리 100 이하 && 0.15초 이내
       3. 클릭
     **/
-    mousedown(item: Item, mousedown: MouseEvent) {
+
+    mousedownHandler(item: Item, mousedown: MouseEvent) {
       mousedown.preventDefault();
       const gridContainer = this.$refs["grid-container"] as HTMLElement;
 
       const startTime = new Date().getTime();
-      const startX = mousedown.pageX;
-      const startY = mousedown.pageY;
-      const changing = mousedown.target as HTMLElement;
-      let changingEl: null | HTMLElement = null;
-      const btnWrapper = changing.closest(".btn-wrapper") as HTMLElement;
-      const changingId = btnWrapper.dataset.id;
-      const index = Number(btnWrapper.dataset.index);
+      const { pageX: startX, pageY: startY } = mousedown;
+
+      /** mousedown 이벤트가 일어난 대상 button 자식 태그들이 될 수 있음 */
+      const mousedownTarget = mousedown.target as HTMLElement;
+      /** 위치가 변경될 폴더 혹은 파일 Element */
+      const changingEl = mousedownTarget.closest(".btn-wrapper") as HTMLElement;
+
+      const changingElId = changingEl.dataset.id;
+      const changingElIndex = changingEl.dataset.index;
+
       const {
         x: targetX,
         y: targetY,
-        height,
-      } = btnWrapper.getBoundingClientRect();
-      /** 
-        TODO: 스타일이 바뀌는 경우 패딩값 style에서 가져오기
-        offsetX, offsetY 아이콘의 어디에 마우스가 있는지?
-      **/
+        height: changingElHeight,
+      } = changingEl.getBoundingClientRect();
 
+      /** padding 값에 따른 마우스 포인터와 chaningEl의 상대 위치 값 */
       const offsetX = startX - targetX - 8;
       const offsetY = startY - targetY;
-      const ghost = btnWrapper.cloneNode(true) as HTMLElement;
-      const divider = this.$refs["divider"] as HTMLElement;
-      divider.style.height = `${height}px`;
-      ghost.classList.add("ghost-component");
-      ghost.dataset.index = "-1";
-      btnWrapper.classList.remove("btn-wrapper");
-      gridContainer.insertBefore(ghost, btnWrapper);
-      btnWrapper.style.zIndex = "9999";
-      btnWrapper.style.left = `${startX - offsetX}px`;
-      btnWrapper.style.top = `${startY - offsetY}px`;
-      btnWrapper.style.position = "absolute";
 
-      let targetIdx: undefined | number = undefined;
-      let targetId: undefined | string = undefined;
-      let positionFlag = 0;
+      /** 기존의 자리를 표시해주는 chaingEl 복사본 Element */
+      const positionHolderEl = changingEl.cloneNode(true) as HTMLElement;
+      /** 변경 위치를 표시해주는 구분선 */
+      const divideEl = this.$refs["divider"] as HTMLElement;
+
+      divideEl.style.height = `${changingElHeight}px`;
+      positionHolderEl.classList.add("positionHolderEl-component");
+      positionHolderEl.dataset.index = "-1";
+      changingEl.classList.remove("btn-wrapper");
+      gridContainer.insertBefore(positionHolderEl, changingEl);
+      changingEl.style.zIndex = "9999";
+      changingEl.style.left = `${startX - offsetX}px`;
+      changingEl.style.top = `${startY - offsetY}px`;
+      changingEl.style.position = "absolute";
+
+      /** 변경될 위치의 기준이 되는 폴더 혹은 파일 Element */
+      let testingEl: null | HTMLElement = null;
+      let testingElIndex: undefined | number = undefined;
+      let testingElId: undefined | string = undefined;
+
+      /** 폴더 혹은 파일의 삽입 위치 - -1: 왼쪽에 삽입, 1: 오른쪽에 삽입, 0: 폴더 내부 혹은 변화 없음 */
+      let insertPositionFlag = 0;
 
       const mousemoveHandler = (e: MouseEvent) => {
         e.preventDefault();
@@ -161,75 +170,80 @@ export default defineComponent({
           return;
         }
 
-        btnWrapper.style.left = `${e.clientX - offsetX}px`;
-        btnWrapper.style.top = `${e.clientY - offsetY}px`;
-        let els = document.elementsFromPoint(e.pageX, e.pageY);
-        const btnWrappers = els.filter((el) => {
-          return el.classList.contains("btn-wrapper");
-        });
+        changingEl.style.left = `${e.clientX - offsetX}px`;
+        changingEl.style.top = `${e.clientY - offsetY}px`;
 
-        changingEl = btnWrappers[0] as HTMLElement;
-        const newTargetIdx = Number(changingEl?.dataset.index);
+        const getTestingEl = (x: number, y: number): HTMLElement => {
+          let mousePositionEls = document
+            .elementsFromPoint(x, y)
+            .filter((el) => el.classList.contains("btn-wrapper"));
 
-        targetId = changingEl?.dataset.id;
+          return mousePositionEls[0] as HTMLElement;
+        };
+
+        testingEl = getTestingEl(e.pageX, e.pageY);
+        testingElId = testingEl?.dataset.id;
+
+        const newTestingElIndex = Number(testingEl?.dataset.index);
+
         // 새로운 버튼위로 올라갔을때
-        if (!isNaN(newTargetIdx)) {
-          const { width, x, y } = changingEl.getBoundingClientRect();
+        if (!isNaN(newTestingElIndex)) {
+          const { width, x, y } = testingEl.getBoundingClientRect();
           const quarter = width / 4;
           const currentPosition = e.pageX;
           const isLeftSide = currentPosition < quarter + x;
           const isCenter =
             currentPosition >= quarter + x &&
             currentPosition <= quarter * 3 + x;
-          // const isRightSide = currentPosition > quarter * 3 + x;
-          const innerBtn = changingEl.querySelector(".btn") as HTMLElement;
+          const innerBtn = testingEl.querySelector(".btn") as HTMLElement;
 
           if (isLeftSide) {
             innerBtn.blur();
-            targetIdx = newTargetIdx;
-            divider.classList.remove("hide");
-            divider.style.left = `${x}px`;
-            divider.style.top = `${y}px`;
-            positionFlag = -1;
+            testingElIndex = newTestingElIndex;
+            divideEl.classList.remove("hide");
+            divideEl.style.left = `${x}px`;
+            divideEl.style.top = `${y}px`;
+            insertPositionFlag = -1;
           } else if (isCenter) {
             innerBtn.focus();
-            divider.classList.add("hide");
-            positionFlag = 0;
+            divideEl.classList.add("hide");
+            insertPositionFlag = 0;
           } else {
             innerBtn.blur();
-            targetIdx = newTargetIdx + 1;
-            divider.classList.remove("hide");
-            divider.style.left = `${width + x}px`;
-            divider.style.top = `${y}px`;
-            positionFlag = 1;
+            testingElIndex = newTestingElIndex + 1;
+            divideEl.classList.remove("hide");
+            divideEl.style.left = `${width + x}px`;
+            divideEl.style.top = `${y}px`;
+            insertPositionFlag = 1;
           }
         } else {
-          divider.classList.add("hide");
+          divideEl.classList.add("hide");
         }
 
         // 버튼 외부영역
-        if (newTargetIdx !== -1) {
-          targetIdx = Number(changingEl?.dataset.index);
+        // TODO: innerBtn focus 해제 필요
+        if (newTestingElIndex !== -1) {
+          testingElIndex = Number(testingEl?.dataset.index);
         }
       };
       document.addEventListener("mousemove", mousemoveHandler);
-      const handleMouseUp = async (mouseupEvt: MouseEvent) => {
-        divider.classList.add("hide");
-        btnWrapper.classList.add("btn-wrapper");
+      const mouseUpHandler = async (mouseupEvt: MouseEvent) => {
+        divideEl.classList.add("hide");
+        changingEl.classList.add("btn-wrapper");
 
-        btnWrapper.style.position = "relative";
-        btnWrapper.style.top = "unset";
-        btnWrapper.style.left = "unset";
-        btnWrapper.style.zIndex = "inherit";
+        changingEl.style.position = "relative";
+        changingEl.style.top = "unset";
+        changingEl.style.left = "unset";
+        changingEl.style.zIndex = "inherit";
 
-        ghost.remove();
+        positionHolderEl.remove();
 
         const endX = mouseupEvt.pageX;
         const endY = mouseupEvt.pageY;
         const moveX = Math.abs(startX - endX);
         const moveY = Math.abs(startY - endY);
 
-        document.removeEventListener("mouseup", handleMouseUp);
+        document.removeEventListener("mouseup", mouseUpHandler);
         document.removeEventListener("mousemove", mousemoveHandler);
 
         if (new Date().getTime() - startTime < 150 && moveX + moveY < 20) {
@@ -241,26 +255,26 @@ export default defineComponent({
           return;
         }
 
-        if (targetIdx !== -1 && index !== -1) {
-          if (positionFlag == 1) {
-            changingEl?.after(btnWrapper);
-          } else if (positionFlag == -1) {
-            gridContainer.insertBefore(btnWrapper, changingEl);
+        if (testingElIndex !== -1 && changingElIndex) {
+          if (insertPositionFlag == 1) {
+            testingEl?.after(changingEl);
+          } else if (insertPositionFlag == -1) {
+            gridContainer.insertBefore(changingEl, testingEl);
           } else {
             if (
-              changingId &&
-              targetId &&
-              changingId !== targetId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
-              changingEl?.dataset.type == "FOLDER"
+              changingElId &&
+              testingElId &&
+              changingElId !== testingElId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+              testingEl?.dataset.type == "FOLDER"
             ) {
-              await BookmarkApi.move(changingId, targetId);
+              await BookmarkApi.move(changingElId, testingElId);
               this.refresh();
             }
           }
         }
       };
 
-      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("mouseup", mouseUpHandler);
     },
     ...mapMutations([
       OPEN_BOOKSHELF_MODALS,
@@ -329,7 +343,7 @@ export default defineComponent({
   border: none;
 }
 
-.ghost-component {
+.positionHolderEl-component {
   opacity: 0.5;
 }
 
