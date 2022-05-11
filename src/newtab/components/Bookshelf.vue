@@ -1,7 +1,7 @@
 <template>
   <div
     class="grid-container"
-    ref="grid-container"
+    ref="gridContainer"
     @contextmenu.prevent.stop="
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
@@ -14,7 +14,7 @@
       :data-index="item.index"
       :data-id="item.id"
       :data-type="item.type"
-      @mousedown="mousedownHandler(item, $event)"
+      @mousedown.left="mousedownHandler(item, $event)"
       class="btn-wrapper"
     >
       <v-btn
@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import Favicon from "./Favicon.vue";
 import { mapMutations, mapActions, mapGetters } from "vuex";
 import { Item } from "../../shared/types/store";
@@ -85,39 +85,25 @@ export default defineComponent({
       default: false,
     },
   },
-  data: () => ({
-    folderItem: {} as Item,
-    lastUpdated: new Date().getTime(),
-  }),
-  computed: {
-    ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
-    children() {
-      return this.folderItem.children?.map((e) => {
-        return { ...e, type: e.children ? "FOLDER" : "FILE" };
-      });
-    },
-  },
-  watch: {
-    refreshTargetId(id?: string) {
-      if (id && this.$props.id === id) {
-        this.refresh();
-        store.commit(SET_REFRESH_TARGET, "");
-      }
-    },
-  },
-  async mounted() {
-    this.refresh();
-  },
-  methods: {
+  setup(props, { emit }) {
     /** 
       1. down 했을때 위치
       2. move 시킬때 첫 위치와 move 위치의 크기값이 일정 이하일때는 클릭 이동거리 100 이하 && 0.15초 이내
       3. 클릭
     **/
+    const getTestingEl = (x: number, y: number): HTMLElement => {
+      let mousePositionEls = document
+        .elementsFromPoint(x, y)
+        .filter((el) => el.classList.contains("btn-wrapper"));
 
-    mousedownHandler(item: Item, mousedown: MouseEvent) {
+      return mousePositionEls[0] as HTMLElement;
+    };
+
+    const gridContainer = ref<HTMLElement>();
+    const divider = ref<HTMLElement>();
+
+    const mousedownHandler = async (item: Item, mousedown: MouseEvent) => {
       mousedown.preventDefault();
-      const gridContainer = this.$refs["grid-container"] as HTMLElement;
 
       const startTime = new Date().getTime();
       const { pageX: startX, pageY: startY } = mousedown;
@@ -142,14 +128,14 @@ export default defineComponent({
 
       /** 기존의 자리를 표시해주는 chaingEl 복사본 Element */
       const positionHolderEl = changingEl.cloneNode(true) as HTMLElement;
-      /** 변경 위치를 표시해주는 구분선 */
-      const divideEl = this.$refs["divider"] as HTMLElement;
 
-      divideEl.style.height = `${changingElHeight}px`;
+      /** 변경 위치를 표시해주는 구분선 */
+      const dividerEl = divider.value as HTMLElement;
+      dividerEl.style.height = `${changingElHeight}px`;
       positionHolderEl.classList.add("positionHolderEl-component");
       positionHolderEl.dataset.index = "-1";
       changingEl.classList.remove("btn-wrapper");
-      gridContainer.insertBefore(positionHolderEl, changingEl);
+      gridContainer.value?.insertBefore(positionHolderEl, changingEl);
       changingEl.style.zIndex = "9999";
       changingEl.style.left = `${startX - offsetX}px`;
       changingEl.style.top = `${startY - offsetY}px`;
@@ -173,14 +159,6 @@ export default defineComponent({
         changingEl.style.left = `${e.clientX - offsetX}px`;
         changingEl.style.top = `${e.clientY - offsetY}px`;
 
-        const getTestingEl = (x: number, y: number): HTMLElement => {
-          let mousePositionEls = document
-            .elementsFromPoint(x, y)
-            .filter((el) => el.classList.contains("btn-wrapper"));
-
-          return mousePositionEls[0] as HTMLElement;
-        };
-
         testingEl = getTestingEl(e.pageX, e.pageY);
         testingElId = testingEl?.dataset.id;
 
@@ -200,24 +178,24 @@ export default defineComponent({
           if (isLeftSide) {
             innerBtn.blur();
             testingElIndex = newTestingElIndex;
-            divideEl.classList.remove("hide");
-            divideEl.style.left = `${x}px`;
-            divideEl.style.top = `${y}px`;
+            dividerEl.classList.remove("hide");
+            dividerEl.style.left = `${x}px`;
+            dividerEl.style.top = `${y}px`;
             insertPositionFlag = -1;
           } else if (isCenter) {
             innerBtn.focus();
-            divideEl.classList.add("hide");
+            dividerEl.classList.add("hide");
             insertPositionFlag = 0;
           } else {
             innerBtn.blur();
             testingElIndex = newTestingElIndex + 1;
-            divideEl.classList.remove("hide");
-            divideEl.style.left = `${width + x}px`;
-            divideEl.style.top = `${y}px`;
+            dividerEl.classList.remove("hide");
+            dividerEl.style.left = `${width + x}px`;
+            dividerEl.style.top = `${y}px`;
             insertPositionFlag = 1;
           }
         } else {
-          divideEl.classList.add("hide");
+          dividerEl.classList.add("hide");
         }
 
         // 버튼 외부영역
@@ -228,7 +206,7 @@ export default defineComponent({
       };
       document.addEventListener("mousemove", mousemoveHandler);
       const mouseUpHandler = async (mouseupEvt: MouseEvent) => {
-        divideEl.classList.add("hide");
+        dividerEl.classList.add("hide");
         changingEl.classList.add("btn-wrapper");
 
         changingEl.style.position = "relative";
@@ -248,9 +226,9 @@ export default defineComponent({
 
         if (new Date().getTime() - startTime < 150 && moveX + moveY < 20) {
           if (!item.url) {
-            this.onClickFolder(item);
+            // this.onClickFolder(item);
           } else {
-            this.openUrl(item.url);
+            // this.openUrl(item.url);
           }
           return;
         }
@@ -259,7 +237,7 @@ export default defineComponent({
           if (insertPositionFlag == 1) {
             testingEl?.after(changingEl);
           } else if (insertPositionFlag == -1) {
-            gridContainer.insertBefore(changingEl, testingEl);
+            gridContainer.value?.insertBefore(changingEl, testingEl);
           } else {
             if (
               changingElId &&
@@ -268,14 +246,45 @@ export default defineComponent({
               testingEl?.dataset.type == "FOLDER"
             ) {
               await BookmarkApi.move(changingElId, testingElId);
-              this.refresh();
+              // this.refresh();
             }
           }
         }
       };
 
       document.addEventListener("mouseup", mouseUpHandler);
+    };
+
+    return {
+      mousedownHandler,
+      gridContainer,
+      divider,
+    };
+  },
+  data: () => ({
+    folderItem: {} as Item,
+    lastUpdated: new Date().getTime(),
+  }),
+  computed: {
+    ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
+    children() {
+      return this.folderItem.children?.map((e) => {
+        return { ...e, type: e.children ? "FOLDER" : "FILE" };
+      });
     },
+  },
+  watch: {
+    refreshTargetId(id?: string) {
+      if (id && this.$props.id === id) {
+        this.refresh();
+        store.commit(SET_REFRESH_TARGET, "");
+      }
+    },
+  },
+  async mounted() {
+    this.refresh();
+  },
+  methods: {
     ...mapMutations([
       OPEN_BOOKSHELF_MODALS,
       SET_TOOLTIP_POSITION,
