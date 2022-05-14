@@ -11,6 +11,8 @@
       :style="
         item.row && item.col ? { gridRow: item.row, gridColumn: item.col } : {}
       "
+      :data-item-id="item.id"
+      :ref="setItemRef"
     >
       <v-btn
         class="btn"
@@ -95,6 +97,30 @@ export default defineComponent({
     };
   },
   methods: {
+    // row, col이 DB에 없는 애들의 row, col을 계산해서 DB에 저장해줌 + 스타일 추가 (위치 고정)
+    async setItemRef(elItem: HTMLDivElement) {
+      const id = elItem.dataset.itemId as string;
+      const itemLayout = await layoutDB.getItemLayoutById(id);
+
+      if (itemLayout) {
+        return;
+      }
+
+      const itemWidth = elItem.offsetWidth;
+      const itemHeight = elItem.offsetHeight;
+
+      // parent 로부터의 offsetLeft로 스스로의 row, column 계산
+      // parent가 min-height, min-width가 제대로 지정되어 있어야 offsetLeft가 정확한 값
+      const col = Math.floor((elItem.offsetLeft - 20) / itemWidth) + 1;
+      const row = Math.floor((elItem.offsetTop - 20) / itemHeight) + 1;
+
+      // row column을 DB에 삽입
+      // console.log("saving initial position to DB", id, row, col);
+      layoutDB.setItemLayoutById({ id, row, col });
+
+      // 저장된 초기 row, col 값을 folderItem에 반영
+      // TODO
+    },
     onClickFolder(item: Item) {
       const { id, title } = item;
       store.commit(OPEN_BOOKSHELF_MODALS, { id, title });
