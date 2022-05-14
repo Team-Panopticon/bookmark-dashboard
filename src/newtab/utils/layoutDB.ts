@@ -102,6 +102,10 @@ class LayoutDB {
     return layoutMap;
   }
 
+  async getItemLayoutById(id: string): Promise<ItemLayout | undefined> {
+    return await this.db.get(OBJECT_STORE_NAME, id);
+  }
+
   async setItemLayoutById({ id, row, col }: ItemLayout) {
     await this.db.put(OBJECT_STORE_NAME, { id, row, col });
   }
