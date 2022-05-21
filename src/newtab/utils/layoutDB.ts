@@ -6,6 +6,7 @@ interface LayoutMap {
 
 interface ItemLayout {
   id: string;
+  parentId: string;
   row: number;
   col: number;
 }
@@ -13,7 +14,7 @@ interface ItemLayout {
 const DB_NAME = "DesktopBookshelfDB";
 const DB_VERSION = 1;
 const OBJECT_STORE_NAME = "desktop";
-const READ_ONLY = "readonly";
+// const READ_ONLY = "readonly";
 // const READ_WRITE = "readwrite";
 
 const parseLayoutData = (layoutDataArray: ItemLayout[]) => {
@@ -34,18 +35,19 @@ class LayoutDB {
           keyPath: "id",
         });
         objectStore.createIndex("id", "id", { unique: true });
+        objectStore.createIndex("parentId", "parentId", { unique: false });
         objectStore.createIndex("row", "row", { unique: false });
         objectStore.createIndex("col", "col", { unique: false });
       },
     });
   }
 
-  async getLayout(): Promise<LayoutMap> {
-    const store = this.db
-      .transaction(OBJECT_STORE_NAME, READ_ONLY)
-      .objectStore(OBJECT_STORE_NAME);
-
-    const result = await store.getAll();
+  async getLayout(parentId: string): Promise<LayoutMap> {
+    const result = await this.db.getAllFromIndex(
+      OBJECT_STORE_NAME,
+      "parentId",
+      parentId
+    );
     const layoutMap = parseLayoutData(result);
 
     return layoutMap;
@@ -55,8 +57,8 @@ class LayoutDB {
     return await this.db.get(OBJECT_STORE_NAME, id);
   }
 
-  async setItemLayoutById({ id, row, col }: ItemLayout) {
-    await this.db.put(OBJECT_STORE_NAME, { id, row, col });
+  async setItemLayoutById({ id, parentId, row, col }: ItemLayout) {
+    await this.db.put(OBJECT_STORE_NAME, { id, parentId, row, col });
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <DesktopBookshelf id="1"></DesktopBookshelf>
+    <Bookshelf id="1"></Bookshelf>
     <CreateFolderModal></CreateFolderModal>
     <BookshelfModalContainer></BookshelfModalContainer>
     <ContextMenuContainer />
@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import DesktopBookshelf from "../components/bookshelf/DesktopBookshelf.vue";
+import Bookshelf from "../components/Bookshelf.vue";
 import UpdateModal from "../components/UpdateModal.vue";
 import store, { SET_REFRESH_TARGET } from "../store";
 import CreateFolderModal from "../components/CreateFolderModal.vue";
@@ -22,7 +22,7 @@ import Tooltip from "../components/Tooltip.vue";
 
 export default defineComponent({
   components: {
-    DesktopBookshelf,
+    Bookshelf,
     CreateFolderModal,
     BookshelfModalContainer,
     ContextMenuContainer,

@@ -4,9 +4,16 @@
     @contextmenu.prevent.stop="
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
-    @click="sortItems('title')"
   >
-    <div v-for="item in folderItem.children" v-bind:key="item.id">
+    <div
+      v-for="item in folderItem.children"
+      v-bind:key="item.id"
+      :style="
+        item.row && item.col ? { gridRow: item.row, gridColumn: item.col } : {}
+      "
+      :data-item-id="item.id"
+      :ref="setItemRef"
+    >
       <v-btn
         class="btn"
         elevation="0"
@@ -50,11 +57,24 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Favicon from "../Favicon.vue";
-import { setupBookshelf } from "../composition/setupBookshelf";
+import Favicon from "./Favicon.vue";
+import { setupBookshelf } from "./composition/setupBookshelf";
+import { OPEN_BOOKSHELF_MODALS } from "@/newtab/store/modules/bookshelfModal";
 import { Item } from "@/shared/types/store";
-import store from "../../store/index";
+import store from "../store/index";
 import { SET_TOOLTIP_SHOW } from "@/newtab/store/modules/tooltip";
+import { layoutDB } from "../utils/layoutDB";
+
+const appendLayoutData = async (folderItem: Item): Promise<Item> => {
+  const layoutData = await layoutDB.getLayout(folderItem.id);
+  folderItem.children?.forEach((item: Item) => {
+    const { row, col } = layoutData[item.id] ?? {};
+    item.row = row;
+    item.col = col;
+  });
+
+  return folderItem;
+};
 
 export default defineComponent({
   components: { Favicon },
@@ -66,7 +86,8 @@ export default defineComponent({
   },
   setup(props) {
     const { folderItem, openTooltip, closeTooltip, openUrl, openContextMenu } =
-      setupBookshelf(props);
+      setupBookshelf(props, appendLayoutData);
+
     return {
       folderItem,
       openTooltip,
@@ -76,15 +97,53 @@ export default defineComponent({
     };
   },
   methods: {
-    sortItems(key: keyof chrome.bookmarks.BookmarkTreeNode, reverse = false) {
-      this.folderItem.children?.sort((a, b) => {
-        const result = String(a[key ?? ""]).localeCompare(String(b[key ?? ""]));
-        return reverse ? -result : result;
-      });
+    // row, col이 DB에 없는 애들의 row, col을 계산해서 DB에 저장해줌 + 스타일 추가 (위치 고정)
+    async setItemRef(elItem?: HTMLDivElement) {
+      if (!elItem) {
+        return;
+      }
+
+      const id = elItem.dataset.itemId as string;
+      const itemLayout = await layoutDB.getItemLayoutById(id);
+
+      if (itemLayout) {
+        return;
+      }
+
+      const itemWidth = elItem.offsetWidth;
+      const itemHeight = elItem.offsetHeight;
+
+      // parent 로부터의 offsetLeft로 스스로의 row, column 계산
+      // parent가 min-height, min-width가 제대로 지정되어 있어야 offsetLeft가 정확한 값
+      const col = Math.floor((elItem.offsetLeft - 20) / itemWidth) + 1;
+      const row = Math.floor((elItem.offsetTop - 20) / itemHeight) + 1;
+
+      // 저장된 초기 row, col 값을 folderItem에 반영
+      const originalItem: Item | undefined = this.folderItem.children?.find(
+        (item) => item.id === id
+      );
+
+      if (!originalItem) {
+        return;
+      }
+
+      const parentId = originalItem.parentId as string;
+
+      // row column을 DB에 삽입
+      layoutDB.setItemLayoutById({ id, parentId, row, col });
+
+      // 저장된 초기 row, col 값을 folderItem에 반영
+      originalItem.row = row;
+      originalItem.col = col;
     },
     onClickFolder(item: Item) {
-      const { id } = item;
-      this.$emit("routeInFolder", id);
+      const isDesktop = this.folderItem.parentId === "0";
+      const { id, title } = item;
+      if (isDesktop) {
+        store.commit(OPEN_BOOKSHELF_MODALS, { id, title });
+      } else {
+        this.$emit("routeInFolder", id);
+      }
       store.commit(SET_TOOLTIP_SHOW, false);
     },
   },
@@ -99,7 +158,7 @@ export default defineComponent({
   padding: 20px;
   width: 100%;
   height: 100%;
-  overflow-y: "auto";
+  overflow-y: auto;
 }
 
 .btn {

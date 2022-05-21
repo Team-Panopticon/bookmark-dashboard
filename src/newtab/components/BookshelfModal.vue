@@ -33,68 +33,21 @@
             </button>
             <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
           </div>
-          <div>
-            <v-menu>
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  color="primary"
-                  dark
-                  v-bind="props"
-                  v-on="props"
-                  default="selectedFilter"
-                  class="sort-btn"
-                  elevation="0"
-                >
-                  Sorting
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-item
-                  v-for="(item, index) in filters"
-                  :key="index"
-                  :value="index"
-                  v-bind:class="{
-                    'v-list-item--active': item === selectedFilter,
-                  }"
-                  v-bind:style="{
-                    'text-transform': 'capitalize !important',
-                  }"
-                  @click="updateSelectedFilter"
-                >
-                  <v-list-item-title>{{ item }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-              <v-list>
-                <v-list-item
-                  v-for="(item, index) in orders"
-                  :key="index"
-                  :value="item"
-                  v-bind:class="{
-                    'v-list-item--active': item === selectedOrder,
-                  }"
-                  @click="updateSelectedOrder"
-                >
-                  <v-list-item-title>{{ item }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-            <button
-              class="modal__close"
-              @click="closeBookshelfModal(timeStampId)"
-            >
-              <v-icon>mdi-close</v-icon>
-            </button>
-          </div>
+          <button
+            class="modal__close"
+            @click="closeBookshelfModal(timeStampId)"
+          >
+            <v-icon>mdi-close</v-icon>
+          </button>
         </v-card-header>
 
         <div class="v-card-content">
-          <ModalBookshelf
+          <Bookshelf
             v-if="viewItem.id"
             :key="viewItem.id"
             @routeInFolder="routeInFolder"
             :id="viewItem.id"
-            ref="modalBookshelfRef"
-          ></ModalBookshelf>
+          ></Bookshelf>
         </div>
       </v-card>
     </vue-final-modal>
@@ -111,7 +64,7 @@ import {
   GET_BOOKSHELF_MODALS_CURRENT_POSITION,
   UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION,
 } from "../store/modules/bookshelfModal";
-import ModalBookshelf from "./bookshelf/ModalBookshelf.vue";
+import Bookshelf from "./Bookshelf.vue";
 import BookmarkApi from "../utils/bookmarkApi";
 interface BreadCrumb {
   disabled: boolean;
@@ -119,7 +72,7 @@ interface BreadCrumb {
 }
 
 export default defineComponent({
-  components: { ModalBookshelf },
+  components: { Bookshelf },
   props: {
     timeStampId: {
       type: String,
@@ -139,10 +92,6 @@ export default defineComponent({
       showBookshelfModal: true,
       position: { top: 0, right: 0 },
       folderItems: [] as FolderItem[],
-      filters: ["index", "title", "dateAdded", "dateGroupModified"],
-      orders: ["ascending", "descending"],
-      selectedFilter: "index",
-      selectedOrder: "ascending",
     };
   },
   computed: {
@@ -227,27 +176,6 @@ export default defineComponent({
         this.position = { top, right };
       }
     },
-    updateSelectedFilter(e: MouseEvent) {
-      const elTarget = e.target as HTMLElement;
-      if (elTarget.textContent) {
-        this.selectedFilter = elTarget.textContent;
-      }
-      this.sortModalBookshelf();
-    },
-    updateSelectedOrder(e: MouseEvent) {
-      const elTarget = e.target as HTMLElement;
-      if (elTarget.textContent) {
-        this.selectedOrder = elTarget.textContent;
-      }
-      this.sortModalBookshelf();
-    },
-    sortModalBookshelf() {
-      const reverse = this.selectedOrder === "descending";
-      (this.$refs.modalBookshelfRef as typeof ModalBookshelf).sortItems(
-        this.selectedFilter,
-        reverse
-      );
-    },
   },
 });
 </script>
@@ -277,8 +205,5 @@ export default defineComponent({
 .v-breadcrumbs {
   padding-top: 0;
   padding-bottom: 0;
-}
-.sort-btn {
-  margin-right: 16px;
 }
 </style>
