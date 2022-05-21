@@ -7,15 +7,16 @@
     "
     :data-parent-id="id"
   >
-    <div ref="divider" class="divider hide"></div>
     <div
       v-for="item in children"
       v-bind:key="item.id"
-      :data-index="item.index"
       :data-id="item.id"
       :data-type="item.type"
+      :data-row="item.row + 1"
+      :data-col="item.col + 1"
       @mousedown.left="mousedownHandler(item, $event)"
       class="btn-wrapper"
+      :style="`grid-row:${item.row + 1}; grid-column:${item.col + 1};`"
     >
       <v-btn
         class="btn"
@@ -57,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref } from "vue";
 import Favicon from "./Favicon.vue";
 import { mapMutations, mapActions, mapGetters } from "vuex";
 import { Item } from "../../shared/types/store";
@@ -86,6 +87,23 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const openUrl = (url: string) => {
+      window.open(url, "_blank")?.focus();
+      store.commit(SET_TOOLTIP_SHOW, false);
+    };
+    const routeInFolder = (id: string) => {
+      emit("routeInFolder", id);
+    };
+    const onClickFolder = (item: Item) => {
+      const { id, title } = item;
+      if (props.isDesktop) {
+        store.commit(OPEN_BOOKSHELF_MODALS, { id, title });
+      } else {
+        routeInFolder(id);
+      }
+      store.commit(SET_TOOLTIP_SHOW, false);
+    };
+
     /** 
       1. down 했을때 위치
       2. move 시킬때 첫 위치와 move 위치의 크기값이 일정 이하일때는 클릭 이동거리 100 이하 && 0.15초 이내
@@ -94,17 +112,22 @@ export default defineComponent({
     const getTestingEl = (x: number, y: number): HTMLElement => {
       let mousePositionEls = document
         .elementsFromPoint(x, y)
-        .filter((el) => el.classList.contains("btn-wrapper"));
+        .filter(
+          (el) =>
+            el.classList.contains("btn-wrapper") &&
+            !el.classList.contains("positionHolderEl-component")
+        );
 
       return mousePositionEls[0] as HTMLElement;
     };
-
+    let originRow = -1;
+    let originCol = -1;
+    let holderRow = -1;
+    let holderCol = -1;
     const gridContainer = ref<HTMLElement>();
-    const divider = ref<HTMLElement>();
-
     const mousedownHandler = async (item: Item, mousedown: MouseEvent) => {
       mousedown.preventDefault();
-
+      const gridContainerEl = gridContainer.value as HTMLElement;
       const startTime = new Date().getTime();
       const { pageX: startX, pageY: startY } = mousedown;
 
@@ -114,7 +137,10 @@ export default defineComponent({
       const changingEl = mousedownTarget.closest(".btn-wrapper") as HTMLElement;
 
       const changingElId = changingEl.dataset.id;
-      const changingElIndex = changingEl.dataset.index;
+
+      /** 파일의 기존위치 : 겹쳤을때 되돌리기 용도 */
+      originRow = Number(changingEl.dataset.row);
+      originCol = Number(changingEl.dataset.col);
 
       const {
         x: targetX,
@@ -129,13 +155,10 @@ export default defineComponent({
       /** 기존의 자리를 표시해주는 chaingEl 복사본 Element */
       const positionHolderEl = changingEl.cloneNode(true) as HTMLElement;
 
-      /** 변경 위치를 표시해주는 구분선 */
-      const dividerEl = divider.value as HTMLElement;
-      dividerEl.style.height = `${changingElHeight}px`;
       positionHolderEl.classList.add("positionHolderEl-component");
-      positionHolderEl.dataset.index = "-1";
+
       changingEl.classList.remove("btn-wrapper");
-      gridContainer.value?.insertBefore(positionHolderEl, changingEl);
+      gridContainerEl.insertBefore(positionHolderEl, changingEl);
       changingEl.style.zIndex = "9999";
       changingEl.style.left = `${startX - offsetX}px`;
       changingEl.style.top = `${startY - offsetY}px`;
@@ -143,11 +166,7 @@ export default defineComponent({
 
       /** 변경될 위치의 기준이 되는 폴더 혹은 파일 Element */
       let testingEl: null | HTMLElement = null;
-      let testingElIndex: undefined | number = undefined;
       let testingElId: undefined | string = undefined;
-
-      /** 폴더 혹은 파일의 삽입 위치 - -1: 왼쪽에 삽입, 1: 오른쪽에 삽입, 0: 폴더 내부 혹은 변화 없음 */
-      let insertPositionFlag = 0;
 
       const mousemoveHandler = (e: MouseEvent) => {
         e.preventDefault();
@@ -155,65 +174,41 @@ export default defineComponent({
         if (new Date().getTime() - startTime < 150) {
           return;
         }
-
         changingEl.style.left = `${e.clientX - offsetX}px`;
         changingEl.style.top = `${e.clientY - offsetY}px`;
 
+        holderRow = Math.floor((e.clientY - 20) / 100) + 1;
+        holderCol = Math.floor((e.clientX - 20) / 96) + 1;
+        positionHolderEl.style.gridColumn = String(holderCol);
+        positionHolderEl.style.gridRow = String(holderRow);
         testingEl = getTestingEl(e.pageX, e.pageY);
         testingElId = testingEl?.dataset.id;
 
-        const newTestingElIndex = Number(testingEl?.dataset.index);
-
+        const innerBtn = testingEl?.querySelector(".btn") as HTMLElement;
         // 새로운 버튼위로 올라갔을때
-        if (!isNaN(newTestingElIndex)) {
-          const { width, x, y } = testingEl.getBoundingClientRect();
-          const quarter = width / 4;
-          const currentPosition = e.pageX;
-          const isLeftSide = currentPosition < quarter + x;
-          const isCenter =
-            currentPosition >= quarter + x &&
-            currentPosition <= quarter * 3 + x;
-          const innerBtn = testingEl.querySelector(".btn") as HTMLElement;
 
-          if (isLeftSide) {
-            innerBtn.blur();
-            testingElIndex = newTestingElIndex;
-            dividerEl.classList.remove("hide");
-            dividerEl.style.left = `${x}px`;
-            dividerEl.style.top = `${y}px`;
-            insertPositionFlag = -1;
-          } else if (isCenter) {
-            innerBtn.focus();
-            dividerEl.classList.add("hide");
-            insertPositionFlag = 0;
-          } else {
-            innerBtn.blur();
-            testingElIndex = newTestingElIndex + 1;
-            dividerEl.classList.remove("hide");
-            dividerEl.style.left = `${width + x}px`;
-            dividerEl.style.top = `${y}px`;
-            insertPositionFlag = 1;
-          }
-        } else {
-          dividerEl.classList.add("hide");
-        }
-
-        // 버튼 외부영역
-        // TODO: innerBtn focus 해제 필요
-        if (newTestingElIndex !== -1) {
-          testingElIndex = Number(testingEl?.dataset.index);
+        if (testingEl?.dataset.type === "FOLDER") {
+          innerBtn?.focus();
+        } else if (testingEl?.dataset.type === "FILE") {
+          positionHolderEl.style.gridColumn = String(originCol);
+          positionHolderEl.style.gridRow = String(originRow);
         }
       };
       document.addEventListener("mousemove", mousemoveHandler);
       const mouseUpHandler = async (mouseupEvt: MouseEvent) => {
-        dividerEl.classList.add("hide");
         changingEl.classList.add("btn-wrapper");
 
         changingEl.style.position = "relative";
         changingEl.style.top = "unset";
         changingEl.style.left = "unset";
         changingEl.style.zIndex = "inherit";
-
+        // TODO : db update => dataset 동기화
+        if (holderRow > 0 && holderCol > 0) {
+          changingEl.style.gridRow = String(holderRow);
+          changingEl.style.gridColumn = String(holderCol);
+          changingEl.dataset.row = String(holderRow);
+          changingEl.dataset.col = String(holderCol);
+        }
         positionHolderEl.remove();
 
         const endX = mouseupEvt.pageX;
@@ -226,29 +221,25 @@ export default defineComponent({
 
         if (new Date().getTime() - startTime < 150 && moveX + moveY < 20) {
           if (!item.url) {
-            // this.onClickFolder(item);
+            onClickFolder(item);
           } else {
-            // this.openUrl(item.url);
+            openUrl(item.url);
           }
           return;
         }
 
-        if (testingElIndex !== -1 && changingElIndex) {
-          if (insertPositionFlag == 1) {
-            testingEl?.after(changingEl);
-          } else if (insertPositionFlag == -1) {
-            gridContainer.value?.insertBefore(changingEl, testingEl);
-          } else {
-            if (
-              changingElId &&
-              testingElId &&
-              changingElId !== testingElId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
-              testingEl?.dataset.type == "FOLDER"
-            ) {
-              await BookmarkApi.move(changingElId, testingElId);
-              // this.refresh();
-            }
-          }
+        if (
+          changingElId &&
+          testingElId &&
+          changingElId !== testingElId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+          testingEl?.dataset.type == "FOLDER"
+        ) {
+          // changingEl.remove();
+          await BookmarkApi.move(changingElId, testingElId);
+          // this.refresh();
+        } else if (testingEl?.dataset.type == "FILE") {
+          changingEl.style.gridColumn = String(originCol);
+          changingEl.style.gridRow = String(originRow);
         }
       };
 
@@ -258,7 +249,6 @@ export default defineComponent({
     return {
       mousedownHandler,
       gridContainer,
-      divider,
     };
   },
   data: () => ({
@@ -268,17 +258,15 @@ export default defineComponent({
   computed: {
     ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
     children() {
-      return this.folderItem.children?.map((e) => {
-        return { ...e, type: e.children ? "FOLDER" : "FILE" };
+      return this.folderItem.children?.map((e, i) => {
+        return { ...e, type: e.children ? "FOLDER" : "FILE", row: i, col: i };
       });
     },
   },
   watch: {
-    refreshTargetId(id?: string) {
-      if (id && this.$props.id === id) {
-        this.refresh();
-        store.commit(SET_REFRESH_TARGET, "");
-      }
+    refreshTargetId() {
+      this.refresh();
+      store.commit(SET_REFRESH_TARGET, "");
     },
   },
   async mounted() {
@@ -293,28 +281,9 @@ export default defineComponent({
     ]),
     ...mapActions([OPEN_BOOKMARK_UPDATE]), // updateMODAL
     openBookmarkModal() {
-      // TODO: 네이밍 변경(ex. updateModal)
       this[OPEN_BOOKMARK_UPDATE](this.folderItem);
     },
-    onClickFolder(item: Item) {
-      const { id, title } = item;
-      if (this.isDesktop) {
-        this._openBookshelfModal(id, title);
-      } else {
-        this.routeInFolder(id);
-      }
-      this[SET_TOOLTIP_SHOW](false);
-    },
-    routeInFolder(id: string) {
-      this.$emit("routeInFolder", id);
-    },
-    _openBookshelfModal(id: string, title: string) {
-      this.openBookshelfModal({ id, title });
-    },
-    openUrl(url: string) {
-      window.open(url, "_blank")?.focus();
-      this[SET_TOOLTIP_SHOW](false);
-    },
+
     openContextMenu,
     async refresh() {
       this.folderItem = await BookmarkApi.getSubTree(this.id);
@@ -358,7 +327,7 @@ export default defineComponent({
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, auto));
+  grid-template-columns: repeat(auto-fill, 96px);
   grid-auto-rows: 100px;
   grid-gap: inherit;
   padding: 20px;
@@ -370,6 +339,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   background: none;
+  border: 1px solid red;
 }
 .btn {
   width: 80px;
