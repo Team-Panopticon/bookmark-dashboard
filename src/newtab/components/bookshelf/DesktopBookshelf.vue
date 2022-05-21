@@ -66,9 +66,9 @@ import { SET_TOOLTIP_SHOW } from "@/newtab/store/modules/tooltip";
 import { layoutDB } from "../../utils/layoutDB";
 
 const appendLayoutData = async (folderItem: Item): Promise<Item> => {
-  const layOutData = await layoutDB.getLayout();
+  const layoutData = await layoutDB.getLayout();
   folderItem.children?.forEach((item: Item) => {
-    const { row, col } = layOutData[item.id] ?? {};
+    const { row, col } = layoutData[item.id] ?? {};
     item.row = row;
     item.col = col;
   });
@@ -115,11 +115,17 @@ export default defineComponent({
       const row = Math.floor((elItem.offsetTop - 20) / itemHeight) + 1;
 
       // row column을 DB에 삽입
-      // console.log("saving initial position to DB", id, row, col);
       layoutDB.setItemLayoutById({ id, row, col });
 
       // 저장된 초기 row, col 값을 folderItem에 반영
-      // TODO
+      const originalItem: Item | undefined = this.folderItem.children?.find(
+        (item) => item.id === id
+      );
+
+      if (originalItem) {
+        originalItem.row = row;
+        originalItem.col = col;
+      }
     },
     onClickFolder(item: Item) {
       const { id, title } = item;
@@ -138,7 +144,7 @@ export default defineComponent({
   padding: 20px;
   width: 100%;
   height: 100%;
-  overflow-y: "auto";
+  overflow-y: auto;
 }
 
 .btn {
