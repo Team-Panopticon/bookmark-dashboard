@@ -14,8 +14,6 @@ interface ItemLayout {
 const DB_NAME = "DesktopBookshelfDB";
 const DB_VERSION = 1;
 const OBJECT_STORE_NAME = "desktop";
-// const READ_ONLY = "readonly";
-// const READ_WRITE = "readwrite";
 
 const parseLayoutData = (layoutDataArray: ItemLayout[]) => {
   const layoutMap: LayoutMap = {};
