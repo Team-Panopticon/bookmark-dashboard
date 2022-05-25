@@ -142,15 +142,12 @@ export default defineComponent({
       originRow = Number(changingEl.dataset.row);
       originCol = Number(changingEl.dataset.col);
 
-      const {
-        x: targetX,
-        y: targetY,
-        height: changingElHeight,
-      } = changingEl.getBoundingClientRect();
-
+      const { x: targetX, y: targetY } = changingEl.getBoundingClientRect();
+      const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
+      console.log(gridContainerEl.getBoundingClientRect());
       /** padding 값에 따른 마우스 포인터와 chaningEl의 상대 위치 값 */
-      const offsetX = startX - targetX - 8;
-      const offsetY = startY - targetY;
+      const offsetX = startX - targetX + 20 + 8;
+      const offsetY = startY - targetY + 20;
 
       /** 기존의 자리를 표시해주는 chaingEl 복사본 Element */
       const positionHolderEl = changingEl.cloneNode(true) as HTMLElement;
@@ -162,7 +159,7 @@ export default defineComponent({
       changingEl.style.zIndex = "9999";
       changingEl.style.left = `${startX - offsetX}px`;
       changingEl.style.top = `${startY - offsetY}px`;
-      changingEl.style.position = "absolute";
+      changingEl.style.position = "fixed";
 
       /** 변경될 위치의 기준이 되는 폴더 혹은 파일 Element */
       let testingEl: null | HTMLElement = null;
@@ -170,15 +167,18 @@ export default defineComponent({
 
       const mousemoveHandler = (e: MouseEvent) => {
         e.preventDefault();
+        const gridContainerEl = gridContainer.value as HTMLElement;
 
+        const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
+        console.log(gridContainerEl.getBoundingClientRect());
         if (new Date().getTime() - startTime < 150) {
           return;
         }
-        changingEl.style.left = `${e.clientX - offsetX}px`;
-        changingEl.style.top = `${e.clientY - offsetY}px`;
+        changingEl.style.left = `${e.pageX - offsetX}px`;
+        changingEl.style.top = `${e.pageY - offsetY}px`;
 
-        holderRow = Math.floor((e.clientY - 20) / 100) + 1;
-        holderCol = Math.floor((e.clientX - 20) / 96) + 1;
+        holderRow = Math.floor((e.clientY - baseY - 20) / 100) + 1;
+        holderCol = Math.floor((e.clientX - baseX - 20) / 96) + 1;
         positionHolderEl.style.gridColumn = String(holderCol);
         positionHolderEl.style.gridRow = String(holderRow);
         testingEl = getTestingEl(e.pageX, e.pageY);
@@ -203,7 +203,11 @@ export default defineComponent({
         changingEl.style.left = "unset";
         changingEl.style.zIndex = "inherit";
         // TODO : db update => dataset 동기화
-        if (holderRow > 0 && holderCol > 0) {
+        if (
+          holderRow > 0 &&
+          holderCol > 0 &&
+          testingEl?.dataset.type !== "FILE"
+        ) {
           changingEl.style.gridRow = String(holderRow);
           changingEl.style.gridColumn = String(holderCol);
           changingEl.dataset.row = String(holderRow);
@@ -234,9 +238,7 @@ export default defineComponent({
           changingElId !== testingElId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
           testingEl?.dataset.type == "FOLDER"
         ) {
-          // changingEl.remove();
           await BookmarkApi.move(changingElId, testingElId);
-          // this.refresh();
         } else if (testingEl?.dataset.type == "FILE") {
           changingEl.style.gridColumn = String(originCol);
           changingEl.style.gridRow = String(originRow);
@@ -334,6 +336,7 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   transition: all 12s;
+  position: relative;
 }
 .btn-wrapper {
   display: flex;
