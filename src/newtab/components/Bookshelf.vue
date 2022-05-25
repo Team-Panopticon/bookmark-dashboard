@@ -56,25 +56,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import Favicon from "./Favicon.vue";
-import { setupBookshelf } from "./composition/setupBookshelf";
-import { OPEN_BOOKSHELF_MODALS } from "@/newtab/store/modules/bookshelfModal";
+import { setupBookshelfAction } from "./composition/setupBookshelfAction";
+import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
 import { Item } from "@/shared/types/store";
-import store from "../store/index";
-import { SET_TOOLTIP_SHOW } from "@/newtab/store/modules/tooltip";
-import { layoutDB } from "../utils/layoutDB";
-
-const appendLayoutData = async (folderItem: Item): Promise<Item> => {
-  const layoutData = await layoutDB.getLayout(folderItem.id);
-  folderItem.children?.forEach((item: Item) => {
-    const { row, col } = layoutData[item.id] ?? {};
-    item.row = row;
-    item.col = col;
-  });
-
-  return folderItem;
-};
 
 export default defineComponent({
   components: { Favicon },
@@ -84,9 +70,17 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
-    const { folderItem, openTooltip, closeTooltip, openUrl, openContextMenu } =
-      setupBookshelf(props, appendLayoutData);
+  setup(props, context) {
+    const folderItem = ref({} as Item);
+    const {
+      openTooltip,
+      closeTooltip,
+      openUrl,
+      openContextMenu,
+      onClickFolder,
+    } = setupBookshelfAction({ folderItem, context });
+
+    const { setItemRef } = setupBookshelfLayout({ id: props.id, folderItem });
 
     return {
       folderItem,
@@ -94,58 +88,9 @@ export default defineComponent({
       closeTooltip,
       openUrl,
       openContextMenu,
+      onClickFolder,
+      setItemRef,
     };
-  },
-  methods: {
-    // row, col이 DB에 없는 애들의 row, col을 계산해서 DB에 저장해줌 + 스타일 추가 (위치 고정)
-    async setItemRef(elItem?: HTMLDivElement) {
-      if (!elItem) {
-        return;
-      }
-
-      const id = elItem.dataset.itemId as string;
-      const itemLayout = await layoutDB.getItemLayoutById(id);
-
-      if (itemLayout) {
-        return;
-      }
-
-      const itemWidth = elItem.offsetWidth;
-      const itemHeight = elItem.offsetHeight;
-
-      // parent 로부터의 offsetLeft로 스스로의 row, column 계산
-      // parent가 min-height, min-width가 제대로 지정되어 있어야 offsetLeft가 정확한 값
-      const col = Math.floor((elItem.offsetLeft - 20) / itemWidth) + 1;
-      const row = Math.floor((elItem.offsetTop - 20) / itemHeight) + 1;
-
-      // 저장된 초기 row, col 값을 folderItem에 반영
-      const originalItem: Item | undefined = this.folderItem.children?.find(
-        (item) => item.id === id
-      );
-
-      if (!originalItem) {
-        return;
-      }
-
-      const parentId = originalItem.parentId as string;
-
-      // row column을 DB에 삽입
-      layoutDB.setItemLayoutById({ id, parentId, row, col });
-
-      // 저장된 초기 row, col 값을 folderItem에 반영
-      originalItem.row = row;
-      originalItem.col = col;
-    },
-    onClickFolder(item: Item) {
-      const isDesktop = this.folderItem.parentId === "0";
-      const { id, title } = item;
-      if (isDesktop) {
-        store.commit(OPEN_BOOKSHELF_MODALS, { id, title });
-      } else {
-        this.$emit("routeInFolder", id);
-      }
-      store.commit(SET_TOOLTIP_SHOW, false);
-    },
   },
 });
 </script>
