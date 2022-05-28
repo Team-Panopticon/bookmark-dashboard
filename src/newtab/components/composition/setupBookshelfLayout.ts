@@ -21,6 +21,7 @@ const appendLayoutData = async (folderItem: Item): Promise<Item> => {
     const { row, col } = layoutData[item.id] ?? {};
     item.row = row;
     item.col = col;
+    item.type = item.children ? "FOLDER" : "FILE";
   });
 
   return folderItem;

@@ -19,7 +19,7 @@ interface Props {
 export interface SetupBookshelf {
   openTooltip: (title: string, event: MouseEvent) => void;
   closeTooltip: () => void;
-  openUrl: (id: string, url: string) => void;
+  openUrl: (url: string) => void;
   openContextMenu: (event: PointerEvent, target: ContextMenuTarget) => void;
   onClickFolder: (item: Item) => void;
 }
@@ -51,7 +51,7 @@ export const setupBookshelfAction = (props: Props): SetupBookshelf => {
     store.commit(SET_TOOLTIP_SHOW, false);
   };
 
-  const openUrl = (id: string, url: string) => {
+  const openUrl = (url: string) => {
     window.open(url, "_blank")?.focus();
     store.commit(SET_TOOLTIP_SHOW, false);
   };
