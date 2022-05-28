@@ -61,6 +61,7 @@ import Favicon from "./Favicon.vue";
 import { setupBookshelfAction } from "./composition/setupBookshelfAction";
 import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
 import { Item } from "@/shared/types/store";
+import { GRID_CONTAINER_PADDING } from "../utils/constant";
 
 export default defineComponent({
   components: { Favicon },
@@ -92,6 +93,11 @@ export default defineComponent({
       setItemRef,
     };
   },
+  data() {
+    return {
+      gridContainerPadding: `${GRID_CONTAINER_PADDING}px`,
+    };
+  },
 });
 </script>
 
@@ -100,7 +106,7 @@ export default defineComponent({
   display: grid;
   grid-template-columns: repeat(auto-fill, 88px);
   grid-auto-rows: 108px;
-  padding: 20px;
+  padding: v-bind("gridContainerPadding");
   width: 100%;
   height: 100%;
   overflow-y: auto;

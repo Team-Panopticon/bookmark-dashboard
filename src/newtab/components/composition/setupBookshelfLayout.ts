@@ -4,6 +4,7 @@ import { onMounted, computed, watch, Ref } from "vue";
 import { useStore } from "vuex";
 import { SET_REFRESH_TARGET } from "../../store/index";
 import { layoutDB } from "@/newtab/utils/layoutDB";
+import { GRID_CONTAINER_PADDING } from "@/newtab/utils/constant";
 
 export interface SetupBookshelf {
   setItemRef: (elItem?: HTMLDivElement) => void;
@@ -71,8 +72,10 @@ export const setupBookshelfLayout = (props: Props): SetupBookshelf => {
 
     // parent 로부터의 offsetLeft로 스스로의 row, column 계산
     // parent가 min-height, min-width가 제대로 지정되어 있어야 offsetLeft가 정확한 값
-    const col = Math.floor((elItem.offsetLeft - 20) / itemWidth) + 1;
-    const row = Math.floor((elItem.offsetTop - 20) / itemHeight) + 1;
+    const col =
+      Math.floor((elItem.offsetLeft - GRID_CONTAINER_PADDING) / itemWidth) + 1;
+    const row =
+      Math.floor((elItem.offsetTop - GRID_CONTAINER_PADDING) / itemHeight) + 1;
 
     // 저장된 초기 row, col 값을 folderItem에 반영
     const originalItem: Item | undefined = folderItem.value.children?.find(
