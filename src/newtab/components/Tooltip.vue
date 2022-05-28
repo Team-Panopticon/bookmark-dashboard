@@ -15,12 +15,7 @@ import {
 } from "../store/modules/tooltip";
 
 export default defineComponent({
-  props: {
-    text: {
-      type: String,
-      required: true,
-    },
-  },
+  data: () => ({}),
   computed: {
     ...mapGetters({
       tooltipPosition: GET_TOOLTIP_POSITION,

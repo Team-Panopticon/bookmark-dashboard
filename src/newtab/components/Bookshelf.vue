@@ -5,10 +5,17 @@
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
   >
-    <div v-for="item in folderItem.children" v-bind:key="item.id">
+    <div
+      v-for="item in folderItem.children"
+      v-bind:key="item.id"
+      :style="
+        item.row && item.col ? { gridRow: item.row, gridColumn: item.col } : {}
+      "
+      :data-item-id="item.id"
+      :ref="setItemRef"
+    >
       <v-btn
         class="btn"
-        tile
         elevation="0"
         v-if="item.children"
         @click="onClickFolder(item)"
@@ -49,20 +56,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import Favicon from "./Favicon.vue";
-import { mapMutations, mapActions, mapGetters } from "vuex";
-import { Item } from "../../shared/types/store";
-import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
-import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
-import store, { GET_REFRESH_TARGET, SET_REFRESH_TARGET } from "../store/index";
-import { openContextMenu } from "../utils/contextMenu";
-import BookmarkApi from "../utils/bookmarkApi";
-import {
-  SET_TOOLTIP_POSITION,
-  SET_TOOLTIP_SHOW,
-  SET_TOOLTIP_TEXT,
-} from "../store/modules/tooltip";
+import { setupBookshelfAction } from "./composition/setupBookshelfAction";
+import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
+import { Item } from "@/shared/types/store";
+import { GRID_CONTAINER_PADDING } from "../utils/constant";
 
 export default defineComponent({
   components: { Favicon },
@@ -71,83 +70,33 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    isDesktop: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
-  data: () => ({
-    folderItem: {} as Item,
-  }),
-  computed: {
-    ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
-  },
-  watch: {
-    refreshTargetId(id?: string) {
-      if (id && this.$props.id === id) {
-        this.refresh();
-        store.commit(SET_REFRESH_TARGET, "");
-      }
-    },
-  },
-  async mounted() {
-    this.refresh();
-  },
-  methods: {
-    ...mapMutations([
-      OPEN_BOOKSHELF_MODALS,
-      SET_TOOLTIP_POSITION,
-      SET_TOOLTIP_TEXT,
-      SET_TOOLTIP_SHOW,
-    ]),
-    ...mapActions([OPEN_BOOKMARK_UPDATE]), // updateMODAL
-    openBookmarkModal() {
-      // TODO: 네이밍 변경(ex. updateModal)
-      this[OPEN_BOOKMARK_UPDATE](this.folderItem);
-    },
-    onClickFolder(item: Item) {
-      const { id, title } = item;
-      // const isRootItem = this.id === "1";
-      if (this.isDesktop) {
-        this._openBookshelfModal(id, title);
-      } else {
-        this.routeInFolder(id);
-      }
-      this[SET_TOOLTIP_SHOW](false);
-    },
-    routeInFolder(id: string) {
-      this.$emit("routeInFolder", id);
-    },
-    _openBookshelfModal(id: string, title: string) {
-      this.openBookshelfModal({ id, title });
-    },
-    openUrl(id: string, url: string) {
-      window.open(url, "_blank")?.focus();
-      this[SET_TOOLTIP_SHOW](false);
-    },
-    openContextMenu,
-    async refresh() {
-      this.folderItem = await BookmarkApi.getSubTree(this.id);
-    },
-    openTooltip(title: string, event: MouseEvent) {
-      const targetElement = event.target as HTMLElement;
-      const buttonElement = targetElement.closest("button");
-      if (!buttonElement) return;
+  setup(props, context) {
+    const folderItem = ref({} as Item);
+    const {
+      openTooltip,
+      closeTooltip,
+      openUrl,
+      openContextMenu,
+      onClickFolder,
+    } = setupBookshelfAction({ folderItem, context });
 
-      const boundingRect = buttonElement.getBoundingClientRect();
-      const position = {
-        x: boundingRect.x,
-        y: boundingRect.y + boundingRect.height,
-      };
+    const { setItemRef } = setupBookshelfLayout({ id: props.id, folderItem });
 
-      this[SET_TOOLTIP_POSITION](position);
-      this[SET_TOOLTIP_TEXT](title);
-      this[SET_TOOLTIP_SHOW](true);
-    },
-    closeTooltip() {
-      this[SET_TOOLTIP_SHOW](false);
-    },
+    return {
+      folderItem,
+      openTooltip,
+      closeTooltip,
+      openUrl,
+      openContextMenu,
+      onClickFolder,
+      setItemRef,
+    };
+  },
+  data() {
+    return {
+      gridContainerPadding: `${GRID_CONTAINER_PADDING}px`,
+    };
   },
 });
 </script>
@@ -155,21 +104,25 @@ export default defineComponent({
 <style lang="scss" scoped>
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, auto));
-  grid-auto-rows: 100px;
-  padding: 20px;
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, 88px);
+  grid-auto-rows: 108px;
+  padding: v-bind("gridContainerPadding");
   width: 100%;
   height: 100%;
+  overflow-y: auto;
 }
 
 .btn {
-  width: 80px;
+  width: 88px;
   height: auto;
-  padding: 4px 0;
+  padding: 8px;
 }
 .btn:focus {
   background-color: rgb(225, 225, 225);
+}
+
+.item {
+  width: 88px;
 }
 
 .item-container {
@@ -198,5 +151,6 @@ export default defineComponent({
   letter-spacing: 0.5px;
   color: #36454f;
   text-transform: none;
+  white-space: normal;
 }
 </style>

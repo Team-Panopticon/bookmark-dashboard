@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <Bookshelf id="1" :isDesktop="true"></Bookshelf>
+    <Bookshelf id="1"></Bookshelf>
     <CreateFolderModal></CreateFolderModal>
     <BookshelfModalContainer></BookshelfModalContainer>
     <ContextMenuContainer />

@@ -1,0 +1,1 @@
+export const GRID_CONTAINER_PADDING = 20;
