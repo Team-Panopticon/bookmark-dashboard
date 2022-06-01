@@ -1,7 +1,7 @@
 <template>
   <div
     class="grid-container"
-    ref="gridContainer"
+    ref="originGridContainer"
     @contextmenu.prevent.stop="
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
@@ -67,7 +67,11 @@ import Favicon from "./Favicon.vue";
 import { setupBookshelfAction } from "./composition/setupBookshelfAction";
 import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
 import { Item } from "@/shared/types/store";
-import { GRID_CONTAINER_PADDING } from "../utils/constant";
+import {
+  GRID_CONTAINER_PADDING,
+  ITEM_HEIGHT,
+  ITEM_WIDTH,
+} from "../utils/constant";
 import BookmarkApi from "../utils/bookmarkApi";
 
 /**
@@ -123,14 +127,16 @@ export default defineComponent({
       return mousePositionEl as HTMLElement;
     };
 
+    let prevVisitedContainerId = -1;
     let originRow = -1;
     let originCol = -1;
     let holderRow = -1;
     let holderCol = -1;
-    const gridContainer = ref<HTMLElement>();
+    const originGridContainer = ref<HTMLElement>();
     const mousedownHandler = async (item: Item, mousedown: MouseEvent) => {
       mousedown.preventDefault();
-      const gridContainerEl = gridContainer.value as HTMLElement;
+      const gridContainerEl = originGridContainer.value as HTMLElement;
+      prevVisitedContainerId = Number(gridContainerEl.dataset.parentId);
       const startTime = new Date().getTime();
       const { pageX: startX, pageY: startY } = mousedown;
 
@@ -170,7 +176,16 @@ export default defineComponent({
       const mousemoveHandler = (e: MouseEvent) => {
         e.preventDefault();
 
-        const gridContainerEl = getContainerEl(e.pageX, e.pageY);
+        const targetGridContainerEl = getContainerEl(e.pageX, e.pageY);
+        const targetGridContainerId = Number(
+          targetGridContainerEl.dataset.parentId
+        );
+
+        if (prevVisitedContainerId !== targetGridContainerId) {
+          positionHolderEl.remove();
+          gridContainerEl.insertBefore(positionHolderEl, null);
+          prevVisitedContainerId = targetGridContainerId;
+        }
 
         const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
 
@@ -180,8 +195,14 @@ export default defineComponent({
         changingEl.style.left = `${e.pageX - offsetX}px`;
         changingEl.style.top = `${e.pageY - offsetY}px`;
 
-        holderRow = Math.floor((e.clientY - baseY - 20) / 100) + 1;
-        holderCol = Math.floor((e.clientX - baseX - 20) / 96) + 1;
+        holderRow =
+          Math.floor(
+            (e.clientY - baseY - GRID_CONTAINER_PADDING) / ITEM_HEIGHT
+          ) + 1;
+        holderCol =
+          Math.floor(
+            (e.clientX - baseX - GRID_CONTAINER_PADDING) / ITEM_WIDTH
+          ) + 1;
         positionHolderEl.style.gridColumn = String(holderCol);
         positionHolderEl.style.gridRow = String(holderRow);
         targetEl = getTargetEl(e.pageX, e.pageY);
@@ -260,12 +281,14 @@ export default defineComponent({
       onClickFolder,
       setItemRef,
       mousedownHandler,
-      gridContainer,
+      originGridContainer,
     };
   },
   data() {
     return {
       gridContainerPadding: `${GRID_CONTAINER_PADDING}px`,
+      itemHeight: `${ITEM_HEIGHT}px`,
+      itemWidth: `${ITEM_WIDTH}px`,
     };
   },
 });
@@ -287,8 +310,8 @@ export default defineComponent({
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 88px);
-  grid-auto-rows: 108px;
+  grid-template-columns: repeat(auto-fill, v-bind("itemWidth"));
+  grid-auto-rows: v-bind("itemHeight");
   padding: v-bind("gridContainerPadding");
   width: 100%;
   height: 100%;
@@ -302,7 +325,7 @@ export default defineComponent({
   border: 1px solid red;
 }
 .btn {
-  width: 88px;
+  width: v-bind("itemWidth");
   height: auto;
   padding: 8px;
   /* padding: 4px 0; */
@@ -314,7 +337,7 @@ export default defineComponent({
 }
 
 .item {
-  width: 88px;
+  width: v-bind("itemWidth");
 }
 
 .item-container {
