@@ -103,7 +103,7 @@ export default defineComponent({
       2. move 시킬때 첫 위치와 move 위치의 크기값이 일정 이하일때는 클릭 이동거리 100 이하 && 0.15초 이내
       3. 클릭
     **/
-    const getTestingEl = (x: number, y: number): HTMLElement => {
+    const getTargetEl = (x: number, y: number): HTMLElement => {
       let mousePositionEls = document
         .elementsFromPoint(x, y)
         .filter(
@@ -114,6 +114,15 @@ export default defineComponent({
 
       return mousePositionEls[0] as HTMLElement;
     };
+
+    const getContainerEl = (x: number, y: number): HTMLElement => {
+      let [mousePositionEl] = document
+        .elementsFromPoint(x, y)
+        .filter((el) => el.classList.contains("grid-container"));
+
+      return mousePositionEl as HTMLElement;
+    };
+
     let originRow = -1;
     let originCol = -1;
     let holderRow = -1;
@@ -137,11 +146,10 @@ export default defineComponent({
       originCol = Number(changingEl.dataset.col);
 
       const { x: targetX, y: targetY } = changingEl.getBoundingClientRect();
-      const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
-      console.log(gridContainerEl.getBoundingClientRect());
+      // const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
       /** padding 값에 따른 마우스 포인터와 chaningEl의 상대 위치 값 */
-      const offsetX = startX - targetX + 20 + 8;
-      const offsetY = startY - targetY + 20;
+      const offsetX = startX - targetX;
+      const offsetY = startY - targetY;
 
       /** 기존의 자리를 표시해주는 chaingEl 복사본 Element */
       const positionHolderEl = changingEl.cloneNode(true) as HTMLElement;
@@ -156,15 +164,16 @@ export default defineComponent({
       changingEl.style.position = "fixed";
 
       /** 변경될 위치의 기준이 되는 폴더 혹은 파일 Element */
-      let testingEl: null | HTMLElement = null;
-      let testingElId: undefined | string = undefined;
+      let targetEl: null | HTMLElement = null;
+      let targetElId: undefined | string = undefined;
 
       const mousemoveHandler = (e: MouseEvent) => {
         e.preventDefault();
-        const gridContainerEl = gridContainer.value as HTMLElement;
+
+        const gridContainerEl = getContainerEl(e.pageX, e.pageY);
 
         const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
-        console.log(gridContainerEl.getBoundingClientRect());
+
         if (new Date().getTime() - startTime < 150) {
           return;
         }
@@ -175,15 +184,15 @@ export default defineComponent({
         holderCol = Math.floor((e.clientX - baseX - 20) / 96) + 1;
         positionHolderEl.style.gridColumn = String(holderCol);
         positionHolderEl.style.gridRow = String(holderRow);
-        testingEl = getTestingEl(e.pageX, e.pageY);
-        testingElId = testingEl?.dataset.id;
+        targetEl = getTargetEl(e.pageX, e.pageY);
+        targetElId = targetEl?.dataset.id;
 
-        const innerBtn = testingEl?.querySelector(".btn") as HTMLElement;
+        const innerBtn = targetEl?.querySelector(".btn") as HTMLElement;
         // 새로운 버튼위로 올라갔을때
 
-        if (testingEl?.dataset.type === "FOLDER") {
+        if (targetEl?.dataset.type === "FOLDER") {
           innerBtn?.focus();
-        } else if (testingEl?.dataset.type === "FILE") {
+        } else if (targetEl?.dataset.type === "FILE") {
           positionHolderEl.style.gridColumn = String(originCol);
           positionHolderEl.style.gridRow = String(originRow);
         }
@@ -200,7 +209,7 @@ export default defineComponent({
         if (
           holderRow > 0 &&
           holderCol > 0 &&
-          testingEl?.dataset.type !== "FILE"
+          targetEl?.dataset.type !== "FILE"
         ) {
           changingEl.style.gridRow = String(holderRow);
           changingEl.style.gridColumn = String(holderCol);
@@ -228,12 +237,12 @@ export default defineComponent({
 
         if (
           changingElId &&
-          testingElId &&
-          changingElId !== testingElId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
-          testingEl?.dataset.type == "FOLDER"
+          targetElId &&
+          changingElId !== targetElId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+          targetEl?.dataset.type == "FOLDER"
         ) {
-          await BookmarkApi.move(changingElId, testingElId);
-        } else if (testingEl?.dataset.type == "FILE") {
+          await BookmarkApi.move(changingElId, targetElId);
+        } else if (targetEl?.dataset.type == "FILE") {
           changingEl.style.gridColumn = String(originCol);
           changingEl.style.gridRow = String(originRow);
         }
