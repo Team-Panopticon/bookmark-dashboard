@@ -138,6 +138,8 @@ export default defineComponent({
     const originGridContainer = ref<HTMLElement>();
     const mousedownHandler = async (item: Item, mousedown: MouseEvent) => {
       mousedown.preventDefault();
+      originRow = originCol = holderRow = holderCol = -1;
+
       const gridContainerEl = originGridContainer.value as HTMLElement;
       prevVisitedContainerId = Number(gridContainerEl.dataset.parentId);
       const startTime = new Date().getTime();
