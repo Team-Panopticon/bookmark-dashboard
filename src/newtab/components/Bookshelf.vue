@@ -107,13 +107,15 @@ export default defineComponent({
       2. move 시킬때 첫 위치와 move 위치의 크기값이 일정 이하일때는 클릭 이동거리 100 이하 && 0.15초 이내
       3. 클릭
     **/
-    const getTargetEl = (x: number, y: number): HTMLElement => {
+    const getTargetEl = (x: number, y: number): HTMLElement | null => {
+      let containerEl = getContainerEl(x, y);
       let mousePositionEls = document
         .elementsFromPoint(x, y)
         .filter(
           (el) =>
             el.classList.contains("btn-wrapper") &&
-            !el.classList.contains("positionHolderEl-component")
+            !el.classList.contains("positionHolderEl-component") &&
+            el.parentElement === containerEl
         );
 
       return mousePositionEls[0] as HTMLElement;
@@ -134,6 +136,7 @@ export default defineComponent({
     let holderCol = -1;
     const originGridContainer = ref<HTMLElement>();
     const mousedownHandler = async (item: Item, mousedown: MouseEvent) => {
+      console.log(" mouse down!!!!");
       mousedown.preventDefault();
       const gridContainerEl = originGridContainer.value as HTMLElement;
       prevVisitedContainerId = Number(gridContainerEl.dataset.parentId);
@@ -183,11 +186,12 @@ export default defineComponent({
 
         if (prevVisitedContainerId !== targetGridContainerId) {
           positionHolderEl.remove();
-          gridContainerEl.insertBefore(positionHolderEl, null);
+          targetGridContainerEl.insertBefore(positionHolderEl, null);
           prevVisitedContainerId = targetGridContainerId;
         }
 
-        const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
+        const { x: baseX, y: baseY } =
+          targetGridContainerEl.getBoundingClientRect();
 
         if (new Date().getTime() - startTime < 150) {
           return;
