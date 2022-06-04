@@ -73,6 +73,7 @@ import {
   ITEM_WIDTH,
 } from "../utils/constant";
 import BookmarkApi from "../utils/bookmarkApi";
+import { layoutDB } from "../utils/layoutDB";
 
 /**
  * @TODO
@@ -221,55 +222,69 @@ export default defineComponent({
           positionHolderEl.style.gridRow = String(originRow);
         }
       };
+
       document.addEventListener("mousemove", mousemoveHandler);
+
       const mouseUpHandler = async (mouseupEvt: MouseEvent) => {
-        changingEl.classList.add("btn-wrapper");
-
-        changingEl.style.position = "relative";
-        changingEl.style.top = "unset";
-        changingEl.style.left = "unset";
-        changingEl.style.zIndex = "inherit";
-        // TODO : db update => dataset 동기화
-        if (
-          holderRow > 0 &&
-          holderCol > 0 &&
-          targetEl?.dataset.type !== "FILE"
-        ) {
-          changingEl.style.gridRow = String(holderRow);
-          changingEl.style.gridColumn = String(holderCol);
-          changingEl.dataset.row = String(holderRow);
-          changingEl.dataset.col = String(holderCol);
-        }
-        positionHolderEl.remove();
-
         const endX = mouseupEvt.pageX;
         const endY = mouseupEvt.pageY;
         const moveX = Math.abs(startX - endX);
         const moveY = Math.abs(startY - endY);
 
-        document.removeEventListener("mouseup", mouseUpHandler);
-        document.removeEventListener("mousemove", mousemoveHandler);
-
+        // 150ms 이하인 경우 클릭으로 판정하고, 아이템 클릭 시 행동 수행
         if (new Date().getTime() - startTime < 150 && moveX + moveY < 20) {
           if (!item.url) {
             onClickFolder(item);
           } else {
             openUrl(item.url);
           }
-          return;
+        } else {
+          // CSS와 DB에서 row col 값 변경
+          if (
+            holderRow > 0 &&
+            holderCol > 0 &&
+            targetEl?.dataset.type !== "FILE"
+          ) {
+            changingEl.style.gridRow = String(holderRow);
+            changingEl.style.gridColumn = String(holderCol);
+            changingEl.dataset.row = String(holderRow);
+            changingEl.dataset.col = String(holderCol);
+
+            layoutDB.setItemLayoutById({
+              id: changingEl.dataset.id as string,
+              parentId: gridContainerEl.dataset.parentId as string,
+              row: holderRow,
+              col: holderCol,
+            });
+          }
+          // 폴더 위에 드랍해서 폴더 안으로 이동시키는 경우
+          // 파일 위로 드랍하는 경우 원래 위치로 튕김
+          if (
+            changingElId &&
+            targetElId &&
+            changingElId !== targetElId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+            targetEl?.dataset.type == "FOLDER"
+          ) {
+            await BookmarkApi.move(changingElId, targetElId);
+          } else if (targetEl?.dataset.type == "FILE") {
+            changingEl.style.gridColumn = String(originCol);
+            changingEl.style.gridRow = String(originRow);
+          }
         }
 
-        if (
-          changingElId &&
-          targetElId &&
-          changingElId !== targetElId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
-          targetEl?.dataset.type == "FOLDER"
-        ) {
-          await BookmarkApi.move(changingElId, targetElId);
-        } else if (targetEl?.dataset.type == "FILE") {
-          changingEl.style.gridColumn = String(originCol);
-          changingEl.style.gridRow = String(originRow);
-        }
+        // 끌고다니던 DOM을 목표 위치에 고정시킴
+        changingEl.classList.add("btn-wrapper");
+        changingEl.style.position = "relative";
+        changingEl.style.top = "unset";
+        changingEl.style.left = "unset";
+        changingEl.style.zIndex = "inherit";
+
+        // positionHolder 삭제
+        positionHolderEl.remove();
+
+        // hander 지우기
+        document.removeEventListener("mouseup", mouseUpHandler);
+        document.removeEventListener("mousemove", mousemoveHandler);
       };
 
       document.addEventListener("mouseup", mouseUpHandler);
