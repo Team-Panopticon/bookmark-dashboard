@@ -136,7 +136,6 @@ export default defineComponent({
     let holderCol = -1;
     const originGridContainer = ref<HTMLElement>();
     const mousedownHandler = async (item: Item, mousedown: MouseEvent) => {
-      console.log(" mouse down!!!!");
       mousedown.preventDefault();
       const gridContainerEl = originGridContainer.value as HTMLElement;
       prevVisitedContainerId = Number(gridContainerEl.dataset.parentId);
