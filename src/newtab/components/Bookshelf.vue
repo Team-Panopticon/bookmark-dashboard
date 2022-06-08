@@ -101,7 +101,10 @@ export default defineComponent({
       openContextMenu,
       onClickFolder,
     } = setupBookshelfAction({ folderItem, context });
-    const { setItemRef } = setupBookshelfLayout({ id: props.id, folderItem });
+    const { setItemRef } = setupBookshelfLayout({
+      id: props.id,
+      folderItem,
+    });
 
     /**
       1. down 했을때 위치
@@ -150,7 +153,7 @@ export default defineComponent({
       /** 위치가 변경될 폴더 혹은 파일 Element */
       const changingEl = mousedownTarget.closest(".btn-wrapper") as HTMLElement;
 
-      const changingElId = changingEl.dataset.id;
+      const changingElId = changingEl.dataset.id as string;
 
       /** 파일의 기존위치 : 겹쳤을때 되돌리기 용도 */
       originRow = Number(changingEl.dataset.row);
@@ -228,65 +231,141 @@ export default defineComponent({
       document.addEventListener("mousemove", mousemoveHandler);
 
       const mouseUpHandler = async (mouseupEvt: MouseEvent) => {
+        // hander 지우기
+        document.removeEventListener("mouseup", mouseUpHandler);
+        document.removeEventListener("mousemove", mousemoveHandler);
+        positionHolderEl.remove();
+
+        const targetGridContainerEl = getContainerEl(
+          mouseupEvt.pageX,
+          mouseupEvt.pageY
+        );
+
+        const targetGridContainerParentId =
+          targetGridContainerEl.dataset.parentId;
+
         const endX = mouseupEvt.pageX;
         const endY = mouseupEvt.pageY;
         const moveX = Math.abs(startX - endX);
         const moveY = Math.abs(startY - endY);
 
+        const isClick =
+          new Date().getTime() - startTime < 150 && moveX + moveY < 20;
+
         // 150ms 이하인 경우 클릭으로 판정하고, 아이템 클릭 시 행동 수행
-        if (new Date().getTime() - startTime < 150 && moveX + moveY < 20) {
+        if (isClick) {
           if (!item.url) {
             onClickFolder(item);
           } else {
             openUrl(item.url);
           }
-        } else {
-          // CSS와 DB에서 row col 값 변경
-          if (
-            holderRow > 0 &&
-            holderCol > 0 &&
-            targetEl?.dataset.type !== "FILE"
-          ) {
-            changingEl.style.gridRow = String(holderRow);
-            changingEl.style.gridColumn = String(holderCol);
-            changingEl.dataset.row = String(holderRow);
-            changingEl.dataset.col = String(holderCol);
+          fixDom(changingEl);
+          return;
+        }
 
-            layoutDB.setItemLayoutById({
-              id: changingEl.dataset.id as string,
-              parentId: gridContainerEl.dataset.parentId as string,
-              row: holderRow,
-              col: holderCol,
-            });
+        const isBetweenContainer = targetGridContainerEl !== gridContainerEl;
+        const isWithinContainer = !isBetweenContainer;
+
+        if (
+          !targetGridContainerParentId ||
+          !changingEl
+          // holder Row / Col 확인 필요한지 확인
+          // holderRow <= 0 ||
+          // holderCol <= 0
+        ) {
+          return;
+        }
+
+        if (isWithinContainer) {
+          // 빈공간
+          if (!targetEl || !targetElId) {
+            setChangingElPosition(changingEl);
+            saveLayoutToDB();
+            return;
           }
-          // 폴더 위에 드랍해서 폴더 안으로 이동시키는 경우
-          // 파일 위로 드랍하는 경우 원래 위치로 튕김
-          if (
-            changingElId &&
-            targetElId &&
-            changingElId !== targetElId && // 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
-            targetEl?.dataset.type == "FOLDER"
-          ) {
+
+          const targetElType = targetEl.dataset.type as "FOLDER" | "FILE";
+
+          // 폴더 위
+          // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+          if (targetElType === "FOLDER" && changingElId !== targetElId) {
             await BookmarkApi.move(changingElId, targetElId);
-          } else if (targetEl?.dataset.type == "FILE") {
+            changingEl.remove();
+            return;
+          }
+
+          // 파일 위
+          if (targetElType === "FILE") {
             changingEl.style.gridColumn = String(originCol);
             changingEl.style.gridRow = String(originRow);
+            fixDom(changingEl);
+            return;
           }
         }
 
-        // 끌고다니던 DOM을 목표 위치에 고정시킴
-        changingEl.classList.add("btn-wrapper");
-        changingEl.style.position = "relative";
-        changingEl.style.top = "unset";
-        changingEl.style.left = "unset";
-        changingEl.style.zIndex = "inherit";
+        if (isBetweenContainer) {
+          // 빈공간
+          if (!targetEl || !targetElId) {
+            setChangingElPosition(changingEl);
+            saveLayoutToDB();
+            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+            targetGridContainerEl.append(changingEl);
+            // TODO: origin, target container refresh
+            return;
+          }
 
-        // positionHolder 삭제
-        positionHolderEl.remove();
+          const targetElType = targetEl.dataset.type as "FOLDER" | "FILE";
 
-        // hander 지우기
-        document.removeEventListener("mouseup", mouseUpHandler);
-        document.removeEventListener("mousemove", mousemoveHandler);
+          // 폴더 위
+          // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+          if (targetElType === "FOLDER" && changingElId !== targetElId) {
+            setChangingElPositionAuto(changingEl);
+            await BookmarkApi.move(changingElId, targetElId);
+            changingEl.remove();
+            // TODO: origin, target container refresh
+            return;
+          }
+
+          // 파일 위
+          if (targetElType === "FILE") {
+            setChangingElPositionAuto(changingEl);
+            targetGridContainerEl.append(changingEl);
+            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+            // TODO: origin, target container refresh
+            return;
+          }
+        }
+
+        function saveLayoutToDB() {
+          layoutDB.setItemLayoutById({
+            id: changingEl.dataset.id as string,
+            parentId: targetGridContainerEl.dataset.parentId as string,
+            row: holderRow,
+            col: holderCol,
+          });
+        }
+
+        function fixDom(target: HTMLElement) {
+          target.classList.add("btn-wrapper");
+          target.style.position = "relative";
+          target.style.top = "unset";
+          target.style.left = "unset";
+          target.style.zIndex = "inherit";
+        }
+
+        function setChangingElPosition(target: HTMLElement) {
+          target.style.gridRow = String(holderRow);
+          target.style.gridColumn = String(holderCol);
+          target.dataset.row = String(holderRow);
+          target.dataset.col = String(holderCol);
+          fixDom(target);
+        }
+
+        function setChangingElPositionAuto(target: HTMLElement) {
+          target.style.gridRow = "auto";
+          target.style.gridColumn = "auto";
+          fixDom(target);
+        }
       };
 
       document.addEventListener("mouseup", mouseUpHandler);
