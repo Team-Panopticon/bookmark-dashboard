@@ -55,9 +55,11 @@ import {
   SET_BOOKMARK_UPDATE_SHOW,
   CLOSE_BOOKMARK_UPDATE,
 } from "../store/modules/updateModal";
-import store, { SET_REFRESH_TARGET } from "../store/index";
+import store from "../store/index";
 
 import BookmarkApi from "../utils/bookmarkApi";
+import { PUSH_REFRESH_TARGET } from "../store/modules/refreshTarget";
+
 export default defineComponent({
   computed: {
     ...mapGetters([GET_BOOKMARK_UPDATE_SHOW, GET_BOOKMARK_UPDATE_INFO]),
@@ -94,7 +96,7 @@ export default defineComponent({
       const { id, title, url, parentId } = this.bookmarkUpdateModalInfo;
       const updateSuccessful = await BookmarkApi.update(id, title, url);
       if (updateSuccessful) {
-        store.commit(SET_REFRESH_TARGET, parentId);
+        store.commit(PUSH_REFRESH_TARGET, [parentId]);
         this[CLOSE_BOOKMARK_UPDATE]();
       }
     },

@@ -268,10 +268,10 @@ export default defineComponent({
 
         if (
           !targetGridContainerParentId ||
-          !changingEl
+          !changingEl ||
           // holder Row / Col 확인 필요한지 확인
-          // holderRow <= 0 ||
-          // holderCol <= 0
+          holderRow <= 0 ||
+          holderCol <= 0
         ) {
           return;
         }
@@ -309,7 +309,7 @@ export default defineComponent({
             setChangingElPosition(changingEl);
             saveLayoutToDB();
             await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
-            targetGridContainerEl.append(changingEl);
+
             // TODO: origin, target container refresh
             return;
           }
@@ -321,7 +321,7 @@ export default defineComponent({
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
             setChangingElPositionAuto(changingEl);
             await BookmarkApi.move(changingElId, targetElId);
-            changingEl.remove();
+
             // TODO: origin, target container refresh
             return;
           }
@@ -329,7 +329,7 @@ export default defineComponent({
           // 파일 위
           if (targetElType === "FILE") {
             setChangingElPositionAuto(changingEl);
-            targetGridContainerEl.append(changingEl);
+
             await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
             // TODO: origin, target container refresh
             return;
