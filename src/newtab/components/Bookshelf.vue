@@ -136,8 +136,8 @@ export default defineComponent({
     let prevVisitedContainerId = -1;
     let originRow = -1;
     let originCol = -1;
-    let holderRow = -1;
-    let holderCol = -1;
+    let holderRow: number | string = -1;
+    let holderCol: number | string = -1;
     const originGridContainer = ref<HTMLElement>();
     const mousedownHandler = async (item: Item, mousedown: MouseEvent) => {
       mousedown.preventDefault();
@@ -158,7 +158,6 @@ export default defineComponent({
       /** 파일의 기존위치 : 겹쳤을때 되돌리기 용도 */
       originRow = Number(changingEl.dataset.row);
       originCol = Number(changingEl.dataset.col);
-      console.log("mousedown", originRow, originCol);
 
       const { x: targetX, y: targetY } = changingEl.getBoundingClientRect();
       // const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
@@ -190,6 +189,8 @@ export default defineComponent({
           targetGridContainerEl.dataset.parentId
         );
 
+        const isWithinContainer = targetGridContainerEl === gridContainerEl;
+
         if (prevVisitedContainerId !== targetGridContainerId) {
           positionHolderEl.remove();
           targetGridContainerEl.insertBefore(positionHolderEl, null);
@@ -205,14 +206,20 @@ export default defineComponent({
         changingEl.style.left = `${e.pageX - offsetX}px`;
         changingEl.style.top = `${e.pageY - offsetY}px`;
 
-        holderRow =
+        const calculatedRow =
           Math.floor(
             (e.clientY - baseY - GRID_CONTAINER_PADDING) / ITEM_HEIGHT
           ) + 1;
-        holderCol =
+        const calculatedCol =
           Math.floor(
             (e.clientX - baseX - GRID_CONTAINER_PADDING) / ITEM_WIDTH
           ) + 1;
+        const isCalculatedRowAndColValid =
+          calculatedRow > 0 && calculatedCol > 0;
+
+        holderRow = isCalculatedRowAndColValid ? calculatedRow : "auto";
+        holderCol = isCalculatedRowAndColValid ? calculatedCol : "auto";
+
         positionHolderEl.style.gridColumn = String(holderCol);
         positionHolderEl.style.gridRow = String(holderRow);
         targetEl = getTargetEl(e.pageX, e.pageY);
@@ -221,9 +228,16 @@ export default defineComponent({
         const innerBtn = targetEl?.querySelector(".btn") as HTMLElement;
         // 새로운 버튼위로 올라갔을때
 
+        if (!isCalculatedRowAndColValid && isWithinContainer) {
+          positionHolderEl.style.gridColumn = String(originCol);
+          positionHolderEl.style.gridRow = String(originRow);
+        }
+
         if (targetEl?.dataset.type === "FOLDER") {
           innerBtn?.focus();
-        } else if (targetEl?.dataset.type === "FILE") {
+        }
+
+        if (targetEl?.dataset.type === "FILE") {
           positionHolderEl.style.gridColumn = String(originCol);
           positionHolderEl.style.gridRow = String(originRow);
         }
@@ -266,7 +280,7 @@ export default defineComponent({
 
         const isBetweenContainer = targetGridContainerEl !== gridContainerEl;
         const isWithinContainer = !isBetweenContainer;
-        const isInPadding = holderRow <= 0 || holderCol <= 0;
+        const isInPadding = holderRow === "auto" || holderCol === "auto";
 
         if (
           !targetGridContainerParentId ||
@@ -287,7 +301,7 @@ export default defineComponent({
           // 빈공간
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
-            saveLayoutToDB();
+            saveLayoutToDB(Number(holderRow), Number(holderCol));
             return;
           }
 
@@ -320,7 +334,7 @@ export default defineComponent({
           // 빈공간
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
-            saveLayoutToDB();
+            saveLayoutToDB(Number(holderRow), Number(holderCol));
             await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
 
             // TODO: origin, target container refresh
@@ -349,12 +363,12 @@ export default defineComponent({
           }
         }
 
-        function saveLayoutToDB() {
+        function saveLayoutToDB(row: number, col: number) {
           layoutDB.setItemLayoutById({
             id: changingEl.dataset.id as string,
             parentId: targetGridContainerEl.dataset.parentId as string,
-            row: Number(holderRow),
-            col: Number(holderCol),
+            row,
+            col,
           });
         }
 
