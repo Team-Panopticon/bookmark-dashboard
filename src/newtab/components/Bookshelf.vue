@@ -62,11 +62,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import Favicon from "./Favicon.vue";
 import { setupBookshelfAction } from "./composition/setupBookshelfAction";
 import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
-import { Item } from "@/shared/types/store";
+import { FolderItem, Item } from "@/shared/types/store";
 import {
   GRID_CONTAINER_PADDING,
   ITEM_HEIGHT,
@@ -79,6 +79,7 @@ import { layoutDB } from "../utils/layoutDB";
  * @TODO
  * <template>data-item-id data-id 중복 삭제
  */
+
 export default defineComponent({
   components: { Favicon },
   props: {
@@ -86,10 +87,9 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    isDesktop: {
-      type: Boolean,
-      required: false,
-      default: false,
+    folderItems: {
+      type: Array as PropType<FolderItem[]>,
+      requiered: false,
     },
   },
   setup(props, context) {
@@ -289,6 +289,9 @@ export default defineComponent({
           // 폴더 위
           // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
+            /**
+             * @ERROR
+             */
             await BookmarkApi.move(changingElId, targetElId);
             changingEl.remove();
             return;
@@ -304,13 +307,55 @@ export default defineComponent({
         }
 
         if (isBetweenContainer) {
+          // if (
+          //   changingElId === targetGridContainerParentId ||
+          //   targetElId === changingElId
+          // ) {
+
+          /**
+           * 1. targetEl이 있을 경우 && changingEl가 targetEl의 부모일 경우, 즉시 리턴 -> targetEl가 targetGridContainerParent의 자식이므로 필요 X ==> 폴더 내의 폴더 Item으로 드래그 했을 경우 ==> 실패
+           * 2. targetEl이 없고, targetGridContainer가 있을 경우 && changingEl가 targetGridContainerParent의 부모일 경우, 즉시 리턴 ==> 폴더 내의 빈공간드래그 했을 경우 ==> 실패
+           *
+           * 0. changingEl이 folderItems에 있을 경우, 즉시 리턴
+           */
+          /**
+           *
+           * - folderItems(breadcrumbs)는 실패 => 이벤트를 처리하는 주체가 changingEl이 있던 container라서 changingEl의 id가 folderItems에 없어서 가져올수가 없다.
+           *
+           * - breadcrumb이 있는 dom의 이름을 뽑아서 할수도 없다 -> key가 이름이 아니라 id이어서
+           *    v-breadcrumbs-item을 이용해서 id를 dom에다 집어넣어주고, targetContainer에서 breadcrumb을 찾아서 검색
+           * - 결국 전체탐색 -> 자식에서 부모로 할수도 없다. -> 부모에서 자식으로 전체 탐색 (폴더만)
+           */
+          const isTargetIsParentOfContainer = props.folderItems?.some(
+            (folderItem) => folderItem.id === changingElId
+          );
+
+          console.log(
+            "=============== isTargetIsParentOfContainer",
+            props.folderItems,
+            targetEl,
+            targetElId,
+            isTargetIsParentOfContainer
+          );
+
+          if (isTargetIsParentOfContainer) {
+            changingEl.style.gridColumn = String(originCol);
+            changingEl.style.gridRow = String(originRow);
+            fixDom(changingEl);
+            return;
+          }
+
           // 빈공간
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
             saveLayoutToDB();
-            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+            /**
+             * @ERROR
+             */
+            // changingElId: Drag하고 있는 ID -> 폴더인 경우
+            // targetGridContainerParentId: 넣을려고 하는 폴더 ID
 
-            // TODO: origin, target container refresh
+            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
             return;
           }
 
@@ -321,17 +366,13 @@ export default defineComponent({
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
             setChangingElPositionAuto(changingEl);
             await BookmarkApi.move(changingElId, targetElId);
-
-            // TODO: origin, target container refresh
             return;
           }
 
           // 파일 위
           if (targetElType === "FILE") {
             setChangingElPositionAuto(changingEl);
-
             await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
-            // TODO: origin, target container refresh
             return;
           }
         }

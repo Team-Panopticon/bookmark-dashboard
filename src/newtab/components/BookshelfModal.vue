@@ -47,6 +47,7 @@
             :key="viewItem.id"
             @routeInFolder="routeInFolder"
             :id="viewItem.id"
+            :folderItems="folderItems"
           ></Bookshelf>
         </div>
       </v-card>
@@ -147,6 +148,7 @@ export default defineComponent({
       UPDATE_BOOKSHELF_MODALS_CURRENT_POSITION,
     ]),
     async routeInFolder(id: string) {
+      console.log("========= folderItems : ", this.folderItems);
       this.folderItems.push({ id, title: "" });
       await this.routePathRefresh();
     },
