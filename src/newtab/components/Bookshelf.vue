@@ -158,6 +158,7 @@ export default defineComponent({
       /** 파일의 기존위치 : 겹쳤을때 되돌리기 용도 */
       originRow = Number(changingEl.dataset.row);
       originCol = Number(changingEl.dataset.col);
+      console.log("mousedown", originRow, originCol);
 
       const { x: targetX, y: targetY } = changingEl.getBoundingClientRect();
       // const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
@@ -265,18 +266,24 @@ export default defineComponent({
 
         const isBetweenContainer = targetGridContainerEl !== gridContainerEl;
         const isWithinContainer = !isBetweenContainer;
+        const isInPadding = holderRow <= 0 || holderCol <= 0;
 
         if (
           !targetGridContainerParentId ||
-          !changingEl ||
+          !changingEl
           // holder Row / Col 확인 필요한지 확인
-          holderRow <= 0 ||
-          holderCol <= 0
         ) {
           return;
         }
 
         if (isWithinContainer) {
+          if (isInPadding) {
+            changingEl.style.gridColumn = String(originCol);
+            changingEl.style.gridRow = String(originRow);
+            fixDom(changingEl);
+            return;
+          }
+
           // 빈공간
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
@@ -304,6 +311,12 @@ export default defineComponent({
         }
 
         if (isBetweenContainer) {
+          if (isInPadding) {
+            setChangingElPositionAuto(changingEl);
+            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+            return;
+          }
+
           // 빈공간
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
@@ -340,8 +353,8 @@ export default defineComponent({
           layoutDB.setItemLayoutById({
             id: changingEl.dataset.id as string,
             parentId: targetGridContainerEl.dataset.parentId as string,
-            row: holderRow,
-            col: holderCol,
+            row: Number(holderRow),
+            col: Number(holderCol),
           });
         }
 
