@@ -70,8 +70,7 @@ function setBookmarksEventHandlers() {
   justify-content: space-between;
 }
 ::v-deep .v-card-header {
-  padding-top: 16px;
-  padding-bottom: 16px;
+  border-radius: 4px 4px 0 0;
 }
 .app-container {
   width: 100%;
