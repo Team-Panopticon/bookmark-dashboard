@@ -324,16 +324,15 @@ export default defineComponent({
               .some((id) => id === changingElId);
 
             if (isDropError || targetElId === changingElId) {
-            changingEl.style.gridColumn = String(originCol);
-            changingEl.style.gridRow = String(originRow);
-            fixDom(changingEl);
-            return;
+              changingEl.style.gridColumn = String(originCol);
+              changingEl.style.gridRow = String(originRow);
+              fixDom(changingEl);
+              return;
             }
           }
 
           // 빈공간
           if (!targetEl || !targetElId) {
-            setChangingElPosition(changingEl);
             saveLayoutToDB();
             /**
              * @ERROR
@@ -350,14 +349,12 @@ export default defineComponent({
           // 폴더 위
           // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
-            setChangingElPositionAuto(changingEl);
             await BookmarkApi.move(changingElId, targetElId);
             return;
           }
 
           // 파일 위
           if (targetElType === "FILE") {
-            setChangingElPositionAuto(changingEl);
             await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
             return;
           }
@@ -385,12 +382,6 @@ export default defineComponent({
           target.style.gridColumn = String(holderCol);
           target.dataset.row = String(holderRow);
           target.dataset.col = String(holderCol);
-          fixDom(target);
-        }
-
-        function setChangingElPositionAuto(target: HTMLElement) {
-          target.style.gridRow = "auto";
-          target.style.gridColumn = "auto";
           fixDom(target);
         }
       };
