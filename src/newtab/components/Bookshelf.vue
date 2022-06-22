@@ -185,13 +185,21 @@ export default defineComponent({
         e.preventDefault();
 
         const targetGridContainerEl = getContainerEl(e.pageX, e.pageY);
+        if (!targetGridContainerEl) {
+          positionHolderEl.style.gridColumn = String(originCol);
+          positionHolderEl.style.gridRow = String(originRow);
+          return;
+        }
+
         const targetGridContainerId = Number(
           targetGridContainerEl.dataset.parentId
         );
 
+        const isDragOverBetweenContainer =
+          targetGridContainerId !== prevVisitedContainerId;
         const isWithinContainer = targetGridContainerEl === gridContainerEl;
 
-        if (prevVisitedContainerId !== targetGridContainerId) {
+        if (isDragOverBetweenContainer) {
           positionHolderEl.remove();
           targetGridContainerEl.insertBefore(positionHolderEl, null);
           prevVisitedContainerId = targetGridContainerId;
@@ -199,7 +207,6 @@ export default defineComponent({
 
         const { x: baseX, y: baseY } =
           targetGridContainerEl.getBoundingClientRect();
-
         if (new Date().getTime() - startTime < 150) {
           return;
         }
@@ -257,7 +264,7 @@ export default defineComponent({
         );
 
         const targetGridContainerParentId =
-          targetGridContainerEl.dataset.parentId;
+          targetGridContainerEl?.dataset.parentId;
 
         const endX = mouseupEvt.pageX;
         const endY = mouseupEvt.pageY;
@@ -287,6 +294,9 @@ export default defineComponent({
           !changingEl
           // holder Row / Col 확인 필요한지 확인
         ) {
+          changingEl.style.gridColumn = String(originCol);
+          changingEl.style.gridRow = String(originRow);
+          fixDom(changingEl);
           return;
         }
 
