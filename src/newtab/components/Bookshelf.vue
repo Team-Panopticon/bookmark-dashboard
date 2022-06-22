@@ -307,42 +307,28 @@ export default defineComponent({
         }
 
         if (isBetweenContainer) {
-          // if (
-          //   changingElId === targetGridContainerParentId ||
-          //   targetElId === changingElId
-          // ) {
-
           /**
-           * 1. targetEl이 있을 경우 && changingEl가 targetEl의 부모일 경우, 즉시 리턴 -> targetEl가 targetGridContainerParent의 자식이므로 필요 X ==> 폴더 내의 폴더 Item으로 드래그 했을 경우 ==> 실패
-           * 2. targetEl이 없고, targetGridContainer가 있을 경우 && changingEl가 targetGridContainerParent의 부모일 경우, 즉시 리턴 ==> 폴더 내의 빈공간드래그 했을 경우 ==> 실패
-           *
-           * 0. changingEl이 folderItems에 있을 경우, 즉시 리턴
+           * 1. .modal-inner로 폴더 상위 찾기
+           * 2. .modal-inner의 자식 v-breadcrumbs 찾기
+           * 3. data-id로 id들 찾기
+           * 4. validation (target 있으면 target까지, 없으면 breadcrumb만)
            */
-          /**
-           *
-           * - folderItems(breadcrumbs)는 실패 => 이벤트를 처리하는 주체가 changingEl이 있던 container라서 changingEl의 id가 folderItems에 없어서 가져올수가 없다.
-           *
-           * - breadcrumb이 있는 dom의 이름을 뽑아서 할수도 없다 -> key가 이름이 아니라 id이어서
-           *    v-breadcrumbs-item을 이용해서 id를 dom에다 집어넣어주고, targetContainer에서 breadcrumb을 찾아서 검색
-           * - 결국 전체탐색 -> 자식에서 부모로 할수도 없다. -> 부모에서 자식으로 전체 탐색 (폴더만)
-           */
-          const isTargetIsParentOfContainer = props.folderItems?.some(
-            (folderItem) => folderItem.id === changingElId
-          );
+          const result = targetGridContainerEl
+            .closest(".modal-inner")
+            ?.querySelector(".folder-route")
+            ?.querySelectorAll("[data-id]");
 
-          console.log(
-            "=============== isTargetIsParentOfContainer",
-            props.folderItems,
-            targetEl,
-            targetElId,
-            isTargetIsParentOfContainer
-          );
+          if (result) {
+            const isDropError = [...result]
+              .map((el) => (el as HTMLElement).dataset.id as string)
+              .some((id) => id === changingElId);
 
-          if (isTargetIsParentOfContainer) {
+            if (isDropError || targetElId === changingElId) {
             changingEl.style.gridColumn = String(originCol);
             changingEl.style.gridRow = String(originRow);
             fixDom(changingEl);
             return;
+            }
           }
 
           // 빈공간

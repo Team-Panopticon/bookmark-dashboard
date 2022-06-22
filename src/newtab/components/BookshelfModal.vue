@@ -31,7 +31,8 @@
             >
               <v-icon>mdi-keyboard-backspace</v-icon>
             </button>
-            <v-breadcrumbs :items="folderRoute"></v-breadcrumbs>
+            <v-breadcrumbs class="folder-route" :items="folderRoute">
+            </v-breadcrumbs>
           </div>
           <button
             class="modal__close"
@@ -107,6 +108,7 @@ export default defineComponent({
       return this.folderItems.map((item) => ({
         disabled: false,
         text: item.title,
+        "data-id": item.id,
       }));
     },
     viewItem() {
