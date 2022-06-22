@@ -158,6 +158,8 @@ export default defineComponent({
       /** 파일의 기존위치 : 겹쳤을때 되돌리기 용도 */
       originRow = Number(changingEl.dataset.row);
       originCol = Number(changingEl.dataset.col);
+      holderRow = Number(changingEl.dataset.row);
+      holderCol = Number(changingEl.dataset.col);
 
       const { x: targetX, y: targetY } = changingEl.getBoundingClientRect();
       // const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
@@ -205,9 +207,11 @@ export default defineComponent({
           prevVisitedContainerId = targetGridContainerId;
         }
 
+        const moveX = Math.abs(startX - e.pageX);
+        const moveY = Math.abs(startY - e.pageY);
         const { x: baseX, y: baseY } =
           targetGridContainerEl.getBoundingClientRect();
-        if (new Date().getTime() - startTime < 150) {
+        if (new Date().getTime() - startTime < 500 && moveX + moveY < 20) {
           return;
         }
         changingEl.style.left = `${e.pageX - offsetX}px`;
