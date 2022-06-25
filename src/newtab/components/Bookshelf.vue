@@ -322,11 +322,8 @@ export default defineComponent({
           const targetElType = targetEl.dataset.type as "FOLDER" | "FILE";
 
           // 폴더 위
-          // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
-            /**
-             * @ERROR
-             */
+            await layoutDB.deleteItemLayoutById(changingElId);
             await BookmarkApi.move(changingElId, targetElId);
             changingEl.remove();
             return;
@@ -367,6 +364,7 @@ export default defineComponent({
           }
 
           if (isInPadding) {
+            await layoutDB.deleteItemLayoutById(changingElId);
             await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
             return;
           }
@@ -383,12 +381,14 @@ export default defineComponent({
 
           // 폴더 위
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
+            await layoutDB.deleteItemLayoutById(changingElId);
             await BookmarkApi.move(changingElId, targetElId);
             return;
           }
 
           // 파일 위
           if (targetElType === "FILE") {
+            await layoutDB.deleteItemLayoutById(changingElId);
             await BookmarkApi.move(changingElId, targetGridContainerParentId);
             return;
           }
