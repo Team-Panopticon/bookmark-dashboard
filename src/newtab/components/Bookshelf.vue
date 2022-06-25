@@ -193,18 +193,18 @@ export default defineComponent({
           return;
         }
 
-        const targetGridContainerId = Number(
+        const targetGridContainerParentId = Number(
           targetGridContainerEl.dataset.parentId
         );
 
         const isDragOverBetweenContainer =
-          targetGridContainerId !== prevVisitedContainerId;
+          targetGridContainerParentId !== prevVisitedContainerId;
         const isWithinContainer = targetGridContainerEl === gridContainerEl;
 
         if (isDragOverBetweenContainer) {
           positionHolderEl.remove();
           targetGridContainerEl.insertBefore(positionHolderEl, null);
-          prevVisitedContainerId = targetGridContainerId;
+          prevVisitedContainerId = targetGridContainerParentId;
         }
 
         const moveX = Math.abs(startX - e.pageX);
