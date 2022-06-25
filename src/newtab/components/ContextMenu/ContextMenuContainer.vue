@@ -66,7 +66,7 @@ export default defineComponent({
   min-width: 64px;
   z-index: 2147483647;
 
-  border-radius: 6px;
+  border-radius: 4px;
   overflow: hidden;
 
   background-color: rgba(87, 87, 86, 0.94);
@@ -75,7 +75,7 @@ export default defineComponent({
 
   padding: 1px;
   .context-card {
-    border-radius: 4.6px;
+    border-radius: 3px;
     padding: 2px 4px;
     border: 0.1px solid rgba(255, 255, 255, 0.3);
     font-weight: 500;

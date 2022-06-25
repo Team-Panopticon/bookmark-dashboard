@@ -199,6 +199,7 @@ export default defineComponent({
 .v-card {
   display: flex;
   flex-direction: column;
+  border-radius: 4px 4px 0 0;
 }
 .v-card-content {
   flex: 1;

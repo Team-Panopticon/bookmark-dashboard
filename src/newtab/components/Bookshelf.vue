@@ -136,8 +136,8 @@ export default defineComponent({
     let prevVisitedContainerId = -1;
     let originRow = -1;
     let originCol = -1;
-    let holderRow = -1;
-    let holderCol = -1;
+    let holderRow: number | string = -1;
+    let holderCol: number | string = -1;
     const originGridContainer = ref<HTMLElement>();
     const mousedownHandler = async (item: Item, mousedown: MouseEvent) => {
       mousedown.preventDefault();
@@ -158,6 +158,8 @@ export default defineComponent({
       /** 파일의 기존위치 : 겹쳤을때 되돌리기 용도 */
       originRow = Number(changingEl.dataset.row);
       originCol = Number(changingEl.dataset.col);
+      holderRow = Number(changingEl.dataset.row);
+      holderCol = Number(changingEl.dataset.col);
 
       const { x: targetX, y: targetY } = changingEl.getBoundingClientRect();
       // const { x: baseX, y: baseY } = gridContainerEl.getBoundingClientRect();
@@ -185,33 +187,50 @@ export default defineComponent({
         e.preventDefault();
 
         const targetGridContainerEl = getContainerEl(e.pageX, e.pageY);
-        const targetGridContainerId = Number(
+        if (!targetGridContainerEl) {
+          positionHolderEl.style.gridColumn = String(originCol);
+          positionHolderEl.style.gridRow = String(originRow);
+          return;
+        }
+
+        const targetGridContainerParentId = Number(
           targetGridContainerEl.dataset.parentId
         );
 
-        if (prevVisitedContainerId !== targetGridContainerId) {
+        const isDragOverBetweenContainer =
+          targetGridContainerParentId !== prevVisitedContainerId;
+        const isWithinContainer = targetGridContainerEl === gridContainerEl;
+
+        if (isDragOverBetweenContainer) {
           positionHolderEl.remove();
           targetGridContainerEl.insertBefore(positionHolderEl, null);
-          prevVisitedContainerId = targetGridContainerId;
+          prevVisitedContainerId = targetGridContainerParentId;
         }
 
+        const moveX = Math.abs(startX - e.pageX);
+        const moveY = Math.abs(startY - e.pageY);
         const { x: baseX, y: baseY } =
           targetGridContainerEl.getBoundingClientRect();
-
-        if (new Date().getTime() - startTime < 150) {
+        if (new Date().getTime() - startTime < 150 && moveX + moveY < 20) {
           return;
         }
         changingEl.style.left = `${e.pageX - offsetX}px`;
         changingEl.style.top = `${e.pageY - offsetY}px`;
 
-        holderRow =
+        const calculatedRow =
           Math.floor(
             (e.clientY - baseY - GRID_CONTAINER_PADDING) / ITEM_HEIGHT
           ) + 1;
-        holderCol =
+        const calculatedCol =
           Math.floor(
             (e.clientX - baseX - GRID_CONTAINER_PADDING) / ITEM_WIDTH
           ) + 1;
+        const isCalculatedRowAndColValid =
+          calculatedRow > 0 && calculatedCol > 0;
+
+        holderRow = isCalculatedRowAndColValid ? calculatedRow : "auto";
+        holderCol = isCalculatedRowAndColValid ? calculatedCol : "auto";
+
         positionHolderEl.style.gridColumn = String(holderCol);
         positionHolderEl.style.gridRow = String(holderRow);
         targetEl = getTargetEl(e.pageX, e.pageY);
@@ -220,9 +239,16 @@ export default defineComponent({
         const innerBtn = targetEl?.querySelector(".btn") as HTMLElement;
         // 새로운 버튼위로 올라갔을때
 
+        if (!isCalculatedRowAndColValid && isWithinContainer) {
+          positionHolderEl.style.gridColumn = String(originCol);
+          positionHolderEl.style.gridRow = String(originRow);
+        }
+
         if (targetEl?.dataset.type === "FOLDER") {
           innerBtn?.focus();
-        } else if (targetEl?.dataset.type === "FILE") {
+        }
+
+        if (targetEl?.dataset.type === "FILE") {
           positionHolderEl.style.gridColumn = String(originCol);
           positionHolderEl.style.gridRow = String(originRow);
         }
@@ -242,7 +268,7 @@ export default defineComponent({
         );
 
         const targetGridContainerParentId =
-          targetGridContainerEl.dataset.parentId;
+          targetGridContainerEl?.dataset.parentId;
 
         const endX = mouseupEvt.pageX;
         const endY = mouseupEvt.pageY;
@@ -265,22 +291,31 @@ export default defineComponent({
 
         const isBetweenContainer = targetGridContainerEl !== gridContainerEl;
         const isWithinContainer = !isBetweenContainer;
+        const isInPadding = holderRow === "auto" || holderCol === "auto";
 
         if (
           !targetGridContainerParentId ||
-          !changingEl ||
+          !changingEl
           // holder Row / Col 확인 필요한지 확인
-          holderRow <= 0 ||
-          holderCol <= 0
         ) {
+          changingEl.style.gridColumn = String(originCol);
+          changingEl.style.gridRow = String(originRow);
+          fixDom(changingEl);
           return;
         }
 
         if (isWithinContainer) {
+          if (isInPadding) {
+            changingEl.style.gridColumn = String(originCol);
+            changingEl.style.gridRow = String(originRow);
+            fixDom(changingEl);
+            return;
+          }
+
           // 빈공간
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
-            saveLayoutToDB();
+            saveLayoutToDB(Number(holderRow), Number(holderCol));
             return;
           }
 
@@ -331,23 +366,22 @@ export default defineComponent({
             }
           }
 
+          if (isInPadding) {
+            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+            return;
+          }
+
           // 빈공간
           if (!targetEl || !targetElId) {
-            saveLayoutToDB();
-            /**
-             * @ERROR
-             */
-            // changingElId: Drag하고 있는 ID -> 폴더인 경우
-            // targetGridContainerParentId: 넣을려고 하는 폴더 ID
-
-            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+            setChangingElPosition(changingEl);
+            saveLayoutToDB(Number(holderRow), Number(holderCol));
+            await BookmarkApi.move(changingElId, targetGridContainerParentId);
             return;
           }
 
           const targetElType = targetEl.dataset.type as "FOLDER" | "FILE";
 
           // 폴더 위
-          // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
             await BookmarkApi.move(changingElId, targetElId);
             return;
@@ -355,17 +389,17 @@ export default defineComponent({
 
           // 파일 위
           if (targetElType === "FILE") {
-            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
+            await BookmarkApi.move(changingElId, targetGridContainerParentId);
             return;
           }
         }
 
-        function saveLayoutToDB() {
+        function saveLayoutToDB(row: number, col: number) {
           layoutDB.setItemLayoutById({
             id: changingEl.dataset.id as string,
             parentId: targetGridContainerEl.dataset.parentId as string,
-            row: holderRow,
-            col: holderCol,
+            row,
+            col,
           });
         }
 
