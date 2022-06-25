@@ -62,11 +62,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import Favicon from "./Favicon.vue";
 import { setupBookshelfAction } from "./composition/setupBookshelfAction";
 import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
-import { Item } from "@/shared/types/store";
+import { FolderItem, Item } from "@/shared/types/store";
 import {
   GRID_CONTAINER_PADDING,
   ITEM_HEIGHT,
@@ -79,6 +79,7 @@ import { layoutDB } from "../utils/layoutDB";
  * @TODO
  * <template>data-item-id data-id 중복 삭제
  */
+
 export default defineComponent({
   components: { Favicon },
   props: {
@@ -86,10 +87,9 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    isDesktop: {
-      type: Boolean,
-      required: false,
-      default: false,
+    folderItems: {
+      type: Array as PropType<FolderItem[]>,
+      requiered: false,
     },
   },
   setup(props, context) {
@@ -324,6 +324,9 @@ export default defineComponent({
           // 폴더 위
           // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
+            /**
+             * @ERROR
+             */
             await BookmarkApi.move(changingElId, targetElId);
             changingEl.remove();
             return;
@@ -339,8 +342,31 @@ export default defineComponent({
         }
 
         if (isBetweenContainer) {
+          /**
+           * 1. .modal-inner로 폴더 상위 찾기
+           * 2. .modal-inner의 자식 v-breadcrumbs 찾기
+           * 3. data-id로 id들 찾기
+           * 4. validation (target 있으면 target까지, 없으면 breadcrumb만)
+           */
+          const targetGridContainerBreadcrumbs = targetGridContainerEl
+            .closest(".modal-inner")
+            ?.querySelector(".folder-route")
+            ?.querySelectorAll("[data-id]");
+
+          if (targetGridContainerBreadcrumbs) {
+            const isDropError = [...targetGridContainerBreadcrumbs]
+              .map((el) => (el as HTMLElement).dataset.id as string)
+              .some((id) => id === changingElId);
+
+            if (isDropError || targetElId === changingElId) {
+              changingEl.style.gridColumn = String(originCol);
+              changingEl.style.gridRow = String(originRow);
+              fixDom(changingEl);
+              return;
+            }
+          }
+
           if (isInPadding) {
-            setChangingElPositionAuto(changingEl);
             await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
             return;
           }
@@ -349,30 +375,21 @@ export default defineComponent({
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
             saveLayoutToDB(Number(holderRow), Number(holderCol));
-            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
-
-            // TODO: origin, target container refresh
+            await BookmarkApi.move(changingElId, targetGridContainerParentId);
             return;
           }
 
           const targetElType = targetEl.dataset.type as "FOLDER" | "FILE";
 
           // 폴더 위
-          // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
-            setChangingElPositionAuto(changingEl);
             await BookmarkApi.move(changingElId, targetElId);
-
-            // TODO: origin, target container refresh
             return;
           }
 
           // 파일 위
           if (targetElType === "FILE") {
-            setChangingElPositionAuto(changingEl);
-
-            await BookmarkApi.move(changingElId, targetGridContainerParentId); // 폴더에서 같은 값을 북마크 move에 넘기는 경우 크롬 자체가 죽어버리는 현상 발견(이유는 정확히 파악 못했음)
-            // TODO: origin, target container refresh
+            await BookmarkApi.move(changingElId, targetGridContainerParentId);
             return;
           }
         }
@@ -399,12 +416,6 @@ export default defineComponent({
           target.style.gridColumn = String(holderCol);
           target.dataset.row = String(holderRow);
           target.dataset.col = String(holderCol);
-          fixDom(target);
-        }
-
-        function setChangingElPositionAuto(target: HTMLElement) {
-          target.style.gridRow = "auto";
-          target.style.gridColumn = "auto";
           fixDom(target);
         }
       };
