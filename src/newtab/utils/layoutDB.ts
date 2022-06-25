@@ -58,6 +58,10 @@ class LayoutDB {
   async setItemLayoutById({ id, parentId, row, col }: ItemLayout) {
     await this.db.put(OBJECT_STORE_NAME, { id, parentId, row, col });
   }
+
+  async deleteItemLayoutById(id: string) {
+    await this.db.delete(OBJECT_STORE_NAME, id);
+  }
 }
 
 export const layoutDB = new LayoutDB();
