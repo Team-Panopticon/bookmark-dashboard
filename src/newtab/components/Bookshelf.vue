@@ -313,13 +313,13 @@ export default defineComponent({
            * 3. data-id로 id들 찾기
            * 4. validation (target 있으면 target까지, 없으면 breadcrumb만)
            */
-          const result = targetGridContainerEl
+          const targetGridContainerBreadcrumbs = targetGridContainerEl
             .closest(".modal-inner")
             ?.querySelector(".folder-route")
             ?.querySelectorAll("[data-id]");
 
-          if (result) {
-            const isDropError = [...result]
+          if (targetGridContainerBreadcrumbs) {
+            const isDropError = [...targetGridContainerBreadcrumbs]
               .map((el) => (el as HTMLElement).dataset.id as string)
               .some((id) => id === changingElId);
 
