@@ -211,7 +211,7 @@ export default defineComponent({
         const moveY = Math.abs(startY - e.pageY);
         const { x: baseX, y: baseY } =
           targetGridContainerEl.getBoundingClientRect();
-        if (new Date().getTime() - startTime < 500 && moveX + moveY < 20) {
+        if (new Date().getTime() - startTime < 150 && moveX + moveY < 20) {
           return;
         }
         changingEl.style.left = `${e.pageX - offsetX}px`;
