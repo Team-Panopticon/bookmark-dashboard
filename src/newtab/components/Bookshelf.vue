@@ -132,7 +132,7 @@ export default defineComponent({
 
       return mousePositionEl as HTMLElement;
     };
-
+    let originGridContainerId: string | undefined;
     let prevVisitedContainerId = -1;
     let originRow = -1;
     let originCol = -1;
@@ -144,7 +144,8 @@ export default defineComponent({
       originRow = originCol = holderRow = holderCol = -1;
 
       const gridContainerEl = originGridContainer.value as HTMLElement;
-      prevVisitedContainerId = Number(gridContainerEl.dataset.parentId);
+      originGridContainerId = gridContainerEl.dataset.parentId;
+      prevVisitedContainerId = Number(originGridContainerId);
       const startTime = new Date().getTime();
       const { pageX: startX, pageY: startY } = mousedown;
 
@@ -378,6 +379,17 @@ export default defineComponent({
           }
 
           const targetElType = targetEl.dataset.type as "FOLDER" | "FILE";
+
+          // a폴더의 첫번째 depth의 자식을 a폴더로 옮길 경우
+          if (
+            targetElType === "FOLDER" &&
+            targetElId === originGridContainerId
+          ) {
+            changingEl.style.gridColumn = String(originCol);
+            changingEl.style.gridRow = String(originRow);
+            fixDom(changingEl);
+            return;
+          }
 
           // 폴더 위
           if (targetElType === "FOLDER" && changingElId !== targetElId) {
