@@ -133,7 +133,7 @@ export default defineComponent({
       return mousePositionEl as HTMLElement;
     };
     let originGridContainerId: string | undefined;
-    let prevVisitedContainerId = -1;
+    let prevVisitedContainerId: string | undefined;
     let originRow = -1;
     let originCol = -1;
     let holderRow: number | string = -1;
@@ -145,7 +145,7 @@ export default defineComponent({
 
       const gridContainerEl = originGridContainer.value as HTMLElement;
       originGridContainerId = gridContainerEl.dataset.parentId;
-      prevVisitedContainerId = Number(originGridContainerId);
+      prevVisitedContainerId = originGridContainerId;
       const startTime = new Date().getTime();
       const { pageX: startX, pageY: startY } = mousedown;
 
@@ -194,9 +194,8 @@ export default defineComponent({
           return;
         }
 
-        const targetGridContainerParentId = Number(
-          targetGridContainerEl.dataset.parentId
-        );
+        const targetGridContainerParentId =
+          targetGridContainerEl.dataset.parentId;
 
         const isDragOverBetweenContainer =
           targetGridContainerParentId !== prevVisitedContainerId;
@@ -250,8 +249,17 @@ export default defineComponent({
         }
 
         if (targetEl?.dataset.type === "FILE") {
-          positionHolderEl.style.gridColumn = String(originCol);
-          positionHolderEl.style.gridRow = String(originRow);
+          if (
+            targetGridContainerParentId &&
+            originGridContainerId &&
+            targetGridContainerParentId !== originGridContainerId
+          ) {
+            positionHolderEl.style.gridColumn = "auto";
+            positionHolderEl.style.gridRow = "auto";
+          } else {
+            positionHolderEl.style.gridColumn = String(originCol);
+            positionHolderEl.style.gridRow = String(originRow);
+          }
         }
       };
 
