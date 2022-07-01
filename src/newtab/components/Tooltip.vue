@@ -1,6 +1,6 @@
 <template>
   <Transition>
-    <div class="tooltip" v-if="tooltipShow">
+    <div class="tooltip" v-show="tooltipShow" v-if="tooltipOn">
       <span class="text">{{ tooltipText }}</span>
     </div>
   </Transition>
@@ -12,6 +12,7 @@ import {
   GET_TOOLTIP_POSITION,
   GET_TOOLTIP_SHOW,
   GET_TOOLTIP_TEXT,
+  GET_TOOLTIP_ON,
 } from "../store/modules/tooltip";
 
 export default defineComponent({
@@ -21,6 +22,7 @@ export default defineComponent({
       tooltipPosition: GET_TOOLTIP_POSITION,
       tooltipText: GET_TOOLTIP_TEXT,
       tooltipShow: GET_TOOLTIP_SHOW,
+      tooltipOn: GET_TOOLTIP_ON,
     }),
     tooltipPositionPx() {
       return {

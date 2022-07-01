@@ -4,6 +4,7 @@ import {
   SET_TOOLTIP_POSITION,
   SET_TOOLTIP_SHOW,
   SET_TOOLTIP_TEXT,
+  SET_TOOLTIP_ON,
 } from "@/newtab/store/modules/tooltip";
 import { Item } from "@/shared/types/store";
 import { Ref, SetupContext } from "vue";
@@ -22,6 +23,8 @@ export interface SetupBookshelf {
   openUrl: (url: string) => void;
   openContextMenu: (event: PointerEvent, target: ContextMenuTarget) => void;
   onClickFolder: (item: Item) => void;
+  offTooltip: () => void;
+  onTooltip: () => void;
 }
 
 export const setupBookshelfAction = (props: Props): SetupBookshelf => {
@@ -50,7 +53,13 @@ export const setupBookshelfAction = (props: Props): SetupBookshelf => {
   const closeTooltip = () => {
     store.commit(SET_TOOLTIP_SHOW, false);
   };
+  const onTooltip = () => {
+    store.commit(SET_TOOLTIP_ON, true);
+  };
 
+  const offTooltip = () => {
+    store.commit(SET_TOOLTIP_ON, false);
+  };
   const openUrl = (url: string) => {
     window.open(url, "_blank")?.focus();
     store.commit(SET_TOOLTIP_SHOW, false);
@@ -73,5 +82,7 @@ export const setupBookshelfAction = (props: Props): SetupBookshelf => {
     openUrl,
     openContextMenu,
     onClickFolder,
+    onTooltip,
+    offTooltip,
   };
 };
