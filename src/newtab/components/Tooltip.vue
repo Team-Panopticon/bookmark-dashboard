@@ -1,6 +1,11 @@
 <template>
   <Transition>
-    <div class="tooltip" v-show="tooltipShow" v-if="tooltipOn">
+    <div
+      :key="tooltipText"
+      class="tooltip"
+      v-show="tooltipShow"
+      v-if="tooltipOn"
+    >
       <span class="text">{{ tooltipText }}</span>
     </div>
   </Transition>
