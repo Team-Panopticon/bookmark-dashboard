@@ -186,7 +186,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 .vfm::v-deep {
   .modal-content {
-    // position: relative;
     width: 500px;
     height: 500px;
   }
