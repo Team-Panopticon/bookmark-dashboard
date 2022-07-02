@@ -16,15 +16,15 @@ interface Props {
   context: SetupContext<Record<string, any>>;
 }
 
-export interface SetupBookshelf {
+interface SetupBookshelfAction {
   openTooltip: (title: string, event: MouseEvent) => void;
   closeTooltip: () => void;
-  openUrl: (id: string, url: string) => void;
+  openUrl: (url: string) => void;
   openContextMenu: (event: PointerEvent, target: ContextMenuTarget) => void;
   onClickFolder: (item: Item) => void;
 }
 
-export const setupBookshelfAction = (props: Props): SetupBookshelf => {
+export const setupBookshelfAction = (props: Props): SetupBookshelfAction => {
   const { folderItem, context } = props;
   const store = useStore();
 
@@ -51,7 +51,7 @@ export const setupBookshelfAction = (props: Props): SetupBookshelf => {
     store.commit(SET_TOOLTIP_SHOW, false);
   };
 
-  const openUrl = (id: string, url: string) => {
+  const openUrl = (url: string) => {
     window.open(url, "_blank")?.focus();
     store.commit(SET_TOOLTIP_SHOW, false);
   };

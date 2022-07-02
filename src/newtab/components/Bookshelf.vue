@@ -1,24 +1,31 @@
 <template>
   <div
     class="grid-container"
+    ref="originGridContainer"
     @contextmenu.prevent.stop="
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
+    :data-parent-id="id"
   >
     <div
       v-for="item in folderItem.children"
       v-bind:key="item.id"
+      class="btn-wrapper"
       :style="
         item.row && item.col ? { gridRow: item.row, gridColumn: item.col } : {}
       "
       :data-item-id="item.id"
+      :data-id="item.id"
+      :data-type="item.type"
+      :data-row="item.row"
+      :data-col="item.col"
       :ref="setItemRef"
+      @mousedown.left="mousedownHandler(item, $event)"
     >
       <v-btn
         class="btn"
         elevation="0"
         v-if="item.children"
-        @click="onClickFolder(item)"
         @mouseover="openTooltip(item.title, $event)"
         @mouseleave="closeTooltip()"
         @contextmenu.prevent.stop="
@@ -35,9 +42,8 @@
       <v-btn
         v-else
         class="btn"
-        tile
+        plain
         elevation="0"
-        @click="openUrl(item.id, item.url)"
         @mouseover="openTooltip(item.title, $event)"
         @mouseleave="closeTooltip()"
         @contextmenu.prevent.stop="
@@ -56,12 +62,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import Favicon from "./Favicon.vue";
 import { setupBookshelfAction } from "./composition/setupBookshelfAction";
 import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
-import { Item } from "@/shared/types/store";
-import { GRID_CONTAINER_PADDING } from "../utils/constant";
+import { setupDragAndDrop } from "./composition/setupDragAndDrop";
+import { FolderItem, Item } from "@/shared/types/store";
+import {
+  GRID_CONTAINER_PADDING,
+  ITEM_HEIGHT,
+  ITEM_WIDTH,
+} from "../utils/constant";
+
+/**
+ * @TODO
+ * <template>data-item-id data-id 중복 삭제
+ */
 
 export default defineComponent({
   components: { Favicon },
@@ -70,9 +86,14 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    folderItems: {
+      type: Array as PropType<FolderItem[]>,
+      requiered: false,
+    },
   },
   setup(props, context) {
     const folderItem = ref({} as Item);
+
     const {
       openTooltip,
       closeTooltip,
@@ -81,7 +102,15 @@ export default defineComponent({
       onClickFolder,
     } = setupBookshelfAction({ folderItem, context });
 
-    const { setItemRef } = setupBookshelfLayout({ id: props.id, folderItem });
+    const { setItemRef } = setupBookshelfLayout({
+      id: props.id,
+      folderItem,
+    });
+
+    const { mousedownHandler, originGridContainer } = setupDragAndDrop({
+      openUrl,
+      onClickFolder,
+    });
 
     return {
       folderItem,
@@ -91,38 +120,64 @@ export default defineComponent({
       openContextMenu,
       onClickFolder,
       setItemRef,
+      mousedownHandler,
+      originGridContainer,
     };
   },
   data() {
     return {
       gridContainerPadding: `${GRID_CONTAINER_PADDING}px`,
+      itemHeight: `${ITEM_HEIGHT}px`,
+      itemWidth: `${ITEM_WIDTH}px`,
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
+.divider {
+  position: absolute;
+  border-left: 2px solid grey;
+}
+
+.hide {
+  border: none;
+}
+
+.positionHolderEl-component {
+  opacity: 0.5;
+}
+
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 88px);
-  grid-auto-rows: 108px;
+  grid-template-columns: repeat(auto-fill, v-bind("itemWidth"));
+  grid-auto-rows: v-bind("itemHeight");
   padding: v-bind("gridContainerPadding");
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  position: relative;
 }
-
+.btn-wrapper {
+  display: flex;
+  justify-content: center;
+  background: none;
+  border: 1px solid red;
+}
 .btn {
-  width: 88px;
+  width: v-bind("itemWidth");
   height: auto;
   padding: 8px;
+  /* padding: 4px 0; */
+  background: none;
 }
+
 .btn:focus {
-  background-color: rgb(225, 225, 225);
+  background-color: rgba(225, 225, 225, 0.3);
 }
 
 .item {
-  width: 88px;
+  width: v-bind("itemWidth");
 }
 
 .item-container {

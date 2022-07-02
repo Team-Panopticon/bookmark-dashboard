@@ -8,6 +8,8 @@ export const SET_TOOLTIP_TEXT = "setTooltipText";
 export const GET_TOOLTIP_SHOW = "getTooltipShow";
 export const SET_TOOLTIP_SHOW = "setTooltipShow";
 
+export const GET_TOOLTIP_ON = "getTooltipOn";
+export const SET_TOOLTIP_ON = "setTooltipOn";
 export interface State {
   tooltipPosition: {
     x: number;
@@ -15,6 +17,7 @@ export interface State {
   };
   tooltipText: string;
   tooltipShow: boolean;
+  tooltipOn: boolean;
 }
 
 const createModalModule: Module<State, RootState> = {
@@ -23,6 +26,7 @@ const createModalModule: Module<State, RootState> = {
     tooltipPosition: { x: 0, y: 0 },
     tooltipText: "",
     tooltipShow: false,
+    tooltipOn: true,
   },
   getters: {
     [GET_TOOLTIP_POSITION](state) {
@@ -34,6 +38,9 @@ const createModalModule: Module<State, RootState> = {
     [GET_TOOLTIP_SHOW](state) {
       return state.tooltipShow;
     },
+    [GET_TOOLTIP_ON](state) {
+      return state.tooltipOn;
+    },
   },
   mutations: {
     [SET_TOOLTIP_POSITION](state, _tooltipPosition) {
@@ -44,6 +51,9 @@ const createModalModule: Module<State, RootState> = {
     },
     [SET_TOOLTIP_SHOW](state, _tooltipShow) {
       state.tooltipShow = _tooltipShow;
+    },
+    [SET_TOOLTIP_ON](state, _tooltipOn) {
+      state.tooltipOn = _tooltipOn;
     },
   },
 };

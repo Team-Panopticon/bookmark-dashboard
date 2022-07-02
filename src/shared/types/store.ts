@@ -1,6 +1,7 @@
 export interface Item extends chrome.bookmarks.BookmarkTreeNode {
   row?: number;
   col?: number;
+  type?: string;
 }
 
 export type modalInfo = {
