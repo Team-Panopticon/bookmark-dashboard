@@ -16,7 +16,7 @@ interface Props {
   context: SetupContext<Record<string, any>>;
 }
 
-export interface SetupBookshelf {
+interface SetupBookshelfAction {
   openTooltip: (title: string, event: MouseEvent) => void;
   closeTooltip: () => void;
   openUrl: (url: string) => void;
@@ -24,7 +24,7 @@ export interface SetupBookshelf {
   onClickFolder: (item: Item) => void;
 }
 
-export const setupBookshelfAction = (props: Props): SetupBookshelf => {
+export const setupBookshelfAction = (props: Props): SetupBookshelfAction => {
   const { folderItem, context } = props;
   const store = useStore();
 

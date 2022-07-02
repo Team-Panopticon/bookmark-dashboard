@@ -9,7 +9,7 @@ import {
 import { layoutDB } from "@/newtab/utils/layoutDB";
 import { GRID_CONTAINER_PADDING } from "@/newtab/utils/constant";
 
-export interface SetupBookshelf {
+interface SetupBookshelfLayout {
   setItemRef: (elItem?: HTMLDivElement) => void;
 }
 
@@ -30,7 +30,7 @@ const appendLayoutData = async (folderItem: Item): Promise<Item> => {
   return folderItem;
 };
 
-export const setupBookshelfLayout = (props: Props): SetupBookshelf => {
+export const setupBookshelfLayout = (props: Props): SetupBookshelfLayout => {
   const store = useStore();
   const { id, folderItem } = props;
 
