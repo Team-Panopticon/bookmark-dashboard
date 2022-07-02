@@ -100,6 +100,8 @@ export default defineComponent({
       openUrl,
       openContextMenu,
       onClickFolder,
+      onTooltip,
+      offTooltip,
     } = setupBookshelfAction({ folderItem, context });
     const { setItemRef } = setupBookshelfLayout({
       id: props.id,
@@ -140,6 +142,7 @@ export default defineComponent({
     let holderCol: number | string = -1;
     const originGridContainer = ref<HTMLElement>();
     const mousedownHandler = async (item: Item, mousedown: MouseEvent) => {
+      offTooltip();
       mousedown.preventDefault();
       originRow = originCol = holderRow = holderCol = -1;
 
@@ -272,6 +275,9 @@ export default defineComponent({
         );
 
         try {
+          // tooptip on
+          onTooltip();
+
           // hander 지우기
           document.removeEventListener("mouseup", mouseUpHandler);
           document.removeEventListener("mousemove", mousemoveHandler);
