@@ -38,12 +38,12 @@ export default defineComponent({
 function setBookmarksEventHandlers() {
   chrome.bookmarks.onCreated.addListener((id: string, bookmark: Item) => {
     const { parentId } = bookmark;
-    store.commit(PUSH_REFRESH_TARGET, parentId);
+    store.commit(PUSH_REFRESH_TARGET, [parentId]);
   });
   chrome.bookmarks.onRemoved.addListener(
     (id: string, removeInfo: chrome.bookmarks.BookmarkRemoveInfo) => {
       const { parentId } = removeInfo;
-      store.commit(PUSH_REFRESH_TARGET, parentId);
+      store.commit(PUSH_REFRESH_TARGET, [parentId]);
     }
   );
   chrome.bookmarks.onMoved.addListener(
