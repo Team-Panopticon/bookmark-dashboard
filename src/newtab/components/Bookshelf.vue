@@ -51,7 +51,7 @@
         "
       >
         <div class="item-container">
-          <Favicon :url="item.url" />
+          <Favicon :url="item.url" :replaceChar="item.title.charAt(0)" />
           <p class="item-title">
             {{ item.title }}
           </p>
