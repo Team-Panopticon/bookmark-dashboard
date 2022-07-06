@@ -10,6 +10,7 @@ import BookmarkApi from "../../utils/bookmarkApi";
 import { layoutDB } from "../../utils/layoutDB";
 import { SET_TOOLTIP_ON } from "@/newtab/store/modules/tooltip";
 import { useStore } from "vuex";
+import { PUSH_REFRESH_TARGET } from "@/newtab/store/modules/refreshTarget";
 
 interface SetupDragAndDrop {
   mousedownHandler: (item: Item, mousedown: MouseEvent) => Promise<void>;
@@ -249,6 +250,10 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
             saveLayoutToDB(Number(holderRow), Number(holderCol));
+            store.commit(PUSH_REFRESH_TARGET, [
+              originGridContainerId,
+              originGridContainerId,
+            ]);
             return;
           }
 
@@ -275,6 +280,17 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
            * 3. data-id로 id들 찾기
            * 4. validation (target 있으면 target까지, 없으면 breadcrumb만)
            */
+
+          // 같은 폴더 모달 간에 이동하는 경우 refresh
+          if (
+            targetGridContainerParentId === gridContainerEl.dataset.parentId
+          ) {
+            store.commit(PUSH_REFRESH_TARGET, [
+              originGridContainerId,
+              originGridContainerId,
+            ]);
+          }
+
           const targetGridContainerBreadcrumbs = targetGridContainerEl
             .closest(".modal-inner")
             ?.querySelector(".folder-route")

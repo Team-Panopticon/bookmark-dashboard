@@ -6,6 +6,7 @@
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
     :data-parent-id="id"
+    :data-timestamp="Date.now()"
   >
     <div
       v-for="item in folderItem.children"

@@ -6,26 +6,29 @@ export const PUSH_REFRESH_TARGET = "pushRefreshTarget";
 export const POP_REFRESH_TARGET = "popRefreshTarget";
 
 export interface State {
-  refreshTargetIds: Set<string>;
+  refreshTargetIds: Array<string>;
 }
 
 const refreshTargetModule: Module<State, RootState> = {
   namespaced: false,
   state: {
-    refreshTargetIds: new Set<string>(),
+    refreshTargetIds: new Array<string>(),
   },
   getters: {
     [GET_REFRESH_TARGET]: (state) => (id: string) =>
-      state.refreshTargetIds.has(id),
+      state.refreshTargetIds.includes(id),
   },
   mutations: {
     [PUSH_REFRESH_TARGET](state, ids: string[]) {
       ids.forEach((id: string) => {
-        state.refreshTargetIds.add(id);
+        state.refreshTargetIds.push(id);
       });
     },
     [POP_REFRESH_TARGET](state, id) {
-      state.refreshTargetIds.delete(id);
+      const idx = state.refreshTargetIds.findIndex(
+        (targetId) => targetId === id
+      );
+      state.refreshTargetIds.splice(idx, 1);
     },
   },
 };
