@@ -116,9 +116,12 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
       e.preventDefault();
 
       const targetGridContainerEl = getContainerEl(e.pageX, e.pageY);
+
       if (!targetGridContainerEl) {
+        gridContainerEl.insertBefore(positionHolderEl, null);
         positionHolderEl.style.gridColumn = String(originCol);
         positionHolderEl.style.gridRow = String(originRow);
+        prevVisitedContainerId = "outOfContainer";
         return;
       }
 
