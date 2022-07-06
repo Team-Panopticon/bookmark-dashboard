@@ -60,7 +60,7 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
     return mousePositionEl as HTMLElement;
   };
   let originGridContainerId: string | undefined;
-  let prevVisitedContainerId: string | undefined;
+  let prevVisitedContainerTimestamp: string | undefined;
   let originRow = -1;
   let originCol = -1;
   let holderRow: number | string = -1;
@@ -73,7 +73,8 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
 
     const gridContainerEl = originGridContainer.value as HTMLElement;
     originGridContainerId = gridContainerEl.dataset.parentId;
-    prevVisitedContainerId = originGridContainerId;
+    prevVisitedContainerTimestamp = gridContainerEl.dataset.timestamp;
+
     const startTime = new Date().getTime();
     const { pageX: startX, pageY: startY } = mousedown;
 
@@ -124,15 +125,17 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
 
       const targetGridContainerParentId =
         targetGridContainerEl.dataset.parentId;
+      const targetGridContainerTimestamp =
+        targetGridContainerEl.dataset.timestamp;
 
       const isDragOverBetweenContainer =
-        targetGridContainerParentId !== prevVisitedContainerId;
+        targetGridContainerTimestamp !== prevVisitedContainerTimestamp;
       const isWithinContainer = targetGridContainerEl === gridContainerEl;
 
       if (isDragOverBetweenContainer) {
         positionHolderEl.remove();
         targetGridContainerEl.insertBefore(positionHolderEl, null);
-        prevVisitedContainerId = targetGridContainerParentId;
+        prevVisitedContainerTimestamp = targetGridContainerTimestamp;
       }
 
       const moveX = Math.abs(startX - e.pageX);
