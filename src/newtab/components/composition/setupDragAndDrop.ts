@@ -300,7 +300,6 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
 
           // 빈공간
           if (!targetEl || !targetElId) {
-            setChangingElPosition(changingEl);
             saveLayoutToDB(Number(holderRow), Number(holderCol));
             await BookmarkApi.move(changingElId, targetGridContainerParentId);
             return;
