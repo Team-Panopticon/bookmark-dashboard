@@ -13,9 +13,9 @@
       alt="icon"
       v-if="showImgIcon"
     />
-    <icon :class="`favicon`" v-else>
+    <span class="favicon" v-else>
       {{ replaceChar }}
-    </icon>
+    </span>
   </div>
 </template>
 <script lang="ts">
