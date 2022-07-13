@@ -178,6 +178,11 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
 
       if (targetEl?.dataset.type === "FOLDER") {
         innerBtn?.focus();
+      } else {
+        const activeElement = document.activeElement;
+        if (activeElement instanceof HTMLElement) {
+          activeElement.blur();
+        }
       }
 
       if (targetEl?.dataset.type === "FILE") {
