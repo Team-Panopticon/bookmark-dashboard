@@ -11,7 +11,11 @@
       @load="loadImage"
       @error="notFoundImage"
       alt="icon"
+      v-if="showImgIcon"
     />
+    <icon :class="`favicon`" v-else>
+      {{ replaceChar }}
+    </icon>
   </div>
 </template>
 <script lang="ts">
@@ -27,13 +31,24 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    replaceChar: String,
   },
-  data: () => ({ isLoading: true, loadingImage: LoadingImg, imgSrc: "" }),
+  data: () => ({
+    isLoading: true,
+    loadingImage: LoadingImg,
+    imgSrc: "",
+    showImgIcon: true,
+    randomColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+  }),
   created() {
     this.imgSrc = PREFIX + this.url;
   },
   methods: {
-    loadImage() {
+    loadImage(e: Event) {
+      const targetImg = e.target as HTMLImageElement;
+      if (targetImg.width <= 16 || targetImg.height <= 16) {
+        this.showImgIcon = false;
+      }
       this.isLoading = false;
     },
 
@@ -55,6 +70,11 @@ export default defineComponent({
   .favicon {
     width: 48px;
     height: 48px;
+    font-size: 48px;
+
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 600;
+    color: v-bind("randomColor");
   }
 
   .disable {
