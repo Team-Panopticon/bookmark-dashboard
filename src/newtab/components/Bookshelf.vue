@@ -10,7 +10,7 @@
   >
     <div
       v-for="item in folderItem.children"
-      v-bind:key="item.id"
+      v-bind:key="item.id + item.row + item.col"
       class="btn-wrapper"
       :style="
         item.row && item.col ? { gridRow: item.row, gridColumn: item.col } : {}

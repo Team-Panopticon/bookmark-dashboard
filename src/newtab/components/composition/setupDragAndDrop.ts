@@ -123,7 +123,6 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
         gridContainerEl.insertBefore(positionHolderEl, null);
         positionHolderEl.style.gridColumn = String(originCol);
         positionHolderEl.style.gridRow = String(originRow);
-        prevVisitedContainerId = "outOfContainer";
         return;
       }
 
