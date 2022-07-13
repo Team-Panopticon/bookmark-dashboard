@@ -10,6 +10,7 @@ import BookmarkApi from "../../utils/bookmarkApi";
 import { layoutDB } from "../../utils/layoutDB";
 import { SET_TOOLTIP_ON } from "@/newtab/store/modules/tooltip";
 import { useStore } from "vuex";
+import { PUSH_REFRESH_TARGET } from "@/newtab/store/modules/refreshTarget";
 
 interface SetupDragAndDrop {
   mousedownHandler: (item: Item, mousedown: MouseEvent) => Promise<void>;
@@ -60,7 +61,7 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
     return mousePositionEl as HTMLElement;
   };
   let originGridContainerId: string | undefined;
-  let prevVisitedContainerId: string | undefined;
+  let prevVisitedContainerTimestamp: string | undefined;
   let originRow = -1;
   let originCol = -1;
   let holderRow: number | string = -1;
@@ -73,7 +74,8 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
 
     const gridContainerEl = originGridContainer.value as HTMLElement;
     originGridContainerId = gridContainerEl.dataset.parentId;
-    prevVisitedContainerId = originGridContainerId;
+    prevVisitedContainerTimestamp = gridContainerEl.dataset.timestamp;
+
     const startTime = new Date().getTime();
     const { pageX: startX, pageY: startY } = mousedown;
 
@@ -127,15 +129,17 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
 
       const targetGridContainerParentId =
         targetGridContainerEl.dataset.parentId;
+      const targetGridContainerTimestamp =
+        targetGridContainerEl.dataset.timestamp;
 
       const isDragOverBetweenContainer =
-        targetGridContainerParentId !== prevVisitedContainerId;
+        targetGridContainerTimestamp !== prevVisitedContainerTimestamp;
       const isWithinContainer = targetGridContainerEl === gridContainerEl;
 
       if (isDragOverBetweenContainer) {
         positionHolderEl.remove();
         targetGridContainerEl.insertBefore(positionHolderEl, null);
-        prevVisitedContainerId = targetGridContainerParentId;
+        prevVisitedContainerTimestamp = targetGridContainerTimestamp;
       }
 
       const moveX = Math.abs(startX - e.pageX);
@@ -249,6 +253,10 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
             saveLayoutToDB(Number(holderRow), Number(holderCol));
+            store.commit(PUSH_REFRESH_TARGET, [
+              originGridContainerId,
+              originGridContainerId,
+            ]);
             return;
           }
 
@@ -275,6 +283,17 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
            * 3. data-id로 id들 찾기
            * 4. validation (target 있으면 target까지, 없으면 breadcrumb만)
            */
+
+          // 같은 폴더 모달 간에 이동하는 경우 refresh
+          if (
+            targetGridContainerParentId === gridContainerEl.dataset.parentId
+          ) {
+            store.commit(PUSH_REFRESH_TARGET, [
+              originGridContainerId,
+              originGridContainerId,
+            ]);
+          }
+
           const targetGridContainerBreadcrumbs = targetGridContainerEl
             .closest(".modal-inner")
             ?.querySelector(".folder-route")
