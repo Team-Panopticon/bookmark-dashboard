@@ -19,7 +19,7 @@ import BookshelfModalContainer from "../components/BookshelfModalContainer.vue";
 import ContextMenuContainer from "../components/ContextMenu/ContextMenuContainer.vue";
 import { Item } from "@/shared/types/store";
 import Tooltip from "../components/Tooltip.vue";
-import { PUSH_REFRESH_TARGET } from "../store/modules/refreshTarget";
+import { UPDATE_REFRESH_TIMES } from "../store/modules/refreshTarget";
 
 export default defineComponent({
   components: {
@@ -38,18 +38,18 @@ export default defineComponent({
 function setBookmarksEventHandlers() {
   chrome.bookmarks.onCreated.addListener((id: string, bookmark: Item) => {
     const { parentId } = bookmark;
-    store.commit(PUSH_REFRESH_TARGET, [parentId]);
+    store.commit(UPDATE_REFRESH_TIMES, [parentId]);
   });
   chrome.bookmarks.onRemoved.addListener(
     (id: string, removeInfo: chrome.bookmarks.BookmarkRemoveInfo) => {
       const { parentId } = removeInfo;
-      store.commit(PUSH_REFRESH_TARGET, [parentId]);
+      store.commit(UPDATE_REFRESH_TIMES, [parentId]);
     }
   );
   chrome.bookmarks.onMoved.addListener(
     (id: string, moveInfo: chrome.bookmarks.BookmarkMoveInfo) => {
       const { parentId, oldParentId } = moveInfo;
-      store.commit(PUSH_REFRESH_TARGET, [parentId, oldParentId]);
+      store.commit(UPDATE_REFRESH_TIMES, [parentId, oldParentId]);
     }
   );
 }

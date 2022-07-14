@@ -2,10 +2,7 @@ import BookmarkApi from "@/newtab/utils/bookmarkApi";
 import { Item } from "@/shared/types/store";
 import { onMounted, computed, watch, Ref } from "vue";
 import { useStore } from "vuex";
-import {
-  GET_REFRESH_TARGET,
-  POP_REFRESH_TARGET,
-} from "../../store/modules/refreshTarget";
+import { GET_REFRESH_TIME } from "../../store/modules/refreshTarget";
 import { layoutDB } from "@/newtab/utils/layoutDB";
 import { GRID_CONTAINER_PADDING } from "@/newtab/utils/constant";
 
@@ -37,19 +34,20 @@ export const setupBookshelfLayout = (props: Props): SetupBookshelfLayout => {
   /**
    * Data
    */
-  const shouldRefreshRef = computed(() =>
-    store.getters[GET_REFRESH_TARGET](id)
+  const recentRefreshTimeRef = computed(() =>
+    store.getters[GET_REFRESH_TIME](id)
   );
 
   const refresh = async () => {
     const subTree = await BookmarkApi.getSubTree(id);
     folderItem.value = await appendLayoutData(subTree);
   };
+  let lastRefreshTime = new Date().getTime();
 
-  watch(shouldRefreshRef, (shouldRefresh) => {
-    if (shouldRefresh) {
+  watch(recentRefreshTimeRef, (recentRefreshTime) => {
+    if (recentRefreshTime !== lastRefreshTime) {
+      lastRefreshTime = recentRefreshTime;
       refresh();
-      store.commit(POP_REFRESH_TARGET, props.id);
     }
   });
 

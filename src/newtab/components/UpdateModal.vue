@@ -58,7 +58,7 @@ import {
 import store from "../store/index";
 
 import BookmarkApi from "../utils/bookmarkApi";
-import { PUSH_REFRESH_TARGET } from "../store/modules/refreshTarget";
+import { UPDATE_REFRESH_TIMES } from "../store/modules/refreshTarget";
 
 export default defineComponent({
   computed: {
@@ -96,7 +96,7 @@ export default defineComponent({
       const { id, title, url, parentId } = this.bookmarkUpdateModalInfo;
       const updateSuccessful = await BookmarkApi.update(id, title, url);
       if (updateSuccessful) {
-        store.commit(PUSH_REFRESH_TARGET, [parentId]);
+        store.commit(UPDATE_REFRESH_TIMES, [parentId]);
         this[CLOSE_BOOKMARK_UPDATE]();
       }
     },
