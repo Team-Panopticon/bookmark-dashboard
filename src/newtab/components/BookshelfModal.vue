@@ -11,7 +11,7 @@
       :resize="true"
       :hide-overlay="true"
       :click-to-close="false"
-      :esc-to-close="false"
+      :esc-to-close="true"
       :prevent-click="true"
       :z-index="zIndex"
     >

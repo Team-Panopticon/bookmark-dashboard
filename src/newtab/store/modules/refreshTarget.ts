@@ -1,34 +1,27 @@
 import { Module } from "vuex";
 import { State as RootState } from "../index";
 
-export const GET_REFRESH_TARGET = "getRefreshTarget";
-export const PUSH_REFRESH_TARGET = "pushRefreshTarget";
-export const POP_REFRESH_TARGET = "popRefreshTarget";
+export const GET_REFRESH_TIME = "getRefreshTime";
+export const UPDATE_REFRESH_TIMES = "updateRefreshTimes";
 
 export interface State {
-  refreshTargetIds: Array<string>;
+  recentRefreshTimes: Map<string, number>;
 }
 
 const refreshTargetModule: Module<State, RootState> = {
   namespaced: false,
   state: {
-    refreshTargetIds: new Array<string>(),
+    recentRefreshTimes: new Map<string, number>(),
   },
   getters: {
-    [GET_REFRESH_TARGET]: (state) => (id: string) =>
-      state.refreshTargetIds.includes(id),
+    [GET_REFRESH_TIME]: (state) => (id: string) =>
+      state.recentRefreshTimes.get(id),
   },
   mutations: {
-    [PUSH_REFRESH_TARGET](state, ids: string[]) {
-      ids.forEach((id: string) => {
-        state.refreshTargetIds.push(id);
+    [UPDATE_REFRESH_TIMES](state, ids: string[]) {
+      ids.forEach((id) => {
+        state.recentRefreshTimes.set(id, new Date().getTime());
       });
-    },
-    [POP_REFRESH_TARGET](state, id) {
-      const idx = state.refreshTargetIds.findIndex(
-        (targetId) => targetId === id
-      );
-      state.refreshTargetIds.splice(idx, 1);
     },
   },
 };

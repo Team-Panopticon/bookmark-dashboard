@@ -10,7 +10,7 @@ import BookmarkApi from "../../utils/bookmarkApi";
 import { layoutDB } from "../../utils/layoutDB";
 import { SET_TOOLTIP_ON } from "@/newtab/store/modules/tooltip";
 import { useStore } from "vuex";
-import { PUSH_REFRESH_TARGET } from "@/newtab/store/modules/refreshTarget";
+import { UPDATE_REFRESH_TIMES } from "@/newtab/store/modules/refreshTarget";
 
 interface SetupDragAndDrop {
   mousedownHandler: (item: Item, mousedown: MouseEvent) => Promise<void>;
@@ -257,10 +257,7 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
           if (!targetEl || !targetElId) {
             setChangingElPosition(changingEl);
             saveLayoutToDB(Number(holderRow), Number(holderCol));
-            store.commit(PUSH_REFRESH_TARGET, [
-              originGridContainerId,
-              originGridContainerId,
-            ]);
+            store.commit(UPDATE_REFRESH_TIMES, [originGridContainerId]);
             return;
           }
 
@@ -292,10 +289,7 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
           if (
             targetGridContainerParentId === gridContainerEl.dataset.parentId
           ) {
-            store.commit(PUSH_REFRESH_TARGET, [
-              originGridContainerId,
-              originGridContainerId,
-            ]);
+            store.commit(UPDATE_REFRESH_TIMES, [originGridContainerId]);
           }
 
           const targetGridContainerBreadcrumbs = targetGridContainerEl
