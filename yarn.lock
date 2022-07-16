@@ -3658,6 +3658,7 @@ __metadata:
     eslint: ^6.7.2
     eslint-plugin-prettier: ^3.3.1
     eslint-plugin-vue: ^7.0.0
+    idb: ^7.0.1
     prettier: ^2.2.1
     roboto-fontface: "*"
     sass: ^1.38.0
@@ -3667,7 +3668,7 @@ __metadata:
     vue-cli-plugin-vuetify: ~2.4.5
     vue-final-modal: ^3.4.3
     vue-js-modal: ^2.0.1
-    vuetify: ^3.0.0-alpha.13
+    vuetify: ^3.0.0-beta.1
     vuetify-loader: ^2.0.0-alpha.0
     vuex: next
     webfontloader: ^1.0.0
@@ -6992,6 +6993,13 @@ __metadata:
   peerDependencies:
     postcss: ^8.1.0
   checksum: 5c324d283552b1269cfc13a503aaaa172a280f914e5b81544f3803bc6f06a3b585fb79f66f7c771a2c052db7982c18bf92d001e3b47282e3abbbb4c4cc488d68
+  languageName: node
+  linkType: hard
+
+"idb@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "idb@npm:7.0.1"
+  checksum: 61526789562cc3518a1a030c7a06cc98edfcd62795700ff28c701d6f84c178aee4e98bedfc79e6c394ba26084aa4667d6594b1728e5868f305f9b34148662679
   languageName: node
   linkType: hard
 
@@ -12167,19 +12175,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vuetify@npm:^3.0.0-alpha.13":
-  version: 3.0.0-alpha.13
-  resolution: "vuetify@npm:3.0.0-alpha.13"
+"vuetify@npm:^3.0.0-beta.1":
+  version: 3.0.0-beta.1
+  resolution: "vuetify@npm:3.0.0-beta.1"
   peerDependencies:
-    "@formatjs/intl": ^1.0.0
-    vue: ^3.2.19
+    "@formatjs/intl": ^1.0.0 || ^2.0.0
+    vue: ^3.2.31
     vue-i18n: ^9.0.0
   peerDependenciesMeta:
     "@formatjs/intl":
       optional: true
     vue-i18n:
       optional: true
-  checksum: 61ff6afdd980791ac7e33522887106718abd9885632b9fc4e731cc99615ac57437e065b5ebb2131e9b0fba3511542228a63c2af40e38591a8817ad2608627757
+  checksum: 693079d3cf8efceae1b82376ebc40cb84f521859d820224bdea837051d3d0bfee151f2858e17f394c9e2716ccef63f66406a571dc2cdde71d7b9463154c3b4c3
   languageName: node
   linkType: hard
 

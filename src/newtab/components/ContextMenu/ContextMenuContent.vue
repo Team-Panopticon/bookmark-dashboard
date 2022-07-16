@@ -84,7 +84,7 @@ export default defineComponent({
     padding: 2px 8px;
     min-width: 96px;
     text-align: start;
-    border-radius: 6px;
+    border-radius: 4px;
     &:hover {
       background-color: rgb(90, 139, 219);
       cursor: pointer;

@@ -1,4 +1,8 @@
-export type Item = chrome.bookmarks.BookmarkTreeNode;
+export interface Item extends chrome.bookmarks.BookmarkTreeNode {
+  row?: number;
+  col?: number;
+  type?: string;
+}
 
 export type modalInfo = {
   folderItem: Item;

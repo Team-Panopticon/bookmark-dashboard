@@ -1,17 +1,32 @@
 <template>
   <div
     class="grid-container"
+    ref="originGridContainer"
     @contextmenu.prevent.stop="
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
+    :data-parent-id="id"
+    :data-timestamp="Date.now()"
   >
-    <div v-for="item in folderItem.children" v-bind:key="item.id">
+    <div
+      v-for="item in folderItem.children"
+      v-bind:key="item.id + item.row + item.col"
+      class="btn-wrapper"
+      :style="
+        item.row && item.col ? { gridRow: item.row, gridColumn: item.col } : {}
+      "
+      :data-item-id="item.id"
+      :data-id="item.id"
+      :data-type="item.type"
+      :data-row="item.row"
+      :data-col="item.col"
+      :ref="setItemRef"
+      @mousedown.left="mousedownHandler(item, $event)"
+    >
       <v-btn
         class="btn"
-        tile
         elevation="0"
         v-if="item.children"
-        @click="onClickFolder(item)"
         @mouseover="openTooltip(item.title, $event)"
         @mouseleave="closeTooltip()"
         @contextmenu.prevent.stop="
@@ -28,9 +43,8 @@
       <v-btn
         v-else
         class="btn"
-        tile
+        plain
         elevation="0"
-        @click="openUrl(item.id, item.url)"
         @mouseover="openTooltip(item.title, $event)"
         @mouseleave="closeTooltip()"
         @contextmenu.prevent.stop="
@@ -38,7 +52,7 @@
         "
       >
         <div class="item-container">
-          <Favicon :url="item.url" />
+          <Favicon :url="item.url" :replaceChar="item.title.charAt(0)" />
           <p class="item-title">
             {{ item.title }}
           </p>
@@ -49,20 +63,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import Favicon from "./Favicon.vue";
-import { mapMutations, mapActions, mapGetters } from "vuex";
-import { Item } from "../../shared/types/store";
-import { OPEN_BOOKSHELF_MODALS } from "../store/modules/bookshelfModal";
-import { OPEN_BOOKMARK_UPDATE } from "../store/modules/updateModal";
-import store, { GET_REFRESH_TARGET, SET_REFRESH_TARGET } from "../store/index";
-import { openContextMenu } from "../utils/contextMenu";
-import BookmarkApi from "../utils/bookmarkApi";
+import { setupBookshelfAction } from "./composition/setupBookshelfAction";
+import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
+import { setupDragAndDrop } from "./composition/setupDragAndDrop";
+import { FolderItem, Item } from "@/shared/types/store";
 import {
-  SET_TOOLTIP_POSITION,
-  SET_TOOLTIP_SHOW,
-  SET_TOOLTIP_TEXT,
-} from "../store/modules/tooltip";
+  GRID_CONTAINER_PADDING,
+  ITEM_HEIGHT,
+  ITEM_WIDTH,
+} from "../utils/constant";
+
+/**
+ * @TODO
+ * <template>data-item-id data-id 중복 삭제
+ */
 
 export default defineComponent({
   components: { Favicon },
@@ -71,105 +87,96 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    isDesktop: {
-      type: Boolean,
-      required: false,
-      default: false,
+    folderItems: {
+      type: Array as PropType<FolderItem[]>,
+      requiered: false,
     },
   },
-  data: () => ({
-    folderItem: {} as Item,
-  }),
-  computed: {
-    ...mapGetters({ refreshTargetId: GET_REFRESH_TARGET }),
-  },
-  watch: {
-    refreshTargetId(id?: string) {
-      if (id && this.$props.id === id) {
-        this.refresh();
-        store.commit(SET_REFRESH_TARGET, "");
-      }
-    },
-  },
-  async mounted() {
-    this.refresh();
-  },
-  methods: {
-    ...mapMutations([
-      OPEN_BOOKSHELF_MODALS,
-      SET_TOOLTIP_POSITION,
-      SET_TOOLTIP_TEXT,
-      SET_TOOLTIP_SHOW,
-    ]),
-    ...mapActions([OPEN_BOOKMARK_UPDATE]), // updateMODAL
-    openBookmarkModal() {
-      // TODO: 네이밍 변경(ex. updateModal)
-      this[OPEN_BOOKMARK_UPDATE](this.folderItem);
-    },
-    onClickFolder(item: Item) {
-      const { id, title } = item;
-      // const isRootItem = this.id === "1";
-      if (this.isDesktop) {
-        this._openBookshelfModal(id, title);
-      } else {
-        this.routeInFolder(id);
-      }
-      this[SET_TOOLTIP_SHOW](false);
-    },
-    routeInFolder(id: string) {
-      this.$emit("routeInFolder", id);
-    },
-    _openBookshelfModal(id: string, title: string) {
-      this.openBookshelfModal({ id, title });
-    },
-    openUrl(id: string, url: string) {
-      window.open(url, "_blank")?.focus();
-      this[SET_TOOLTIP_SHOW](false);
-    },
-    openContextMenu,
-    async refresh() {
-      this.folderItem = await BookmarkApi.getSubTree(this.id);
-    },
-    openTooltip(title: string, event: MouseEvent) {
-      const targetElement = event.target as HTMLElement;
-      const buttonElement = targetElement.closest("button");
-      if (!buttonElement) return;
+  setup(props, context) {
+    const folderItem = ref({} as Item);
 
-      const boundingRect = buttonElement.getBoundingClientRect();
-      const position = {
-        x: boundingRect.x,
-        y: boundingRect.y + boundingRect.height,
-      };
+    const {
+      openTooltip,
+      closeTooltip,
+      openUrl,
+      openContextMenu,
+      onClickFolder,
+    } = setupBookshelfAction({ folderItem, context });
 
-      this[SET_TOOLTIP_POSITION](position);
-      this[SET_TOOLTIP_TEXT](title);
-      this[SET_TOOLTIP_SHOW](true);
-    },
-    closeTooltip() {
-      this[SET_TOOLTIP_SHOW](false);
-    },
+    const { setItemRef } = setupBookshelfLayout({
+      id: props.id,
+      folderItem,
+    });
+
+    const { mousedownHandler, originGridContainer } = setupDragAndDrop({
+      openUrl,
+      onClickFolder,
+    });
+
+    return {
+      folderItem,
+      openTooltip,
+      closeTooltip,
+      openContextMenu,
+      setItemRef,
+      mousedownHandler,
+      originGridContainer,
+    };
+  },
+  data() {
+    return {
+      gridContainerPadding: `${GRID_CONTAINER_PADDING}px`,
+      itemHeight: `${ITEM_HEIGHT}px`,
+      itemWidth: `${ITEM_WIDTH}px`,
+    };
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, auto));
-  grid-auto-rows: 100px;
-  padding: 20px;
-  gap: 16px;
-  width: 100%;
-  height: 100%;
+.divider {
+  position: absolute;
+  border-left: 2px solid grey;
 }
 
-.btn {
-  width: 80px;
-  height: auto;
-  padding: 4px 0;
+.hide {
+  border: none;
 }
+
+.positionHolderEl-component {
+  opacity: 0.5;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, v-bind("itemWidth"));
+  grid-auto-rows: v-bind("itemHeight");
+  padding: v-bind("gridContainerPadding");
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+}
+.btn-wrapper {
+  display: flex;
+  justify-content: center;
+  background: none;
+  // border: 1px solid red;
+}
+.btn {
+  width: v-bind("itemWidth");
+  height: auto;
+  padding: 8px;
+  /* padding: 4px 0; */
+  background: none;
+}
+
 .btn:focus {
-  background-color: rgb(225, 225, 225);
+  background-color: rgba(225, 225, 225, 0.3);
+}
+
+.item {
+  width: v-bind("itemWidth");
 }
 
 .item-container {
@@ -198,5 +205,6 @@ export default defineComponent({
   letter-spacing: 0.5px;
   color: #36454f;
   text-transform: none;
+  white-space: normal;
 }
 </style>
