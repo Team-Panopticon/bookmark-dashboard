@@ -7,6 +7,8 @@
     :max-height="700"
     :max-width="700"
     z-index="9999"
+    :esc-to-close="true"
+    :click-to-close="false"
   >
     <v-card class="modal-inner" outlined title elevation="7">
       <v-card-header class="modal-banner bg-primary">
@@ -24,6 +26,7 @@
             required
             outlined="true"
             v-on:click.stop.self
+            v-on:keydown.enter.stop="update"
           ></v-text-field>
           <v-text-field
             v-show="isFolder"
@@ -31,6 +34,7 @@
             label="URL"
             required
             v-on:click.stop
+            v-on:keydown.enter.stop="update"
           >
           </v-text-field>
         </v-form>
@@ -107,5 +111,6 @@ export default defineComponent({
 <style scoped>
 .v-card-text {
   opacity: 0.9;
+  padding-top: 16px;
 }
 </style>
