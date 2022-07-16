@@ -161,7 +161,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   background: none;
-  border: 1px solid red;
+  // border: 1px solid red;
 }
 .btn {
   width: v-bind("itemWidth");

@@ -76,4 +76,7 @@ function setBookmarksEventHandlers() {
   width: 100%;
   height: 100%;
 }
+::v-deep .v-text-field input {
+  color: black;
+}
 </style>
