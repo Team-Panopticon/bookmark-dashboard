@@ -17,8 +17,10 @@ interface Props {
 
 const appendLayoutData = async (folderItem: Item): Promise<Item> => {
   const layoutData = await layoutDB.getLayout(folderItem.id);
+  console.log("==== layoutData", layoutData);
   folderItem.children?.forEach((item: Item) => {
     const { row, col } = layoutData[item.id] ?? {};
+    console.log("====== row col", row, col);
     item.row = row;
     item.col = col;
     item.type = item.children ? "FOLDER" : "FILE";
@@ -92,12 +94,16 @@ export const setupBookshelfLayout = (props: Props): SetupBookshelfLayout => {
 
     const parentId = originalItem.parentId as string;
 
-    // row column을 DB에 삽입
-    layoutDB.setItemLayoutById({ id, parentId, row, col });
-
-    // 저장된 초기 row, col 값을 folderItem에 반영
-    originalItem.row = row;
-    originalItem.col = col;
+    // row column이 Infinity일 경우 Auto로 셋팅, 아닐경우 DB에 삽입
+    if (row === -Infinity || col === -Infinity) {
+      originalItem.row = "auto";
+      originalItem.col = "auto";
+    } else {
+      layoutDB.setItemLayoutById({ id, parentId, row, col });
+      // 저장된 초기 row, col 값을 folderItem에 반영
+      originalItem.row = row;
+      originalItem.col = col;
+    }
   };
 
   return {
