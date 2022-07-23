@@ -17,10 +17,8 @@ interface Props {
 
 const appendLayoutData = async (folderItem: Item): Promise<Item> => {
   const layoutData = await layoutDB.getLayout(folderItem.id);
-  console.log("==== layoutData", layoutData);
   folderItem.children?.forEach((item: Item) => {
     const { row, col } = layoutData[item.id] ?? {};
-    console.log("====== row col", row, col);
     item.row = row;
     item.col = col;
     item.type = item.children ? "FOLDER" : "FILE";
@@ -66,7 +64,7 @@ export const setupBookshelfLayout = (props: Props): SetupBookshelfLayout => {
       return;
     }
 
-    const id = elItem.dataset.itemId as string;
+    const id = elItem.dataset.id as string;
     const itemLayout = await layoutDB.getItemLayoutById(id);
 
     if (itemLayout) {

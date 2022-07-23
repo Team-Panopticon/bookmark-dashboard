@@ -15,7 +15,6 @@
       :style="
         item.row && item.col ? { gridRow: item.row, gridColumn: item.col } : {}
       "
-      :data-item-id="item.id"
       :data-id="item.id"
       :data-type="item.type"
       :data-row="item.row"
