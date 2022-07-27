@@ -151,12 +151,28 @@ export const setupDragAndDrop = (props: Props): SetupDragAndDrop => {
       changingEl.style.left = `${e.pageX - offsetX}px`;
       changingEl.style.top = `${e.pageY - offsetY}px`;
 
+      /**
+       * client: 드래그하고 있는 요소의, 현재 화면 기준 position
+       * targetGridContainerEl.scroll: 스크롤로 이동된 거리
+       * base: 부모 Container의 좌상단 위치
+       */
       const calculatedRow =
-        Math.floor((e.clientY - baseY - GRID_CONTAINER_PADDING) / ITEM_HEIGHT) +
-        1;
+        Math.floor(
+          (e.clientY +
+            targetGridContainerEl.scrollTop -
+            baseY -
+            GRID_CONTAINER_PADDING) /
+            ITEM_HEIGHT
+        ) + 1;
       const calculatedCol =
-        Math.floor((e.clientX - baseX - GRID_CONTAINER_PADDING) / ITEM_WIDTH) +
-        1;
+        Math.floor(
+          (e.clientX +
+            targetGridContainerEl.scrollLeft -
+            baseX -
+            GRID_CONTAINER_PADDING) /
+            ITEM_WIDTH
+        ) + 1;
+
       const isCalculatedRowAndColValid = calculatedRow > 0 && calculatedCol > 0;
 
       holderRow = isCalculatedRowAndColValid ? calculatedRow : "auto";

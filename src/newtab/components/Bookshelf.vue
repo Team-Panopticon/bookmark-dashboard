@@ -15,12 +15,11 @@
       :style="
         item.row && item.col ? { gridRow: item.row, gridColumn: item.col } : {}
       "
-      :data-item-id="item.id"
       :data-id="item.id"
       :data-type="item.type"
       :data-row="item.row"
       :data-col="item.col"
-      :ref="setItemRef"
+      ref="itemRefs"
       @mousedown.left="mousedownHandler(item, $event)"
     >
       <v-btn
@@ -94,6 +93,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const folderItem = ref({} as Item);
+    const itemRefs = ref<HTMLDivElement[]>([]);
 
     const {
       openTooltip,
@@ -103,9 +103,10 @@ export default defineComponent({
       onClickFolder,
     } = setupBookshelfAction({ folderItem, context });
 
-    const { setItemRef } = setupBookshelfLayout({
+    setupBookshelfLayout({
       id: props.id,
       folderItem,
+      itemRefs,
     });
 
     const { mousedownHandler, originGridContainer } = setupDragAndDrop({
@@ -115,10 +116,10 @@ export default defineComponent({
 
     return {
       folderItem,
+      itemRefs,
       openTooltip,
       closeTooltip,
       openContextMenu,
-      setItemRef,
       mousedownHandler,
       originGridContainer,
     };
