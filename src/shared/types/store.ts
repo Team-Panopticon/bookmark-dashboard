@@ -1,6 +1,6 @@
 export interface Item extends chrome.bookmarks.BookmarkTreeNode {
-  row?: number;
-  col?: number;
+  row?: number | string;
+  col?: number | string;
   type?: string;
 }
 

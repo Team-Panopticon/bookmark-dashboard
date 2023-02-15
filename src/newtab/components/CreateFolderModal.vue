@@ -4,6 +4,8 @@
     classes="modal-container"
     content-class="modal-content"
     z-index="9999"
+    :esc-to-close="true"
+    :click-to-close="false"
   >
     <v-card class="modal-inner" outlined title elevation="7">
       <v-card-header class="modal-banner bg-primary">
@@ -21,6 +23,7 @@
             required
             outlined="true"
             v-on:click.stop.self
+            v-on:keydown.enter.stop="createFolder(folderName)"
           ></v-text-field>
         </v-form>
       </v-card-text>
@@ -92,5 +95,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 .v-card-text {
   opacity: 0.9;
+  padding-top: 16px;
 }
 </style>

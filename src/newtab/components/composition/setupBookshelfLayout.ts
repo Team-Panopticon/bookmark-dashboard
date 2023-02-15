@@ -2,20 +2,14 @@ import BookmarkApi from "@/newtab/utils/bookmarkApi";
 import { Item } from "@/shared/types/store";
 import { onMounted, computed, watch, Ref } from "vue";
 import { useStore } from "vuex";
-import {
-  GET_REFRESH_TARGET,
-  POP_REFRESH_TARGET,
-} from "../../store/modules/refreshTarget";
+import { GET_REFRESH_TIME } from "../../store/modules/refreshTarget";
 import { layoutDB } from "@/newtab/utils/layoutDB";
 import { GRID_CONTAINER_PADDING } from "@/newtab/utils/constant";
-
-interface SetupBookshelfLayout {
-  setItemRef: (elItem?: HTMLDivElement) => void;
-}
 
 interface Props {
   id: string;
   folderItem: Ref<Item>;
+  itemRefs: Ref<HTMLDivElement[]>;
 }
 
 const appendLayoutData = async (folderItem: Item): Promise<Item> => {
@@ -30,43 +24,41 @@ const appendLayoutData = async (folderItem: Item): Promise<Item> => {
   return folderItem;
 };
 
-export const setupBookshelfLayout = (props: Props): SetupBookshelfLayout => {
+export const setupBookshelfLayout = (props: Props): void => {
   const store = useStore();
-  const { id, folderItem } = props;
+  const { id, folderItem, itemRefs } = props;
 
   /**
    * Data
    */
-  const shouldRefreshRef = computed(() =>
-    store.getters[GET_REFRESH_TARGET](id)
+  const recentRefreshTimeRef = computed(() =>
+    store.getters[GET_REFRESH_TIME](id)
   );
 
   const refresh = async () => {
     const subTree = await BookmarkApi.getSubTree(id);
     folderItem.value = await appendLayoutData(subTree);
   };
+  let lastRefreshTime = new Date().getTime();
 
-  watch(shouldRefreshRef, (shouldRefresh) => {
-    if (shouldRefresh) {
+  watch(recentRefreshTimeRef, (recentRefreshTime) => {
+    if (recentRefreshTime !== lastRefreshTime) {
+      lastRefreshTime = recentRefreshTime;
       refresh();
-      store.commit(POP_REFRESH_TARGET, props.id);
     }
   });
 
   /**
    * LifeCycle Hook
    */
-  onMounted(() => {
-    refresh();
+  onMounted(async () => {
+    await refresh();
+    // row, col 없는 애들 계산 -> DB 저장
+    itemRefs.value.forEach(setRowCol);
   });
-
   // row, col이 DB에 없는 애들의 row, col을 계산해서 DB에 저장해줌 + 스타일 추가 (위치 고정)
-  const setItemRef = async (elItem?: HTMLDivElement) => {
-    if (!elItem) {
-      return;
-    }
-
-    const id = elItem.dataset.itemId as string;
+  const setRowCol = async (elItem: HTMLDivElement) => {
+    const id = elItem.dataset.id as string;
     const itemLayout = await layoutDB.getItemLayoutById(id);
 
     if (itemLayout) {
@@ -94,15 +86,15 @@ export const setupBookshelfLayout = (props: Props): SetupBookshelfLayout => {
 
     const parentId = originalItem.parentId as string;
 
-    // row column을 DB에 삽입
-    layoutDB.setItemLayoutById({ id, parentId, row, col });
-
-    // 저장된 초기 row, col 값을 folderItem에 반영
-    originalItem.row = row;
-    originalItem.col = col;
-  };
-
-  return {
-    setItemRef,
+    // row column이 Infinity일 경우 Auto로 셋팅, 아닐경우 DB에 삽입
+    if (row === -Infinity || col === -Infinity) {
+      originalItem.row = "auto";
+      originalItem.col = "auto";
+    } else {
+      layoutDB.setItemLayoutById({ id, parentId, row, col });
+      // 저장된 초기 row, col 값을 folderItem에 반영
+      originalItem.row = row;
+      originalItem.col = col;
+    }
   };
 };

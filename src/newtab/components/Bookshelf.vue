@@ -6,20 +6,20 @@
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
     "
     :data-parent-id="id"
+    :data-timestamp="Date.now()"
   >
     <div
       v-for="item in folderItem.children"
-      v-bind:key="item.id"
+      v-bind:key="item.id + item.row + item.col"
       class="btn-wrapper"
       :style="
         item.row && item.col ? { gridRow: item.row, gridColumn: item.col } : {}
       "
-      :data-item-id="item.id"
       :data-id="item.id"
       :data-type="item.type"
       :data-row="item.row"
       :data-col="item.col"
-      :ref="setItemRef"
+      ref="itemRefs"
       @mousedown.left="mousedownHandler(item, $event)"
     >
       <v-btn
@@ -93,6 +93,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const folderItem = ref({} as Item);
+    const itemRefs = ref<HTMLDivElement[]>([]);
 
     const {
       openTooltip,
@@ -102,9 +103,10 @@ export default defineComponent({
       onClickFolder,
     } = setupBookshelfAction({ folderItem, context });
 
-    const { setItemRef } = setupBookshelfLayout({
+    setupBookshelfLayout({
       id: props.id,
       folderItem,
+      itemRefs,
     });
 
     const { mousedownHandler, originGridContainer } = setupDragAndDrop({
@@ -114,10 +116,10 @@ export default defineComponent({
 
     return {
       folderItem,
+      itemRefs,
       openTooltip,
       closeTooltip,
       openContextMenu,
-      setItemRef,
       mousedownHandler,
       originGridContainer,
     };
@@ -160,7 +162,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   background: none;
-  border: 1px solid red;
+  // border: 1px solid red;
 }
 .btn {
   width: v-bind("itemWidth");
