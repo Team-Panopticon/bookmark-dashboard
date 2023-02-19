@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" :class="{ darkMode }">
     <Bookshelf id="1"></Bookshelf>
     <CreateFolderModal></CreateFolderModal>
     <BookshelfModalContainer></BookshelfModalContainer>
@@ -21,6 +21,8 @@ import { Item } from "@/shared/types/store";
 import Tooltip from "../components/Tooltip.vue";
 import { UPDATE_REFRESH_TIMES } from "../store/modules/refreshTarget";
 
+import { GET_CONFIG_MODE } from "../store/modules/config";
+import { mapGetters } from "vuex";
 export default defineComponent({
   components: {
     Bookshelf,
@@ -29,6 +31,17 @@ export default defineComponent({
     ContextMenuContainer,
     UpdateModal,
     Tooltip,
+  },
+  computed: {
+    ...mapGetters([GET_CONFIG_MODE]),
+    darkMode: {
+      get(): boolean {
+        return this[GET_CONFIG_MODE] === "DARK";
+      },
+      set() {
+        return;
+      },
+    },
   },
   mounted() {
     setBookmarksEventHandlers();
@@ -75,6 +88,10 @@ function setBookmarksEventHandlers() {
 .app-container {
   width: 100%;
   height: 100%;
+}
+.darkMode {
+  background: #202124;
+  color: white;
 }
 ::v-deep .v-text-field input {
   color: black;
