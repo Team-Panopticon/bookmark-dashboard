@@ -68,7 +68,7 @@ import Favicon from "./Favicon.vue";
 import { setupBookshelfAction } from "./composition/setupBookshelfAction";
 import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
 import { setupDragAndDrop } from "./composition/setupDragAndDrop";
-import { FolderItem, Item } from "@/shared/types/store";
+import { FolderItem, Item, MODE } from "@/shared/types/store";
 import {
   GRID_CONTAINER_PADDING,
   ITEM_HEIGHT,
@@ -139,7 +139,7 @@ export default defineComponent({
     ...mapGetters([GET_CONFIG_MODE]),
     darkMode: {
       get(): boolean {
-        return this[GET_CONFIG_MODE] === "DARK";
+        return this[GET_CONFIG_MODE] === MODE.DARK;
       },
       set() {
         return;
