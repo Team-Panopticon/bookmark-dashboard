@@ -228,6 +228,9 @@ export default defineComponent({
   /* color: # */
 }
 .darkMode {
+  background: #202124;
+  color: white;
+
   .item-title {
     color: white;
   }
