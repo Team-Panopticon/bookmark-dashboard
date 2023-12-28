@@ -31,8 +31,8 @@
   </v-card>
 </template>
 <script lang="ts">
-import { MODE } from "@/shared/types/store";
 import { defineComponent } from "vue";
+import { notifyDarkMode } from "./utils/notify-dark-mode";
 
 export default defineComponent({
   name: "Popup",
@@ -44,15 +44,16 @@ export default defineComponent({
   computed: {
     darkMode: {
       get(): boolean {
-        return localStorage.getItem("mode") === MODE.DARK;
+        return localStorage.getItem("darkMode") === "true" || false;
       },
       set(isDarkMode: boolean) {
-        return localStorage.setItem(
-          "mode",
-          isDarkMode ? MODE.DARK : MODE.LIGHT
-        );
+        notifyDarkMode(isDarkMode);
+        return localStorage.setItem("darkMode", String(isDarkMode));
       },
     },
+  },
+  mounted() {
+    notifyDarkMode(this.darkMode);
   },
 });
 </script>
