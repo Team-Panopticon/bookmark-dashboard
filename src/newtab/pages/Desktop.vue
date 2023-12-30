@@ -30,6 +30,7 @@ export default defineComponent({
     UpdateModal,
     Tooltip,
   },
+
   mounted() {
     setBookmarksEventHandlers();
   },

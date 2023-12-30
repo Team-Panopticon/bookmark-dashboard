@@ -6,6 +6,7 @@ import createBookshelfModal from "./modules/bookshelfModal";
 import contextMenu from "./modules/contextMenu";
 import tooltip from "./modules/tooltip";
 import refreshTarget from "./modules/refreshTarget";
+import config from "./modules/config";
 
 export const GET_BOOKMARK_TREE_CHILDREN = "getBookmarkTree";
 export const GET_BOOKMARK_TREE_ROOT = "getBookmarkTreeRoot";
@@ -22,6 +23,7 @@ const store = createStore<State>({
     updateModal,
     tooltip,
     refreshTarget,
+    config,
   },
 });
 

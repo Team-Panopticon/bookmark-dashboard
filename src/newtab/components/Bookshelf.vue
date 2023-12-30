@@ -1,6 +1,7 @@
 <template>
   <div
     class="grid-container"
+    :class="{ darkMode }"
     ref="originGridContainer"
     @contextmenu.prevent.stop="
       openContextMenu($event, { item: folderItem, type: 'BACKGROUND' })
@@ -67,12 +68,14 @@ import Favicon from "./Favicon.vue";
 import { setupBookshelfAction } from "./composition/setupBookshelfAction";
 import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
 import { setupDragAndDrop } from "./composition/setupDragAndDrop";
-import { FolderItem, Item } from "@/shared/types/store";
+import { FolderItem, Item, MODE } from "@/shared/types/store";
 import {
   GRID_CONTAINER_PADDING,
   ITEM_HEIGHT,
   ITEM_WIDTH,
 } from "../utils/constant";
+import { mapGetters } from "vuex";
+import { GET_CONFIG_MODE } from "../store/modules/config";
 
 /**
  * @TODO
@@ -124,12 +127,24 @@ export default defineComponent({
       originGridContainer,
     };
   },
+
   data() {
     return {
       gridContainerPadding: `${GRID_CONTAINER_PADDING}px`,
       itemHeight: `${ITEM_HEIGHT}px`,
       itemWidth: `${ITEM_WIDTH}px`,
     };
+  },
+  computed: {
+    ...mapGetters([GET_CONFIG_MODE]),
+    darkMode: {
+      get(): boolean {
+        return this[GET_CONFIG_MODE] === MODE.DARK;
+      },
+      set() {
+        return;
+      },
+    },
   },
 });
 </script>
@@ -168,8 +183,9 @@ export default defineComponent({
   width: v-bind("itemWidth");
   height: auto;
   padding: 8px;
-  /* padding: 4px 0; */
   background: none;
+  box-sizing: border-box;
+  border: 1px solid transparent;
 }
 
 .btn:focus {
@@ -190,7 +206,7 @@ export default defineComponent({
 
 .item-icon {
   font-size: 50px;
-  color: #36454f;
+  color: #eddd60;
 }
 
 .item-title {
@@ -203,9 +219,29 @@ export default defineComponent({
   line-height: 1.2em;
   height: 2.4em;
   word-break: break-all;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.2px;
+  font-size: 11px;
   color: #36454f;
   text-transform: none;
   white-space: normal;
+  word-break: break-word;
+  /* color: # */
+}
+.darkMode {
+  background: #202124;
+  color: white;
+
+  .item-title {
+    color: white;
+  }
+
+  .btn:focus {
+    /* background-color: rgba(232, 234, 237, 0.1); */
+    border: 1px solid #5f6368;
+  }
+  .btn:hover {
+    /* background-color: rgba(232, 234, 237, 0.1); */
+    border: 1px solid #5f6368;
+  }
 }
 </style>
