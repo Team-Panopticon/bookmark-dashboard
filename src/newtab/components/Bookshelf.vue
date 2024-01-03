@@ -68,14 +68,13 @@ import Favicon from "./Favicon.vue";
 import { setupBookshelfAction } from "./composition/setupBookshelfAction";
 import { setupBookshelfLayout } from "./composition/setupBookshelfLayout";
 import { setupDragAndDrop } from "./composition/setupDragAndDrop";
-import { FolderItem, Item, MODE } from "@/shared/types/store";
+import { FolderItem, Item } from "@/shared/types/store";
+import { isDarkModeEvent } from "@/shared/types/dark-mode-event";
 import {
   GRID_CONTAINER_PADDING,
   ITEM_HEIGHT,
   ITEM_WIDTH,
 } from "../utils/constant";
-import { mapGetters } from "vuex";
-import { GET_CONFIG_MODE } from "../store/modules/config";
 
 /**
  * @TODO
@@ -129,21 +128,30 @@ export default defineComponent({
   },
 
   data() {
+    const darkMode = localStorage.getItem("darkMode") === "true" || false;
     return {
       gridContainerPadding: `${GRID_CONTAINER_PADDING}px`,
       itemHeight: `${ITEM_HEIGHT}px`,
       itemWidth: `${ITEM_WIDTH}px`,
+      darkMode,
     };
   },
-  computed: {
-    ...mapGetters([GET_CONFIG_MODE]),
-    darkMode: {
-      get(): boolean {
-        return this[GET_CONFIG_MODE] === MODE.DARK;
-      },
-      set() {
+
+  mounted() {
+    chrome.runtime.onMessage.addListener(this.onReceiveChromeMessage);
+  },
+  beforeUnmount() {
+    chrome.runtime.onMessage.removeListener(this.onReceiveChromeMessage);
+  },
+  methods: {
+    onReceiveChromeMessage(request: unknown, sender: any) {
+      if (sender.id !== chrome.runtime.id) {
         return;
-      },
+      }
+
+      if (isDarkModeEvent(request)) {
+        this.darkMode = request.darkMode;
+      }
     },
   },
 });

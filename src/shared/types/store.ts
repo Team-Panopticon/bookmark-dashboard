@@ -14,8 +14,3 @@ export interface FolderItem {
   title: string;
   id: string;
 }
-
-export enum MODE {
-  DARK = "DARK",
-  LIGHT = "LIGHT",
-}
