@@ -12,6 +12,10 @@
         >icon by surang - Flaticon</a
       >
     </v-card-text>
+    <v-card-text
+      >DARK_MODE
+      <input type="checkbox" v-model="darkMode" />
+    </v-card-text>
     <v-card-actions>
       <v-btn
         href="https://github.com/Team-Panopticon/bookmark-dashboard"
@@ -26,8 +30,9 @@
     </v-card-actions>
   </v-card>
 </template>
-<script>
+<script lang="ts">
 import { defineComponent } from "vue";
+import { notifyDarkMode } from "./utils/notify-dark-mode";
 
 export default defineComponent({
   name: "Popup",
@@ -35,6 +40,20 @@ export default defineComponent({
     return {
       version: "v" + process.env.VUE_APP_VERSION,
     };
+  },
+  computed: {
+    darkMode: {
+      get(): boolean {
+        return localStorage.getItem("darkMode") === "true" || false;
+      },
+      set(isDarkMode: boolean) {
+        notifyDarkMode(isDarkMode);
+        return localStorage.setItem("darkMode", String(isDarkMode));
+      },
+    },
+  },
+  mounted() {
+    notifyDarkMode(this.darkMode);
   },
 });
 </script>
